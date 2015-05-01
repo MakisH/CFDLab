@@ -10,6 +10,10 @@ calculate_dt (double Re,
 	      double dy, int imax, int jmax, double **U, double **V)
 {
 
+
+   /* if tau negative we don't do anything in this function, therefore the dt from file is used */
+  if (tau >= 0){
+
   // Let's find the max abs values of U and V.
   double maxU = 0, maxV = 0;	// we can afford setting the init values to 0, since we deal with abs values.
 
@@ -28,7 +32,8 @@ calculate_dt (double Re,
 
   // Finally, the calc of dt.
   *dt = tau * min;
-  // BE CAREFUL! IF TAU<0, THEN dt FROM THE FILE (VIA read_parameters(..)) SHOULD BE USED. THIS HAS TO BE IMPLEMENTED IN MAIN FILE.
+  }
+
 }
 
 void
@@ -100,8 +105,6 @@ calculate_fg (double Re,
 	  v3 = V[i - 1][j];
 	  v4 = V[i][j - 1];
 	  v6 = V[i + 1][j - 1];
-
-
 
 	  v2y =
 	    1 / dy * (pow (1 / 2 * (v + v2), 2) - pow (1 / 2 * (v4 + v), 2)) +

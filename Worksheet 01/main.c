@@ -160,6 +160,23 @@ int main(int argn, char** args){
   free_matrix( F, 0, *imax+1, 0, *jmax+1);
   free_matrix( G, 0, *imax+1, 0, *jmax+1);
 
+  // Free other pointers
+  free(xlength);
+  free(ylength);
+  free(imax);
+  free(jmax);
+  free(dx);
+  free(dy);
+  free(t_end);
+  free(dt);
+  free(tau);
+  free(dt_value);
+  free(itermax);
+  free(eps);
+  free(omg);
+  free(alpha);
+  free(res);
+
   return 0;
 
 }

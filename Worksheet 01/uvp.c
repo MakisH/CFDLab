@@ -27,13 +27,7 @@ void calculate_dt (double Re,
   // Finding the min of the prescribed three values.
   double min = fmin (dx / maxU, dy / maxV);
   min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
-<<<<<<< HEAD
-  //printf("%f   %f   %f   %f \n", dx, maxU, dy, maxV);
-  //printf("%f", 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
-  //printf("%f   %f \n",tau, min);
-=======
 
->>>>>>> 0ec31d5f41842f70bf380d683494f127da1b0456
   // Finally, the calc of dt.
   *dt = tau * min;
  }
@@ -73,16 +67,16 @@ void calculate_fg (double Re,
 	  v6 = V[i + 1][j - 1];
 
 	  u2x =
-	    1 / dx * (pow (1.0 / 2 * (u + u1), 2) - pow (1.0 / 2 * (u3 + u), 2)) +
-	    alpha / (2 * dx) * (abs (u + u1) * (u - u1) -
-				abs (u3 + u) * (u3 - u));
+	    1 / dx * (pow ( (u + u1)/2, 2) - pow ((u3 + u)/2, 2)) +
+	    alpha / (2 * dx) * (fabs (u + u1) * (u - u1) -
+				fabs (u3 + u) * (u3 - u)); // correct
 	  uv_y =
 	    1 / (2 * dy) * ((v + v1) * (u + u2) - (v4 + v6) * (u4 + u)) +
-	    alpha / (2 * dy) * (abs (v + v1) * (u - u2) -
-				abs (v4 + v6) * (u4 - u));
+	    alpha / (2 * dy) * (fabs (v + v1) * (u - u2) -
+				fabs (v4 + v6) * (u4 - u)); // correct
 
-	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3);
-	  uyy = 1 / (dy * dy) * (u2 - 2 * u + u4);
+	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3); //correct
+	  uyy = 1 / (dy * dy) * (u2 - 2 * u + u4); // correct
 
 	  F[i][j] = u + dt * (1.0 / Re * (uxx + uyy) - u2x - uv_y + GX); // calculation of F
 	}
@@ -110,12 +104,12 @@ void calculate_fg (double Re,
 
 	  v2y =
 	    1 / dy * (pow (1.0 / 2 * (v + v2), 2) - pow (1.0 / 2 * (v4 + v), 2)) +
-	    alpha / (2 * dy) * (abs (v + v2) * (v - v2) -
-				abs (v4 + v) * (v4 - v));
+	    alpha / (2 * dy) * (fabs (v + v2) * (v - v2) -
+				fabs (v4 + v) * (v4 - v));
 	  uv_x =
 	    1 / (2 * dx) * ((u + u2) * (v + v1) - (u3 + u5) * (v3 + v)) +
-	    alpha / (2 * dx) * (abs (u + u2) * (v - v1) -
-				abs (u3 + u5) * (v3 - v));
+	    alpha / (2 * dx) * (fabs (u + u2) * (v - v1) -
+				fabs (u3 + u5) * (v3 - v));
 
 	  vxx = 1 / (dx * dx) * (v1 - 2 * v + v3);
 	  vyy = 1 / (dy * dy) * (v2 - 2 * v + v4);

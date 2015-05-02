@@ -2,14 +2,12 @@
 #include "helper.h"
 #include <math.h>
 
-void
-calculate_dt (double Re,
+void calculate_dt (double Re,
 	      double tau,
 	      double *dt,
 	      double dx,
 	      double dy, int imax, int jmax, double **U, double **V)
 {
-
 
    /* if tau negative we don't do anything in this function, therefore the dt from file is used */
   if (tau >= 0){
@@ -36,8 +34,8 @@ calculate_dt (double Re,
 
 }
 
-void
-calculate_fg (double Re,
+
+void calculate_fg (double Re,
 	      double GX,
 	      double GY,
 	      double alpha,
@@ -137,6 +135,43 @@ calculate_fg (double Re,
       F[imax][j] = U[imax][j];
     }
 
+}
 
+
+void calculate_uv(
+  double dt,
+  double dx,
+  double dy,
+  int imax,
+  int jmax,
+  double **U,
+  double **V,
+  double **F,
+  double **G,
+  double **P
+)
+{
+
+  // Pre-calculate the -dt/dx and -dt/dy factors
+  double _dt_dx = - dt / dx;
+  double _dt_dy = - dt / dy; 
+
+  // Update the horizontal velocities (explicit Euler method)
+  for (int i = 1; i < imax; ++i)
+  {
+    for (int j = 1; j < jmax + 1; ++j)
+    {
+      U[i][j] = F[i][j] + _dt_dx * ( P[i+1][j] - P[i][j] );
+    }
+  }
+
+  // Update the vertival velocities (explicit Euler method)
+  for (int i = 1; i < imax + 1; ++i)
+  {
+    for (int j = 1; j < jmax; ++j)
+    {
+      V[i][j] = G[i][j] + _dt_dy * ( P[i][j+1] - P[i][j] );
+    }
+  }
 
 }

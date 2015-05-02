@@ -109,9 +109,8 @@ int main(int argn, char** args){
     // Calculate dt if read dt is not negative
     // TODO: move the condition to the main (get rid of a function call)
 
-    if (t > 0) {    
-      calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
-    }    
+    calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
+
     //printf("dt=%f \n",*dt);
     // Set the boundary values
     boundaryvalues(*imax, *jmax, U, V);

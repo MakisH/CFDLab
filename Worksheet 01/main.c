@@ -105,10 +105,9 @@ int main(int argn, char** args){
   // Time loop
   while ( t < *t_end )
   {
-    // Calculate dt if read dt is not negative
+    // Calculate dt if read tau is not negative
     // TODO: move the condition to the main (get rid of a function call)
-
-    calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
+    if (*tau > 0) calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
 
     // Set the boundary values
     boundaryvalues(*imax, *jmax, U, V);

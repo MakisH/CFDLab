@@ -151,17 +151,16 @@ void calculate_rs(
 	double fracdydt = 1 /  (dy * dt);
 	double *RSi;
 	double *Fi;
-	double *Fiminus1p;
+	double *Fiminus1;
 	double *Gi;
     // calculate rs for the fluid cells
     for(unsigned int i = 1; i <= imax + 1; ++i){
-    	iminus1 = i - 1;
     	// could pull R[i], G[i] and F[i] calculation here
  	RSi = RS[i];
  	Fi = F[i];
  	Fiminus1 = F[i - 1];
  	Gi = G[i];
-        for(unsigned int j = 1; j= < jmax + 1; ++j){
+        for(unsigned int j = 1; j <= jmax + 1; ++j){
 		// calculate only interior cells, but use the boundary
 		RSi[j] = (Fi[j] - Fiminus1[j]) * fracdxdt + (Gi[j] - Gi[j - 1]) * fracdydt;
         }

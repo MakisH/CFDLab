@@ -105,7 +105,7 @@ int main(int argn, char** args){
   // Time loop
   while ( t < *t_end )
   {
-    printf("entered time loop with t=%f\n",t);
+    //printf("entered time loop with t=%f\n",t);
     // Calculate dt if read dt is not negative
     // TODO: move the condition to the main (get rid of a function call)
 
@@ -133,7 +133,10 @@ int main(int argn, char** args){
     // Update the velocities
     calculate_uv(*dt, *dx, *dy, *imax, *jmax, U, V, F, G, P);
 
-    // TODO: output of u,v,p for visualization (if necessary)
+    // Output of u, v, p for visualization
+    if (n%100==0)
+    write_vtkFile(problem, n, *xlength, *ylength, *imax, *jmax, *dx, *dy, U, V, P);
+
 //    for (int i=0; i<*imax+1; ++i) {
 //      for (int j=0; j<*jmax+1; ++j) {
 //        printf("%f ",P[i][j]);
@@ -147,9 +150,6 @@ int main(int argn, char** args){
 
     //if (n == 2) break;
   }
-
-  // Output of u, v, p for visualization
-  write_vtkFile(problem, *t_end, *xlength, *ylength, *imax, *jmax, *dx, *dy, U, V, P);
   
   // Free arrays
   free_matrix( U, 0, *imax+1, 0, *jmax+1);

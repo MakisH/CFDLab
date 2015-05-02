@@ -122,6 +122,8 @@ int main(int argn, char** args){
     calculate_rs(*dt, *dx, *dy, *imax, *jmax, F, G, RS);
 
     // SOR loop
+    it = 0; // reset the number of sor iterations
+    *res = 100 * *eps; // just larger than eps
     while ( it < *itermax && *res > *eps ) 
     {
       //printf("entered SOR loop with it=%d and re=%f\n",it,*res);

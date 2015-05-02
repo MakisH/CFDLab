@@ -145,23 +145,31 @@ void calculate_rs(
   double **G,
   double **RS
 ){
-	double fracdxdt = 1 / (dx * dt);
-	double fracdydt = 1 /  (dy * dt);
-	double *RSi;
-	double *Fi;
-	double *Fiminus1;
-	double *Gi;
+	double dx_dt = 1 / (dx * dt);
+	double dy_dt = 1 /  (dy * dt);
+	//double *RSi;
+	//double *Fi;
+	//double *Fiminus1;
+//	double *Gi;
     // calculate rs for the fluid cells
-    for(unsigned int i = 1; i <= imax; ++i){
+  //  for(unsigned int i = 1; i <= imax; ++i){
     	// could pull R[i], G[i] and F[i] calculation here
- 	RSi = RS[i];
- 	Fi = F[i];
- 	Fiminus1 = F[i - 1];
- 	Gi = G[i];
-        for(unsigned int j = 1; j <= jmax; ++j){
-		// calculate only interior cells, but use the boundary
-		RSi[j] = (Fi[j] - Fiminus1[j]) * fracdxdt + (Gi[j] - Gi[j - 1]) * fracdydt;
-        }
+ //	RSi = RS[i];
+ //	Fi = F[i];
+ //	Fiminus1 = F[i - 1];
+ //	Gi = G[i];
+//        for(unsigned int j = 1; j <= jmax; ++j){
+//		// calculate only interior cells, but use the boundary
+//		RSi[j] = (Fi[j] - Fiminus1[j]) * dx_dt + (Gi[j] - Gi[j - 1]) * dy_dt;
+//        }
+//    }
+	
+    for(unsigned int i = 1; i <= imax; ++i)
+    {
+      for(unsigned int j = 1; j <= jmax; ++j)
+      {
+	RS[i][j] = (F[i][j] - F[i-1][j]) * dx_dt + (G[i][j] - G[i][j-1]) * dy_dt;
+      }
     }
 }
 
@@ -186,14 +194,14 @@ void calculate_uv(
   // Update the horizontal velocities (explicit Euler method)
   for (int i = 1; i < imax; ++i)
   {
-    for (int j = 1; j < jmax + 1; ++j)
+    for (int j = 1; j <= jmax; ++j)
     {
       U[i][j] = F[i][j] + _dt_dx * ( P[i+1][j] - P[i][j] );
     }
   }
 
   // Update the vertival velocities (explicit Euler method)
-  for (int i = 1; i < imax + 1; ++i)
+  for (int i = 1; i <= imax; ++i)
   {
     for (int j = 1; j < jmax; ++j)
     {

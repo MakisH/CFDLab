@@ -27,9 +27,7 @@ void calculate_dt (double Re,
   // Finding the min of the prescribed three values.
   double min = fmin (dx / maxU, dy / maxV);
   min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
-  printf("%f   %f   %f   %f \n", dx, maxU, dy, maxV);
-  printf("%f", 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
-  printf("%f   %f \n",tau, min);
+
   // Finally, the calc of dt.
   *dt = tau * min;
  }
@@ -69,7 +67,7 @@ void calculate_fg (double Re,
 	  v6 = V[i + 1][j - 1];
 
 	  u2x =
-	    1 / dx * (pow (1 / 2 * (u + u1), 2) - pow (1 / 2 * (u3 + u), 2)) +
+	    1 / dx * (pow (1.0 / 2 * (u + u1), 2) - pow (1.0 / 2 * (u3 + u), 2)) +
 	    alpha / (2 * dx) * (abs (u + u1) * (u - u1) -
 				abs (u3 + u) * (u3 - u));
 	  uv_y =
@@ -80,7 +78,7 @@ void calculate_fg (double Re,
 	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3);
 	  uyy = 1 / (dy * dy) * (u2 - 2 * u + u4);
 
-	  F[i][j] = u + dt * (1 / Re * (uxx + uyy) - u2x - uv_y + GX); // calculation of F
+	  F[i][j] = u + dt * (1.0 / Re * (uxx + uyy) - u2x - uv_y + GX); // calculation of F
 	}
     }
 
@@ -105,7 +103,7 @@ void calculate_fg (double Re,
 	  v6 = V[i + 1][j - 1];
 
 	  v2y =
-	    1 / dy * (pow (1 / 2 * (v + v2), 2) - pow (1 / 2 * (v4 + v), 2)) +
+	    1 / dy * (pow (1.0 / 2 * (v + v2), 2) - pow (1.0 / 2 * (v4 + v), 2)) +
 	    alpha / (2 * dy) * (abs (v + v2) * (v - v2) -
 				abs (v4 + v) * (v4 - v));
 	  uv_x =

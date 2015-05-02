@@ -39,7 +39,103 @@
  */
 int main(int argn, char** args){
 
+  // Input file
+  // TODO: take the filename as an argument
+  const char filename[100] = "cavity100.dat";
 
+  // Name of the problem (to be used in the output filename)
+  // TODO: better implementation?
+  const char problem[100] = "cavity100";
 
-  return -1;
+  // Parameters declaration
+  // Geometry data
+  double  xlength, ylength;
+  int     imax, jmax;
+  double  dx, dy;
+
+  // Time-stepping data
+  double  t_end;
+  double  dt;
+  double  tau;
+  double  dt_value;
+  
+  // Pressure iteration data
+  int     itermax;
+  double  eps;
+  double  omg;
+  double  alpha;
+
+  // Problem-dependent quantities
+  double  Re;
+  double  GX, GY;
+  double  UI, VI, PI;
+
+  // Read the input file
+  read_paramters( filename, Re, UI, VI, PI, GX, GY, t_end, 
+                  xlength, ylength, dt, dx, dy, imax, jmax, 
+                  alpha, omg, tau, itermax, eps, dt_value);
+
+  // Setup arrays
+  double **U  = matrix(0, imax+1, 0, jmax+1);
+  double **V  = matrix(0, imax+1, 0, jmax+1);
+  double **P  = matrix(0, imax+1, 0, jmax+1);
+  double **RS = matrix(0, imax+1, 0, jmax+1);
+  double **F  = matrix(0, imax+1, 0, jmax+1);
+  double **G  = matrix(0, imax+1, 0, jmax+1);
+  
+  // Some help variables
+  double  t = 0.0;
+  int     n = 0;
+  int     it = 0;
+  double  res = 100*eps; // just larger than eps
+  
+  // Assign initial values
+  init_uvp( UI, VI, PI, imax, jmax, U, V, P );
+  
+  // Time loop
+  while ( t < t_end )
+  {
+    // Calculate dt if read dt is not negative
+    // TODO: move the condition to the main (get rid of a function call)
+    calculate_dt(Re, tau, dt, dx, dy, imax, jmax, U, V);
+  
+    // Set the boundary values
+    boundaryvalues(imax, jmax, U, V);
+    
+    // Calculate F and G terms of the pressure Poisson equation
+    calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V, F, G);
+
+    // Calculate the right-hand side of the pressure Poisson equation
+    calculate_rs(dt, dx, dy, imax, jmax, F, G, RS);
+
+    // SOR loop
+    while ( it < itmax && res > eps ) 
+    {
+      sor(omg, dx, dy, imax, jmax, P, RS, res); // one SOR iteration
+      it++;
+    }
+
+    // Update the velocities
+    calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P);
+
+    // TODO: output of u,v,p for visualization (if necessary)
+
+    // Update loop state
+    t = t + dt;
+    n = n + 1;
+  }
+
+  // Output of u, v, p for visualization
+  write_vtkFile(problem, t_end, xlength, ylength, imax, jmax, dx, dy, U, V, P);
+  
+  // Free arrays
+  free_matrix( U, 0, imax+1, 0, jmax+1);
+  free_matrix( V, 0, imax+1, 0, jmax+1);
+  free_matrix( P, 0, imax+1, 0, jmax+1);
+  free_matrix( RS, 0, imax+1, 0, jmax+1);
+  free_matrix( F, 0, imax+1, 0, jmax+1);
+  free_matrix( G, 0, imax+1, 0, jmax+1);
+
+  return 0;
+
 }

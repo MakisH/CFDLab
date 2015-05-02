@@ -26,7 +26,7 @@ void calculate_dt (double Re,
 
   // Finding the min of the prescribed three values.
   double min = fmin (dx / maxU, dy / maxV);
-  min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
+  min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dx) + 1 / (dy * dy), -1));
 
   // Finally, the calc of dt.
   *dt = tau * min;

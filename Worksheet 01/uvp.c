@@ -19,21 +19,21 @@ void calculate_dt (double Re,
     {
       for (int j = 1; j <= jmax; ++j)
 	{
-	  maxU = fmax (maxU, abs (U[i][j]));
-	  maxV = fmax (maxV, abs (V[i][j]));
+	  maxU = fmax (maxU, fabs (U[i][j]));
+	  maxV = fmax (maxV, fabs (V[i][j]));
 	}
     }
 
   // Finding the min of the prescribed three values.
   double min = fmin (dx / maxU, dy / maxV);
-  min = fmin (min, 1 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
-
+  min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
+  printf("%f   %f   %f   %f \n", dx, maxU, dy, maxV);
+  printf("%f", 1.0 / 2 * Re * pow (1 / (dx * dy) + 1 / (dy * dy), -1));
+  printf("%f   %f \n",tau, min);
   // Finally, the calc of dt.
   *dt = tau * min;
-  }
-
+ }
 }
-
 
 void calculate_fg (double Re,
 	      double GX,

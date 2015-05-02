@@ -31,7 +31,7 @@ void boundaryvalues(
   for (int i=1; i<imax+1; ++i)
     {
       U[i][0]       = - U[i][1];
-      U[i][jmax+1]  = - U[i][jmax];
+      U[i][jmax+1]  = 2.0 - U[i][jmax];
     }
 
 }

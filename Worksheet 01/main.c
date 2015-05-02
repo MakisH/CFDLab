@@ -105,10 +105,14 @@ int main(int argn, char** args){
   // Time loop
   while ( t < *t_end )
   {
+    printf("entered time loop with t=%f\n",t);
     // Calculate dt if read dt is not negative
     // TODO: move the condition to the main (get rid of a function call)
-    calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
-  
+
+    if (t > 0) {    
+      calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
+    }    
+    //printf("dt=%f \n",*dt);
     // Set the boundary values
     boundaryvalues(*imax, *jmax, U, V);
     
@@ -121,6 +125,7 @@ int main(int argn, char** args){
     // SOR loop
     while ( it < *itermax && *res > *eps ) 
     {
+      //printf("entered SOR loop with it=%d and re=%f\n",it,*res);
       sor(*omg, *dx, *dy, *imax, *jmax, P, RS, res); // one SOR iteration
       it++;
     }
@@ -129,10 +134,18 @@ int main(int argn, char** args){
     calculate_uv(*dt, *dx, *dy, *imax, *jmax, U, V, F, G, P);
 
     // TODO: output of u,v,p for visualization (if necessary)
-
+//    for (int i=0; i<*imax+1; ++i) {
+//      for (int j=0; j<*jmax+1; ++j) {
+//        printf("%f ",P[i][j]);
+//      }
+//      printf("\n");
+//    }
+//        printf("\n");
     // Update loop state
     t = t + *dt;
     n = n + 1;
+
+    //if (n == 2) break;
   }
 
   // Output of u, v, p for visualization

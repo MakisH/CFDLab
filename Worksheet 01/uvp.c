@@ -69,14 +69,14 @@ void calculate_fg (double Re,
 	  u2x =
 	    1 / dx * (pow ( (u + u1)/2, 2) - pow ((u3 + u)/2, 2)) +
 	    alpha / (2 * dx) * (fabs (u + u1) * (u - u1) -
-				fabs (u3 + u) * (u3 - u)); // correct
+				fabs (u3 + u) * (u3 - u));
 	  uv_y =
 	    1 / (2 * dy) * ((v + v1) * (u + u2) - (v4 + v6) * (u4 + u)) +
 	    alpha / (2 * dy) * (fabs (v + v1) * (u - u2) -
-				fabs (v4 + v6) * (u4 - u)); // correct
+				fabs (v4 + v6) * (u4 - u));
 
-	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3); //correct
-	  uyy = 1 / (dy * dy) * (u2 - 2 * u + u4); // correct
+	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3); 
+	  uyy = 1 / (dy * dy) * (u2 - 2 * u + u4); 
 
 	  F[i][j] = u + dt * (1.0 / Re * (uxx + uyy) - u2x - uv_y + GX); // calculation of F
 	}
@@ -145,24 +145,8 @@ void calculate_rs(
   double **G,
   double **RS
 ){
-	double dx_dt = 1 / (dx * dt);
-	double dy_dt = 1 /  (dy * dt);
-	//double *RSi;
-	//double *Fi;
-	//double *Fiminus1;
-//	double *Gi;
-    // calculate rs for the fluid cells
-  //  for(unsigned int i = 1; i <= imax; ++i){
-    	// could pull R[i], G[i] and F[i] calculation here
- //	RSi = RS[i];
- //	Fi = F[i];
- //	Fiminus1 = F[i - 1];
- //	Gi = G[i];
-//        for(unsigned int j = 1; j <= jmax; ++j){
-//		// calculate only interior cells, but use the boundary
-//		RSi[j] = (Fi[j] - Fiminus1[j]) * dx_dt + (Gi[j] - Gi[j - 1]) * dy_dt;
-//        }
-//    }
+    double dx_dt = 1 / (dx * dt);
+    double dy_dt = 1 /  (dy * dt);
 	
     for(unsigned int i = 1; i <= imax; ++i)
     {

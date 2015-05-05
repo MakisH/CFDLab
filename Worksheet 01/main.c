@@ -120,7 +120,6 @@ int main(int argn, char** args){
   while ( t <= *t_end )
   {
     // Calculate dt if read tau is not negative
-    // TODO: move the condition to the main (get rid of a function call)
     if (*tau > 0) calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
 
     // Set the boundary values
@@ -153,6 +152,8 @@ int main(int argn, char** args){
     n = n + 1;
 
   }
+
+  //printf("result = %f \n",U[*imax/2][7 * *jmax/8]);
   
   // Free arrays
   free_matrix( U, 0, *imax+1, 0, *jmax+1);

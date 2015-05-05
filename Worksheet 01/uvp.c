@@ -150,7 +150,7 @@ void calculate_rs(
     {
       for(unsigned int j = 1; j <= jmax; ++j)
       {
-	RS[i][j] = (F[i][j] - F[i-1][j]) * dx_dt + (G[i][j] - G[i][j-1]) * dy_dt;
+	      RS[i][j] = (F[i][j] - F[i-1][j]) * dx_dt + (G[i][j] - G[i][j-1]) * dy_dt;
       }
     }
 }

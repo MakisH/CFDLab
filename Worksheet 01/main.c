@@ -1,3 +1,5 @@
+// CFD Lab 2015 - Worksheet 1 - Group 02 (M. Andreev, G. Chourdakis, I. Tominec)
+
 #include "helper.h"
 #include "boundary_val.h"
 #include "uvp.h"

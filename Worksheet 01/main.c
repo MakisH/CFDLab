@@ -117,7 +117,7 @@ int main(int argn, char** args){
   init_uvp( *UI, *VI, *PI, *imax, *jmax, U, V, P );
   
   // Time loop
-  while ( t < *t_end )
+  while ( t <= *t_end )
   {
     // Calculate dt if read tau is not negative
     // TODO: move the condition to the main (get rid of a function call)

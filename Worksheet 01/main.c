@@ -1,3 +1,5 @@
+// CFD Lab 2015 - Worksheet 1 - Group 02 (M. Andreev, G. Chourdakis, I. Tominec)
+
 #include "helper.h"
 #include "boundary_val.h"
 #include "uvp.h"
@@ -42,13 +44,27 @@
  */
 int main(int argn, char** args){
 
+  // Usage info
+  if ( argn > 3 ) {
+    printf("Usage: sim [input file] [problem name] \n");
+    return 1;
+  }
+
   // Input file
-  // TODO: take the filename as an argument
-  const char filename[100] = "cavity100.dat";
+  char *filename = NULL;
+  if ( argn == 2 ) {
+    filename = args[1];
+  } else {
+    filename = "cavity100.dat";
+  }
 
   // Name of the problem (to be used in the output filename)
-  // TODO: better implementation?
-  const char problem[100] = "cavity100";
+  char *problem = NULL;
+  if ( argn == 3) {
+    problem = args[2];
+  } else {
+    problem = "cavity100";
+  }
 
   // Parameters declaration
   // Geometry data
@@ -80,7 +96,7 @@ int main(int argn, char** args){
   double * PI = malloc(sizeof(double));
 
   // Read the input file
-  read_parameters( filename, Re, UI, VI, PI, GX, GY, t_end, 
+  read_parameters(filename, Re, UI, VI, PI, GX, GY, t_end, 
                   xlength, ylength, dt, dx, dy, imax, jmax, 
                   alpha, omg, tau, itermax, eps, dt_value);
 
@@ -103,10 +119,9 @@ int main(int argn, char** args){
   init_uvp( *UI, *VI, *PI, *imax, *jmax, U, V, P );
   
   // Time loop
-  while ( t < *t_end )
+  while ( t <= *t_end )
   {
     // Calculate dt if read tau is not negative
-    // TODO: move the condition to the main (get rid of a function call)
     if (*tau > 0) calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
 
     // Set the boundary values
@@ -139,6 +154,8 @@ int main(int argn, char** args){
     n = n + 1;
 
   }
+
+  //printf("result = %f \n",U[*imax/2][7 * *jmax/8]);
   
   // Free arrays
   free_matrix( U, 0, *imax+1, 0, *jmax+1);

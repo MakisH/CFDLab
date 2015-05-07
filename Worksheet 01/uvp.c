@@ -66,11 +66,11 @@ void calculate_fg (double Re,
 
 	  u2x =
 	    1 / dx * (pow ( (u + u1)/2, 2) - pow ((u3 + u)/2, 2)) +
-	    alpha / (2 * dx) * (fabs (u + u1) * (u - u1) -
+	    alpha / (4 * dx) * (fabs (u + u1) * (u - u1) -
 				fabs (u3 + u) * (u3 - u));
 	  uv_y =
-	    1 / (2 * dy) * ((v + v1) * (u + u2) - (v4 + v6) * (u4 + u)) +
-	    alpha / (2 * dy) * (fabs (v + v1) * (u - u2) -
+	    1 / (4 * dy) * ((v + v1) * (u + u2) - (v4 + v6) * (u4 + u)) +
+	    alpha / (4 * dy) * (fabs (v + v1) * (u - u2) -
 				fabs (v4 + v6) * (u4 - u));
 
 	  uxx = 1 / (dx * dx) * (u1 - 2 * u + u3); 
@@ -102,11 +102,11 @@ void calculate_fg (double Re,
 
 	  v2y =
 	    1 / dy * (pow (1.0 / 2 * (v + v2), 2) - pow (1.0 / 2 * (v4 + v), 2)) +
-	    alpha / (2 * dy) * (fabs (v + v2) * (v - v2) -
+	    alpha / (4 * dy) * (fabs (v + v2) * (v - v2) -
 				fabs (v4 + v) * (v4 - v));
 	  uv_x =
-	    1 / (2 * dx) * ((u + u2) * (v + v1) - (u3 + u5) * (v3 + v)) +
-	    alpha / (2 * dx) * (fabs (u + u2) * (v - v1) -
+	    1 / (4 * dx) * ((u + u2) * (v + v1) - (u3 + u5) * (v3 + v)) +
+	    alpha / (4 * dx) * (fabs (u + u2) * (v - v1) -
 				fabs (u3 + u5) * (v3 - v));
 
 	  vxx = 1 / (dx * dx) * (v1 - 2 * v + v3);

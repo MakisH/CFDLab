@@ -24,7 +24,7 @@ void calculate_dt (double Re,
 
   // Finding the min of the prescribed three values.
   double min = fmin (dx / maxU, dy / maxV);
-  min = fmin (min, 1.0 / 2 * Re * pow (1 / (dx * dx) + 1 / (dy * dy), -1));
+  min = fmin ( min, 1.0 / 2 * Re * 1.0 / (1 / (dx * dx) + 1 / (dy * dy)) );
 
   // Finally, the calc of dt.
   *dt = tau * min;
@@ -65,7 +65,7 @@ void calculate_fg (double Re,
 	  v6 = V[i + 1][j - 1];
 
 	  u2x =
-	    1 / dx * (pow ( (u + u1)/2, 2) - pow ((u3 + u)/2, 2)) +
+	    1 / dx * ( ((u + u1)*(u + u1)/4) - ((u3 + u)*(u3 + u)/4) ) +
 	    alpha / (4 * dx) * (fabs (u + u1) * (u - u1) -
 				fabs (u3 + u) * (u3 - u));
 	  uv_y =
@@ -101,7 +101,7 @@ void calculate_fg (double Re,
 	  v6 = V[i + 1][j - 1];
 
 	  v2y =
-	    1 / dy * (pow (1.0 / 2 * (v + v2), 2) - pow (1.0 / 2 * (v4 + v), 2)) +
+	    1 / dy * ( (1.0 / 2 * (v + v2))*(1.0 / 2 * (v + v2)) - (1.0 / 2 * (v4 + v))*(1.0 / 2 * (v4 + v)) ) +
 	    alpha / (4 * dy) * (fabs (v + v2) * (v - v2) -
 				fabs (v4 + v) * (v4 - v));
 	  uv_x =

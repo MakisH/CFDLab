@@ -68,89 +68,88 @@ int main(int argn, char** args){
 
   // Parameters declaration
   // Geometry data
-  double * xlength = malloc(sizeof(double));
-  double * ylength = malloc(sizeof(double));
-  int    * imax = malloc(sizeof(int)); 
-  int    * jmax = malloc(sizeof(int));
-  double * dx = malloc(sizeof(double));
-  double * dy = malloc(sizeof(double));
+  double xlength;
+  double ylength;
+  int    imax; 
+  int    jmax;
+  double dx;
+  double dy;
 
   // Time-stepping data
-  double * t_end = malloc(sizeof(double));
-  double * dt = malloc(sizeof(double));
-  double * tau = malloc(sizeof(double));
-  double * dt_value = malloc(sizeof(double));
+  double t_end;
+  double dt;
+  double tau;
+  double dt_value;
   
   // Pressure iteration data
-  int    * itermax = malloc(sizeof(int));
-  double * eps = malloc(sizeof(double));
-  double * omg = malloc(sizeof(double));
-  double * alpha = malloc(sizeof(double));
+  int    itermax;
+  double eps;
+  double omg;
+  double alpha;
 
   // Problem-dependent quantities
-  double * Re = malloc(sizeof(double));
-  double * GX = malloc(sizeof(double)); 
-  double * GY = malloc(sizeof(double));
-  double * UI = malloc(sizeof(double));
-  double * VI = malloc(sizeof(double));
-  double * PI = malloc(sizeof(double));
+  double Re;
+  double GX; 
+  double GY;
+  double UI;
+  double VI;
+  double PI;
 
   // Read the input file
-  read_parameters(filename, Re, UI, VI, PI, GX, GY, t_end, 
-                  xlength, ylength, dt, dx, dy, imax, jmax, 
-                  alpha, omg, tau, itermax, eps, dt_value);
+  read_parameters(filename, &Re, &UI, &VI, &PI, &GX, &GY, &t_end, 
+                  &xlength, &ylength, &dt, &dx, &dy, &imax, &jmax, 
+                  &alpha, &omg, &tau, &itermax, &eps, &dt_value);
 
   // Setup arrays
-  double **U  = (double**)matrix(0, *imax+1, 0, *jmax+1);
-  double **V  = (double**)matrix(0, *imax+1, 0, *jmax+1);
-  double **P  = (double**)matrix(0, *imax+1, 0, *jmax+1);
-  double **RS = (double**)matrix(0, *imax+1, 0, *jmax+1);
-  double **F  = (double**)matrix(0, *imax+1, 0, *jmax+1);
-  double **G  = (double**)matrix(0, *imax+1, 0, *jmax+1);
+  double **U  = (double**)matrix(0, imax+1, 0, jmax+1);
+  double **V  = (double**)matrix(0, imax+1, 0, jmax+1);
+  double **P  = (double**)matrix(0, imax+1, 0, jmax+1);
+  double **RS = (double**)matrix(0, imax+1, 0, jmax+1);
+  double **F  = (double**)matrix(0, imax+1, 0, jmax+1);
+  double **G  = (double**)matrix(0, imax+1, 0, jmax+1);
   
   // Some help variables
   double  t = 0.0;
   int     n = 0;
   int     it = 0;
-  double * res = malloc(sizeof(double));
-  *res = 100 * *eps; // just larger than eps
+  double res = 100 * eps; // just larger than eps
   
   // Assign initial values
-  init_uvp( *UI, *VI, *PI, *imax, *jmax, U, V, P );
+  init_uvp( UI, VI, PI, imax, jmax, U, V, P );
   
   // Time loop
-  while ( t <= *t_end )
+  while ( t <= t_end )
   {
     // Calculate dt if read tau is not negative
-    if (*tau > 0) calculate_dt(*Re, *tau, dt, *dx, *dy, *imax, *jmax, U, V);
+    if (tau > 0) calculate_dt(Re, tau, &dt, dx, dy, imax, jmax, U, V);
 
     // Set the boundary values
-    boundaryvalues(*imax, *jmax, U, V);
+    boundaryvalues(imax, jmax, U, V);
     
     // Calculate F and G terms of the pressure Poisson equation
-    calculate_fg(*Re, *GX, *GY, *alpha, *dt, *dx, *dy, *imax, *jmax, U, V, F, G);
+    calculate_fg(Re, GX, GY, alpha, dt, dx, dy, imax, jmax, U, V, F, G);
 
     // Calculate the right-hand side of the pressure Poisson equation
-    calculate_rs(*dt, *dx, *dy, *imax, *jmax, F, G, RS);
+    calculate_rs(dt, dx, dy, imax, jmax, F, G, RS);
 
     // SOR loop
     it = 0; // reset the number of sor iterations
-    *res = 100 * *eps; // just larger than eps
-    while ( it < *itermax && *res > *eps ) 
+    res = 100 * eps; // just larger than eps
+    while ( it < itermax && res > eps ) 
     {
-      sor(*omg, *dx, *dy, *imax, *jmax, P, RS, res); // one SOR iteration
+      sor(omg, dx, dy, imax, jmax, P, RS, &res); // one SOR iteration
       it++;
     }
 
     // Update the velocities
-    calculate_uv(*dt, *dx, *dy, *imax, *jmax, U, V, F, G, P);
+    calculate_uv(dt, dx, dy, imax, jmax, U, V, F, G, P);
 
     // Output of u, v, p for visualization
     if (n%100==0)
-    write_vtkFile(problem, n, *xlength, *ylength, *imax, *jmax, *dx, *dy, U, V, P);
+    write_vtkFile(problem, n, xlength, ylength, imax, jmax, dx, dy, U, V, P);
 
     // Update loop state
-    t = t + *dt;
+    t = t + dt;
     n = n + 1;
 
   }
@@ -158,30 +157,19 @@ int main(int argn, char** args){
   //printf("result = %f \n",U[*imax/2][7 * *jmax/8]);
   
   // Free arrays
-  free_matrix( U, 0, *imax+1, 0, *jmax+1);
-  free_matrix( V, 0, *imax+1, 0, *jmax+1);
-  free_matrix( P, 0, *imax+1, 0, *jmax+1);
-  free_matrix( RS, 0, *imax+1, 0, *jmax+1);
-  free_matrix( F, 0, *imax+1, 0, *jmax+1);
-  free_matrix( G, 0, *imax+1, 0, *jmax+1);
-
-  // Free other pointers
-  free(xlength);
-  free(ylength);
-  free(imax);
-  free(jmax);
-  free(dx);
-  free(dy);
-  free(t_end);
-  free(dt);
-  free(tau);
-  free(dt_value);
-  free(itermax);
-  free(eps);
-  free(omg);
-  free(alpha);
-  free(res);
+  free_matrix( U, 0, imax+1, 0, jmax+1);
+  free_matrix( V, 0, imax+1, 0, jmax+1);
+  free_matrix( P, 0, imax+1, 0, jmax+1);
+  free_matrix( RS, 0, imax+1, 0, jmax+1);
+  free_matrix( F, 0, imax+1, 0, jmax+1);
+  free_matrix( G, 0, imax+1, 0, jmax+1);
 
   return 0;
 
 }
+
+// Memory leaks, don't use malloc() for scalars
+// visualize for multiples of dt
+// loop fusion! (at least on the boundaries)
+// pow() --> x*x
+// be careful of boundary conditions evaluation order

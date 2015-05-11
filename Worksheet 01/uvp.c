@@ -16,10 +16,10 @@ void calculate_dt (double Re,
   for (int i = 1; i <= imax; ++i)
     {
       for (int j = 1; j <= jmax; ++j)
-	{
-	  maxU = fmax (maxU, fabs (U[i][j]));
-	  maxV = fmax (maxV, fabs (V[i][j]));
-	}
+	      {
+	        maxU = fmax (maxU, fabs (U[i][j]));
+	        maxV = fmax (maxV, fabs (V[i][j]));
+	      }
     }
 
   // Finding the min of the prescribed three values.
@@ -173,20 +173,13 @@ void calculate_uv(
   double _dt_dx = - dt / dx;
   double _dt_dy = - dt / dy; 
 
-  // Update the horizontal velocities (explicit Euler method)
   for (int i = 1; i < imax; ++i)
   {
     for (int j = 1; j <= jmax; ++j)
     {
+      // Update the horizontal velocities (explicit Euler method)
       U[i][j] = F[i][j] + _dt_dx * ( P[i+1][j] - P[i][j] );
-    }
-  }
-
-  // Update the vertival velocities (explicit Euler method)
-  for (int i = 1; i <= imax; ++i)
-  {
-    for (int j = 1; j < jmax; ++j)
-    {
+      // Update the vertival velocities (explicit Euler method)
       V[i][j] = G[i][j] + _dt_dy * ( P[i][j+1] - P[i][j] );
     }
   }

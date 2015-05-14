@@ -10,7 +10,6 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
-  /* TODO */
 
 	int x, y, z, i;
 

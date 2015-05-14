@@ -45,14 +45,27 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 
-	// Moving wall. For every x, y we set z = xlength + 1.
+	
+	unsigned int iter1,iter2, fixed_iter_xy;
 	z = xlength + 1;
 	for (x=0; x < xlength+2; x++){
 		for (y=0; y < xlength+2; y++){
-			flagField[x + y*xlength + z*xlength*xlength] = MOVING_WALL;
+	// Moving wall. For every x, y we set z = xlength + 1.
+			flagField[x + y*xlength + z*xlength*xlength] = MOVING_WALL;	// z+ dimension
+			
+			// add all other walls in the same loop, simply switch the indices
+			// - x and y are iterators, z is "0" or "xlength + 1"
+			// the only question is whether this is OK with the cache memory
+			// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
+                        flagField[    x*xlength + y*xlength*xlength] = NO_SLIP;		// x- dimension	
+                        flagField[x 		+ y*xlength*xlength] = NO_SLIP;		// y- dimension
+			flagField[x + y*xlength			   ] = NO_SLIP;		// z- dimension
+
+                        flagField[z + x*xlength + y*xlength*xlength] = NO_SLIP;		// x+ dimension
+			flagField[x + z*xlength + y*xlength*xlength] = NO_SLIP;		// y+ dimension
 		}
 	}
-
+/*
 
 	// No slip. For every y, z we set x = 0.
 	x = 0;
@@ -61,6 +74,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
 		}
 	}
+
 
 
 	// No slip. For every x, z we set y = 0.
@@ -94,7 +108,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
                         flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
                 }
         }
-
+*/
 
 
 }

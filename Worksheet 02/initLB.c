@@ -1,8 +1,24 @@
 #include "initLB.h"
 
 int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int argc, char *argv[]){
-  /* TODO */
 
+  if ( argc != 1 ) {
+
+    printf("Usage: sim input_file");
+    return 1;
+
+  } else {
+    
+    const char *szFileName = NULL;
+    szFileName = argv[1];  
+
+    READ_INT( szFileName, *xlength );
+    READ_DOUBLE( szFileName, *tau );
+    READ_DOUBLE( szFileName, *velocityWall );
+    READ_INT( szFileName, *timesteps );
+    READ_INT( szFileName, *timestepsPerPlotting );
+
+  }
 
 
   return 0;

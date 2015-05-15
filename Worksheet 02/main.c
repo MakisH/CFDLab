@@ -42,7 +42,7 @@ int main(int argc, char *argv[]){
     treatBoundary( collideField, flagField, velocityWall, xlength );
 
     if ( t % timestepsPerPlotting == 0 ){
-      writeVtkOutput( collideField, flagField, "bla/", t, xlength );
+      writeVtkOutput( collideField, flagField, "pics/", t, xlength );
     }
 
   }

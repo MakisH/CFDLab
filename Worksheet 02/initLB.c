@@ -4,7 +4,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 
   if ( argc != 2 ) {
 
-    printf("Usage: sim input_file");
+    printf("Usage: ./lbsim input_file");
     return 1;
 
   } else {

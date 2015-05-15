@@ -20,4 +20,3 @@
   static const double C_S_sq = 0.577350269189626 * 0.577350269189626;
 
 #endif
-

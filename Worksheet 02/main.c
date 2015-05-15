@@ -21,10 +21,10 @@ int main(int argc, char *argv[]){
   readParameters( &xlength, &tau, &velocityWall[0], &timesteps, &timestepsPerPlotting, argc, argv );
 
   // Three main arrays allocation..
-  int domain = (xlength+2)*(xlength+2)*(xlength+2);
-  collideField = (double *) malloc(Q_NUMBER*domain * sizeof(collideField));
-  streamField = (double *) malloc(Q_NUMBER*domain * sizeof(streamField));
-  flagField = (int *) malloc(domain * sizeof(flagField));
+  int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);
+  collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
+  streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
+  flagField = (int *) malloc(domain * sizeof(int));
 
   initialiseFields( collideField, streamField, flagField, xlength );
 

@@ -21,7 +21,7 @@ int main(int argc, char *argv[]){
   // Three main arrays allocation.
   int domain = (xlength+2)*(xlength+2)*(xlength+2);
   collideField = malloc(Q_NUMBER*domain * sizeof(collideField));
-  streamField = malloc(Q_NUMBER*domain * sizeof(streamFieldField));
+  streamField = malloc(Q_NUMBER*domain * sizeof(streamField));
   flagField = malloc(domain * sizeof(flagField));
 
   readParameters( &xlength, &tau, &velocityWall, timesteps, timestepsPerPlotting, argc, argv );

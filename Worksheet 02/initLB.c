@@ -60,14 +60,13 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 
-	
-	unsigned int iter1,iter2, fixed_iter_xy;
+	//unsigned int iter1,iter2, fixed_iter_xy; <- Why do we need that?
 	z = xlength + 1;
 	for (x=0; x < xlength+2; x++){
 		for (y=0; y < xlength+2; y++){
 	// Moving wall. For every x, y we set z = xlength + 1.
 			flagField[x + y*(xlength+2) + z*(xlength+2)*(xlength+2)] = MOVING_WALL;	// z+ dimension
-			
+
 			// add all other walls in the same loop, simply switch the indices
 			// - x and y are iterators, z is "0" or "xlength + 1"
 			// the only question is whether this is OK with the cache memory

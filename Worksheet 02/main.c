@@ -22,9 +22,9 @@ int main(int argc, char *argv[]){
 
   // Three main arrays allocation..
   int domain = (xlength+2)*(xlength+2)*(xlength+2);
-  collideField = malloc(Q_NUMBER*domain * sizeof(collideField));
-  streamField = malloc(Q_NUMBER*domain * sizeof(streamField));
-  flagField = malloc(domain * sizeof(flagField));
+  collideField = (double *) malloc(Q_NUMBER*domain * sizeof(collideField));
+  streamField = (double *) malloc(Q_NUMBER*domain * sizeof(streamField));
+  flagField = (int *) malloc(domain * sizeof(flagField));
 
   initialiseFields( collideField, streamField, flagField, xlength );
 

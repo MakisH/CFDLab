@@ -20,11 +20,11 @@ int main(int argc, char *argv[]){
 
   // Three main arrays allocation.
   int domain = (xlength+2)*(xlength+2)*(xlength+2);
-  collideField = malloc(Q_NUMBER*domain * sizeof(collideField));
-  streamField = malloc(Q_NUMBER*domain * sizeof(streamField));
-  flagField = malloc(domain * sizeof(flagField));
+  collideField = (double *) malloc(Q_NUMBER*domain * sizeof(collideField));
+  streamField = (double *) malloc(Q_NUMBER*domain * sizeof(streamField));
+  flagField = (int *) malloc(domain * sizeof(flagField));
 
-  readParameters( &xlength, &tau, &velocityWall, timesteps, timestepsPerPlotting, argc, argv );
+  readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
 
   // TODO: initialise pointers here!
   initialiseFields( collideField, streamField, flagField, xlength );
@@ -32,18 +32,18 @@ int main(int argc, char *argv[]){
   for(int t = 0; t < timesteps; t++){
 
     double *swap = NULL;
-    doStreaming( collideField, streamField, flagfield, xlength );
+    doStreaming( collideField, streamField, flagField, xlength );
 
     swap = collideField;
     collideField = streamField;
     streamField = swap;
 
-    doCollision( collideField, flagfield, &tau, xlength );
+    doCollision( collideField, flagField, &tau, xlength );
 
-    treatBoundary( collideField, flagfield, velocityWall, xlength );
+    treatBoundary( collideField, flagField, velocityWall, xlength );
 
     if ( t % timestepsPerPlotting == 0 ){
-      writeVtkOutput( collideField, flagfield, argv, t, xlength );
+      writeVtkOutput( collideField, flagField, (const char *) argv, t, xlength );
     }
 
   }

@@ -1,8 +1,24 @@
 #include "initLB.h"
 
 int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int argc, char *argv[]){
-  /* TODO */
 
+  if ( argc != 1 ) {
+
+    printf("Usage: sim input_file");
+    return 1;
+
+  } else {
+    
+    const char *szFileName = NULL;
+    szFileName = argv[1];  
+
+    READ_INT( szFileName, *xlength );
+    READ_DOUBLE( szFileName, *tau );
+    READ_DOUBLE( szFileName, *velocityWall );
+    READ_INT( szFileName, *timesteps );
+    READ_INT( szFileName, *timestepsPerPlotting );
+
+  }
 
 
   return 0;
@@ -33,7 +49,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	/* flagField init: boundary vs. fluid. */
 	/* Boundary initialization: (5 walls: no-slip; 1 wall: moving wall). Fluid: inner part. */
 	/* Why that many for statements? We used the loop unrolling approach to get rid of the if-statements, which would be present in the third for loop. */
-
 
 	// Fluid init (inner part of flagField).
 	for (x = 1; x < xlength +1; x++) {

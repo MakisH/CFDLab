@@ -178,7 +178,7 @@ void read_int( const char* szFileName, const char* szVarName, int* pVariable)
 {
     char* szValue = NULL;       /* string containing the read variable value */
 
-    if( szVarName  == 0 )  ERROR("null pointer given as varable name" );
+    if( szVarName  == 0 )  ERROR("null pointer given as variable name" );
     if( szFileName == 0 )  ERROR("null pointer given as filename" );
     if( pVariable  == 0 )  ERROR("null pointer given as variable" );
 
@@ -200,7 +200,7 @@ void read_double( const char* szFileName, const char* szVarName, double* pVariab
 {
     char* szValue = NULL;       /* String mit dem eingelesenen Variablenwert */
 
-    if( szVarName  == 0 )  ERROR("null pointer given as varable name" );
+    if( szVarName  == 0 )  ERROR("null pointer given as variable name" );
     if( szFileName == 0 )  ERROR("null pointer given as filename" );
     if( pVariable  == 0 )  ERROR("null pointer given as variable" );
 

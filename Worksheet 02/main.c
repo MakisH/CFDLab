@@ -18,15 +18,14 @@ int main(int argc, char *argv[]){
   int timesteps;
   int timestepsPerPlotting;
 
-  // Three main arrays allocation.
+  readParameters( &xlength, &tau, &velocityWall[0], &timesteps, &timestepsPerPlotting, argc, argv );
+
+  // Three main arrays allocation..
   int domain = (xlength+2)*(xlength+2)*(xlength+2);
   collideField = (double *) malloc(Q_NUMBER*domain * sizeof(collideField));
   streamField = (double *) malloc(Q_NUMBER*domain * sizeof(streamField));
   flagField = (int *) malloc(domain * sizeof(flagField));
 
-  readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
-
-  // TODO: initialise pointers here!
   initialiseFields( collideField, streamField, flagField, xlength );
 
   for(int t = 0; t < timesteps; t++){
@@ -43,7 +42,7 @@ int main(int argc, char *argv[]){
     treatBoundary( collideField, flagField, velocityWall, xlength );
 
     if ( t % timestepsPerPlotting == 0 ){
-      writeVtkOutput( collideField, flagField, (const char *) argv, t, xlength );
+      writeVtkOutput( collideField, flagField, "pics/", t, xlength );
     }
 
   }

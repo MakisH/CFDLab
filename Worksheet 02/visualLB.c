@@ -7,18 +7,16 @@
 void write_vtkHeader(FILE *fp, int xlength);
 void write_vtkPointCoordinates( FILE *fp, int xlength);
 
-void writeVtkOutput(const double * const collideField, const int * const flagField, const char * filename, unsigned int t, int xlength) {
+void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int xlength) {
 
 // Opening the file.
-
-	char szFileName[80];
 	FILE *fp = NULL;
-	sprintf (szFileName, "%s.%i.vtk", filename, t);
+	sprintf (filename, ".%i.vtk", t);
 
-	fp = fopen(szFileName, "w");
+	fp = fopen(filename, "w");
 	if (fp == NULL) {
 		char szBuff[80];
-		sprintf(szBuff, "Failed to open %s", szFileName);
+		sprintf(szBuff, "Failed to open %s", filename);
 		ERROR(szBuff);
 		return;
 	}

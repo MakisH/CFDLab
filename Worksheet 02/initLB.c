@@ -2,7 +2,7 @@
 
 int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int argc, char *argv[]){
 
-  if ( argc != 1 ) {
+  if ( argc != 2 ) {
 
     printf("Usage: sim input_file");
     return 1;
@@ -28,7 +28,6 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
 
 	int x, y, z, i;
-
 	/* stream & collide Fields initialization. */
 	for (x = 0; x < xlength + 2; x++){
 		for (y = 0; y < xlength+2; y++){

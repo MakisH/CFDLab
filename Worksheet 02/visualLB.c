@@ -11,12 +11,13 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 // Opening the file.
 	FILE *fp = NULL;
-	sprintf (filename, ".%i.vtk", t);
+	char sZFilename[80];
+	sprintf (sZFilename, "%s%i.vtk", filename, t);
 
-	fp = fopen(filename, "w");
+	fp = fopen(sZFilename, "w");
 	if (fp == NULL) {
 		char szBuff[80];
-		sprintf(szBuff, "Failed to open %s", filename);
+		sprintf(szBuff, "Failed to open %s", sZFilename);
 		ERROR(szBuff);
 		return;
 	}

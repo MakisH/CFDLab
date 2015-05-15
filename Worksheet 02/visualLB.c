@@ -7,18 +7,16 @@
 void write_vtkHeader(FILE *fp, int xlength);
 void write_vtkPointCoordinates( FILE *fp, int xlength);
 
-void writeVtkOutput(const double * const collideField, const int * const flagField, const char * filename, unsigned int t, int xlength) {
+void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int xlength) {
 
 // Opening the file.
-
-	char szFileName[80];
 	FILE *fp = NULL;
-	sprintf (szFileName, "%s.%i.vtk", filename, t);
+	sprintf (filename, ".%i.vtk", t);
 
-	fp = fopen(szFileName, "w");
+	fp = fopen(filename, "w");
 	if (fp == NULL) {
 		char szBuff[80];
-		sprintf(szBuff, "Failed to open %s", szFileName);
+		sprintf(szBuff, "Failed to open %s", filename);
 		ERROR(szBuff);
 		return;
 	}
@@ -35,15 +33,15 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	double density;
 
 	/* DENSITIES */
-	fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength, xlength, xlength);
-	fprintf(fp,"POINTS %i float\n", xlength*xlength*xlength );
+	fprintf(fp,"DIMENSIONS  %i %i %i \n", (xlength+2), (xlength+2), (xlength+2));
+	fprintf(fp,"POINTS %i float\n", (xlength+2)*(xlength+2)*(xlength+2) );
 	fprintf(fp,"DENSITIES. \n\n");
 
         for (x = 0; x < xlength + 2; x++) {
                 for(y = 0; y < xlength + 2; y++) {
                         for (z = 0; z < xlength + 2; z++){
 
-                                computeDensity (collideField + Q_NUMBER * (x + xlength*y + xlength*xlength*z), &density);
+                                computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
 
                                 fprintf(fp, "%f\n", density);
                         }
@@ -52,16 +50,16 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 
 	/* VELOCITIES */
-        fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength, xlength, xlength);
-        fprintf(fp,"POINTS %i float\n", xlength*xlength*xlength );
+        fprintf(fp,"DIMENSIONS  %i %i %i \n", (xlength+2), (xlength+2), (xlength+2));
+        fprintf(fp,"POINTS %i float\n", (xlength+2)*(xlength+2)*(xlength+2) );
         fprintf(fp,"VELOCITIES. \n\n");
 
 	for (x = 0; x < xlength + 2; x++) {
 		for(y = 0; y < xlength + 2; y++) {
 			for (z = 0; z < xlength + 2; z++){
 
-                                computeDensity (collideField + Q_NUMBER * (x + xlength*y + xlength*xlength*z), &density);
-                                computeVelocity (collideField + Q_NUMBER * (x + xlength*y + xlength*xlength*z), &density, velocity);
+                                computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
+                                computeVelocity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density, velocity);
 
 				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
 			}
@@ -84,8 +82,8 @@ void write_vtkHeader( FILE *fp, int xlength) {
   fprintf(fp,"ASCII\n");
   fprintf(fp,"\n");
   fprintf(fp,"DATASET STRUCTURED_GRID\n");
-  fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength, xlength, xlength);
-  fprintf(fp,"POINTS %i float\n", xlength*xlength*xlength );
+  fprintf(fp,"DIMENSIONS  %i %i %i \n", (xlength+2), (xlength+2), (xlength+2));
+  fprintf(fp,"POINTS %i float\n", (xlength+2)*(xlength+2)*(xlength+2) );
   fprintf(fp,"\n");
 }
 

@@ -5,7 +5,7 @@
 void computePostCollisionDistributions(double *currentCell, const double * const tau, const double *const feq){
   /* TODO */ // Be careful! A C guy should check if what I do really makes sense!
   for (int i=0; i<Q_NUMBER; i++) {
-        *(currentCell + i) -= ( 1 / tau ) * ( *(currentCell + i) - feq[i]; 
+        *(currentCell + i) -= ( 1 / *tau ) * ( *(currentCell + i) - feq[i]);
   }
 
 }

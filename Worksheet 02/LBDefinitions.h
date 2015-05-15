@@ -11,5 +11,8 @@
   static const unsigned int NO_SLIP = 1;
   static const unsigned int MOVING_WALL = 2;
 
+  // Precalculations for performance
+  static const double C_S_sq = C_S * C_S;
+
 #endif
 

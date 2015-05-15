@@ -3,10 +3,14 @@
 
 
 void computePostCollisionDistributions(double *currentCell, const double * const tau, const double *const feq){
-  /* TODO */
+  /* TODO */ // Be careful! A C guy should check if what I do really makes sense!
+  for (int i=0; i<Q_NUMBER; i++) {
+        *(currentCell + i) -= ( 1 / tau ) * ( *(currentCell + i) - feq[i]; 
+  }
+
 }
 
-void doCollision(double *collideField, int *flagField,const double * const tau,int xlength){
+void doCollision(double *collideField, int *flagField, const double * const tau, int xlength){
 
 	int x, y, z;
 
@@ -26,6 +30,7 @@ void doCollision(double *collideField, int *flagField,const double * const tau,i
 				computeVelocity (currentCell, &density, velocity);
 				computeFeq (&density, velocity, feq);
 				computePostCollisionDistributions (currentCell, tau, feq);
+
 			}
 		}
 	}

@@ -50,7 +50,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	/* Boundary initialization: (5 walls: no-slip; 1 wall: moving wall). Fluid: inner part. */
 	/* Why that many for statements? We used the loop unrolling approach to get rid of the if-statements, which would be present in the third for loop. */
 
-
 	// Fluid init (inner part of flagField).
 	for (x = 1; x < xlength +1; x++) {
 		for (y = 1; y < xlength + 1; y++) {

@@ -36,32 +36,32 @@ int main(int argc, char *argv[]){
 	flagField = (int *) malloc(domain * sizeof(int));
 
 	initialiseFields( collideField, streamField, flagField, xlength );
-	printf("InitializeFields Complete!\n");
+	//printf("InitializeFields Complete!\n");
 	// writeVtkOutput( collideField, flagField, "pics/", 0, xlength );
 	// printf("xlength %d Complete!\n", xlength);
 	// return 0;
 
 	char gg = 'a';
 	putc(gg, stdout);
-	for(int t = 0; t < timesteps; t++){
+	for(int t = 0; t <= timesteps; t++){
 		printf("t = %d \n", t);
 		double *swap = NULL;
 		doStreaming( collideField, streamField, flagField, xlength );
-		printf("Streaming Complete!\n");
+		//printf("Streaming Complete!\n");
 		swap = collideField;
 		collideField = streamField;
 		streamField = swap;
 
 		doCollision( collideField, flagField, &tau, xlength );
-		printf("Collision Complete!\n");
+		//printf("Collision Complete!\n");
 
 		treatBoundary( collideField, flagField, velocityWall, xlength );
-		printf("treat Boundary Complete!\n %d %d",t,timestepsPerPlotting);
+		//printf("treat Boundary Complete!\n %d %d",t,timestepsPerPlotting);
 
 		if ( t % timestepsPerPlotting == 0 ){
 			writeVtkOutput( collideField, flagField, "pics/", t, xlength );
 		}
-		printf("vtkOutputs Complete!\n");
+		//printf("vtkOutputs Complete!\n");
 
 	}
 	printf("Bye!\n");

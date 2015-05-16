@@ -8,8 +8,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   int x_start, x_end, y_start, y_end, z_start, z_end;
   double f_inv_i, density, c_uwall;
   
-  double each[5]; // trick to implement a "foreach" loop, for every i to be touched
-  int each_size;
+  int each[5]; // trick to implement a "foreach" loop, for every i to be touched
+  int eachSize;
 
   double SizeX = (xlength+2);
   double SizeY = (xlength+2);
@@ -25,7 +25,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = 0;      x_end = SizeX;
         y_start = 0;      y_end = SizeY;
         z_start = 0;      z_end = 0;
-        each = {1, 2, 3, 4, 5}; eachSize = 5;
+        each[0] = 1;
+        each[1] = 2;
+        each[2] = 3;
+        each[3] = 4;
+        each[4] = 5;
+        eachSize = 5;
         break;
 
       // z = SizeZ (moving wall by default)
@@ -33,7 +38,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = 0;      x_end = SizeX;
         y_start = 0;      y_end = SizeY;
         z_start = SizeZ;  z_end = SizeZ;
-        each = {15, 16, 17, 18, 19}; eachSize = 5;
+        each[0] = 15;
+        each[1] = 16;
+        each[2] = 17;
+        each[3] = 18;
+        each[4] = 19;
+        eachSize = 5;
         break;
 
       // y = 0 (no-slip by default)
@@ -41,7 +51,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = 0;      x_end = SizeX;
         y_start = 0;      y_end = 0;
         z_start = 0;      z_end = SizeZ;
-        each = {6, 7, 8}; eachSize = 3;
+        each[0] = 6;
+        each[1] = 7;
+        each[2] = 8;
+        each[3] = 0;
+        each[4] = 0;
+        eachSize = 3;
         break;
 
       // y = SizeY (no-slip by default)
@@ -49,7 +64,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = 0;      x_end = SizeX;
         y_start = SizeY;  y_end = SizeY;
         z_start = 0;      z_end = SizeZ;
-        each = {12, 13, 14}; eachSize = 3;
+        each[0] = 12;
+        each[1] = 13;
+        each[2] = 14;
+        each[3] = 0;
+        each[4] = 0;
+        eachSize = 3;
         break;
 
       // x = 0 (no-slip by default)
@@ -57,7 +77,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = 0;      x_end = 0;
         y_start = 0;      y_end = SizeY;
         z_start = 0;      z_end = SizeZ;
-        each = {9}; eachSize = 1;
+        each[0] = 9;
+        each[1] = 0;
+        each[2] = 0;
+        each[3] = 0;
+        each[4] = 0;
+        eachSize = 1;
         break;
 
       // x = SizeX (no-slip by default)
@@ -65,7 +90,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
         x_start = SizeX;  x_end = SizeX;
         y_start = 0;      y_end = SizeY;
         z_start = 0;      z_end = SizeZ;
-        each = {11}; eachSize = 1;
+        each[0] = 11;
+        each[1] = 0;
+        each[2] = 0;
+        each[3] = 0;
+        each[4] = 0;
+        eachSize = 1;
         break;
     }
 
@@ -77,7 +107,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 
-          for (int e=0; e<each_size; e++) { 
+          for (int e=0; e<eachSize; e++) { 
             // "Foreach" i on the boundary. We may kill prefetching but there is no foreach in C...
             i = each[e];
             // inv(i) - inverse direction of i

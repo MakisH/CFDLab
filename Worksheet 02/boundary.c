@@ -3,8 +3,6 @@
 #include "computeCellValues.h"
 #include <stdio.h>
 
-#include <stdio.h>
-
 void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
 
   int i, inv_i, currentCell, neighborCell;

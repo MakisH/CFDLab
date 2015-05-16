@@ -22,9 +22,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     switch (boundary) {
       // z = 0 (no-slip by default)
       case 1 :
-        x_start = 0;      x_end = SizeX;
-        y_start = 0;      y_end = SizeY;
-        z_start = 0;      z_end = 0;
+        x_start = 0;        x_end = SizeX-1;
+        y_start = 0;        y_end = SizeY-1;
+        z_start = 0;        z_end = 0;
         each[0] = 1;
         each[1] = 2;
         each[2] = 3;
@@ -35,9 +35,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
       // z = SizeZ (moving wall by default)
       case 2 :
-        x_start = 0;      x_end = SizeX;
-        y_start = 0;      y_end = SizeY;
-        z_start = SizeZ;  z_end = SizeZ;
+        x_start = 0;        x_end = SizeX-1;
+        y_start = 0;        y_end = SizeY-1;
+        z_start = SizeZ-1;  z_end = SizeZ-1;
         each[0] = 15;
         each[1] = 16;
         each[2] = 17;
@@ -48,9 +48,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
       // y = 0 (no-slip by default)
       case 3 :
-        x_start = 0;      x_end = SizeX;
-        y_start = 0;      y_end = 0;
-        z_start = 0;      z_end = SizeZ;
+        x_start = 0;        x_end = SizeX-1;
+        y_start = 0;        y_end = 0;
+        z_start = 0;        z_end = SizeZ-1;
         each[0] = 6;
         each[1] = 7;
         each[2] = 8;
@@ -61,9 +61,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
       // y = SizeY (no-slip by default)
       case 4 :
-        x_start = 0;      x_end = SizeX;
-        y_start = SizeY;  y_end = SizeY;
-        z_start = 0;      z_end = SizeZ;
+        x_start = 0;        x_end = SizeX-1;
+        y_start = SizeY-1;  y_end = SizeY-1;
+        z_start = 0;        z_end = SizeZ-1;
         each[0] = 12;
         each[1] = 13;
         each[2] = 14;
@@ -74,9 +74,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
       // x = 0 (no-slip by default)
       case 5 :
-        x_start = 0;      x_end = 0;
-        y_start = 0;      y_end = SizeY;
-        z_start = 0;      z_end = SizeZ;
+        x_start = 0;        x_end = 0;
+        y_start = 0;        y_end = SizeY-1;
+        z_start = 0;        z_end = SizeZ-1;
         each[0] = 9;
         each[1] = 0;
         each[2] = 0;
@@ -87,9 +87,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
       // x = SizeX (no-slip by default)
       case 6 :
-        x_start = SizeX;  x_end = SizeX;
-        y_start = 0;      y_end = SizeY;
-        z_start = 0;      z_end = SizeZ;
+        x_start = SizeX-1;  x_end = SizeX-1;
+        y_start = 0;        y_end = SizeY-1;
+        z_start = 0;        z_end = SizeZ-1;
         each[0] = 11;
         each[1] = 0;
         each[2] = 0;

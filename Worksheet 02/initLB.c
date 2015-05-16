@@ -33,8 +33,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		for (y = 0; y < xlength+2; y++){
 			for (z = 0; z < xlength+2; z++){
 				for (i = 0; i < Q_NUMBER; i++){
-					streamField[Q_NUMBER * (x + y*(xlength) + z*(xlength)*(xlength)) + i] = LATTICEWEIGHTS[i];
-					collideField[Q_NUMBER * (x + y*(xlength) + z*(xlength)*(xlength)) + i] = LATTICEWEIGHTS[i];
+					streamField[Q_NUMBER * (x + y*(xlength+2) + z*(xlength+2)*(xlength+2)) + i] = LATTICEWEIGHTS[i];
+					collideField[Q_NUMBER * (x + y*(xlength+2) + z*(xlength+2)*(xlength+2)) + i] = LATTICEWEIGHTS[i];
 				}
 			}
 		}
@@ -53,7 +53,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	for (x = 1; x < xlength +1; x++) {
 		for (y = 1; y < xlength + 1; y++) {
 			for (z = 1; z < xlength + 1; z++) {
-				flagField[x + y*(xlength) + z*(xlength)*(xlength)] = FLUID;
+				flagField[x + y*(xlength+2) + z*(xlength+2)*(xlength+2)] = FLUID;
 			}
 		}
 	}
@@ -64,18 +64,18 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	for (x=0; x < xlength+2; x++){
 		for (y=0; y < xlength+2; y++){
 	// Moving wall. For every x, y we set z = xlength + 1.
-			flagField[x + y*(xlength) + z*(xlength)*(xlength)] = MOVING_WALL;	// z+ dimension
+			flagField[x + y*(xlength+2) + z*(xlength+2)*(xlength+2)] = MOVING_WALL;	// z+ dimension
 
 			// add all other walls in the same loop, simply switch the indices
 			// - x and y are iterators, z is "0" or "xlength + 1"
 			// the only question is whether this is OK with the cache memory
 			// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
-                        flagField[    x*(xlength) + y*(xlength)*(xlength)] = NO_SLIP;		// x- dimension	
-                        flagField[x 		+ y*(xlength)*(xlength)] = NO_SLIP;		// y- dimension
-			flagField[x + y*(xlength)			   ] = NO_SLIP;		// z- dimension
+                        flagField[    x*(xlength+2) + y*(xlength+2)*(xlength+2)] = NO_SLIP;		// x- dimension	
+                        flagField[x 		+ y*(xlength+2)*(xlength+2)] = NO_SLIP;		// y- dimension
+			flagField[x + y*(xlength+2)			   ] = NO_SLIP;		// z- dimension
 
-                        flagField[z + x*(xlength) + y*(xlength)*(xlength)] = NO_SLIP;		// x+ dimension
-			flagField[x + z*(xlength) + y*(xlength)*(xlength)] = NO_SLIP;		// y+ dimension
+                        flagField[z + x*(xlength+2) + y*(xlength+2)*(xlength+2)] = NO_SLIP;		// x+ dimension
+			flagField[x + z*(xlength+2) + y*(xlength+2)*(xlength+2)] = NO_SLIP;		// y+ dimension
 		}
 	}
 

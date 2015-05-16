@@ -20,6 +20,15 @@ int main(int argc, char *argv[]){
 
   readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
 
+  // DEBUG: Print what we read 
+  printf("xlength = %d \n", xlength);
+  printf("tau = %f \n", tau);
+  printf("timesteps = %d \n", timesteps);
+  printf("timestepsPerPlotting = %d \n", timestepsPerPlotting);
+  printf("velocityWall[1] = %f \n", velocityWall[1]);
+  printf("velocityWall[2] = %f \n", velocityWall[2]);
+  printf("velocityWall[3] = %f \n", velocityWall[3]);
+
   // Three main arrays allocation..
   int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);
   collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));

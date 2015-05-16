@@ -17,5 +17,7 @@ timestepsPerPlotting        10
 #--------------------------------------------
 #               boundaries
 #--------------------------------------------
-velocityWall                1.0
+velocityWall1               1.0
+velocityWall2               0.0
+velocityWall3               0.0  
 

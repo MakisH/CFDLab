@@ -1,6 +1,7 @@
 #include "LBDefinitions.h"
 #include "boundary.h"
 #include "computeCellValues.h"
+#include "stdio.h"
 
 void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
 
@@ -17,7 +18,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   double SizeXY = SizeX * SizeY;
 
   for (int boundary = 1; boundary <= 6; boundary++) {
-
+    printf("boundary = %d \n", boundary);
     // which boundary am I processing now?
     switch (boundary) {
       // z = 0 (no-slip by default)
@@ -50,7 +51,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
       case 3 :
         x_start = 0;        x_end = SizeX-1;
         y_start = 0;        y_end = 0;
-        z_start = 0;        z_end = SizeZ-1;
+        z_start = 1;        z_end = SizeZ-2;
         each[0] = 6;
         each[1] = 7;
         each[2] = 8;
@@ -63,7 +64,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
       case 4 :
         x_start = 0;        x_end = SizeX-1;
         y_start = SizeY-1;  y_end = SizeY-1;
-        z_start = 0;        z_end = SizeZ-1;
+        z_start = 1;        z_end = SizeZ-2;
         each[0] = 12;
         each[1] = 13;
         each[2] = 14;
@@ -75,8 +76,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
       // x = 0 (no-slip by default)
       case 5 :
         x_start = 0;        x_end = 0;
-        y_start = 0;        y_end = SizeY-1;
-        z_start = 0;        z_end = SizeZ-1;
+        y_start = 1;        y_end = SizeY-2;
+        z_start = 1;        z_end = SizeZ-2;
         each[0] = 9;
         each[1] = 0;
         each[2] = 0;
@@ -88,8 +89,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
       // x = SizeX (no-slip by default)
       case 6 :
         x_start = SizeX-1;  x_end = SizeX-1;
-        y_start = 0;        y_end = SizeY-1;
-        z_start = 0;        z_end = SizeZ-1;
+        y_start = 1;        y_end = SizeY-2;
+        z_start = 1;        z_end = SizeZ-2;
         each[0] = 11;
         each[1] = 0;
         each[2] = 0;
@@ -103,7 +104,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     for (int x = x_start; x <= x_end; x++) {
       for (int y = y_start; y <= y_end; y++) {
         for (int z = z_start; z <= z_end; z++) {
-       
+          printf("x = %d, y = %d, z = %d \n", x, y, z);
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 

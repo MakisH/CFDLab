@@ -38,7 +38,7 @@ int main(int argc, char *argv[]){
   initialiseFields( collideField, streamField, flagField, xlength );
 
   for(int t = 0; t < timesteps; t++){
-
+    printf("t = %d \n", t);
     double *swap = NULL;
     doStreaming( collideField, streamField, flagField, xlength );
 

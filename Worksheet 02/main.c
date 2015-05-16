@@ -19,7 +19,6 @@ int main(int argc, char *argv[]){
 	int timestepsPerPlotting;
 
   readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
-
   // DEBUG: Print what we read 
   printf("xlength = %d \n", xlength);
   printf("tau = %f \n", tau);

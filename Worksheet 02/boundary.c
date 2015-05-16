@@ -104,7 +104,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     for (int x = x_start; x <= x_end; x++) {
       for (int y = y_start; y <= y_end; y++) {
         for (int z = z_start; z <= z_end; z++) {
-
+          printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 
@@ -114,7 +114,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             // inv(i) - inverse direction of i
             inv_i = Q_NUMBER + 1 - i;
             // Neighbor cell of current cell in inv(i) direction
-            neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1] + LATTICEVELOCITIES[inv_i][2]*SizeX + LATTICEVELOCITIES[inv_i][3]*SizeXY;
+            neighborCell = currentCell + LATTICEVELOCITIES[inv_i][0] + LATTICEVELOCITIES[inv_i][1]*SizeX + LATTICEVELOCITIES[inv_i][2]*SizeXY;
             // We use f*_inv(i) in both cases (no-slip and moving wall)
             f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
 
@@ -130,7 +130,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
               computeDensity(collideField+neighborCell, &density);
 
               // vector product c_i * u_wall
-              c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
+              c_uwall = LATTICEVELOCITIES[i][0] * wallVelocity[0] + LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2];
 
               // update the boundary
               collideField[ Q_NUMBER*currentCell + i] = f_inv_i + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;

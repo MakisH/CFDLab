@@ -105,8 +105,6 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
       for (int y = y_start; y <= y_end; y++) {
         for (int z = z_start; z <= z_end; z++) {
 
-	  	  printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
-
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 

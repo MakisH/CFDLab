@@ -12,9 +12,9 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 		READ_DOUBLE( szFileName, *tau );
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );
-		read_double( szFileName, "velocityWall1", &velocityWall[1] );
-		read_double( szFileName, "velocityWall2", &velocityWall[2] );
-		read_double( szFileName, "velocityWall3", &velocityWall[3] );
+		read_double( szFileName, "velocityWall1", &velocityWall[0] );
+		read_double( szFileName, "velocityWall2", &velocityWall[1] );
+		read_double( szFileName, "velocityWall3", &velocityWall[2] );
 	}
 	return 0;
 }

@@ -112,7 +112,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             // "Foreach" i on the boundary. We may kill prefetching but there is no foreach in C...
             i = each[e];
             // inv(i) - inverse direction of i
-            inv_i = Q_NUMBER + 1 - i;
+            inv_i = Q_NUMBER - i;
             // Neighbor cell of current cell in inv(i) direction
             neighborCell = currentCell + LATTICEVELOCITIES[inv_i][0] + LATTICEVELOCITIES[inv_i][1]*SizeX + LATTICEVELOCITIES[inv_i][2]*SizeXY;
             // We use f*_inv(i) in both cases (no-slip and moving wall)

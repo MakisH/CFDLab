@@ -18,7 +18,7 @@ int main(int argc, char *argv[]){
   int timesteps;
   int timestepsPerPlotting;
 
-  readParameters( &xlength, &tau, &velocityWall[0], &timesteps, &timestepsPerPlotting, argc, argv );
+  readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
 
   // Three main arrays allocation..
   int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);

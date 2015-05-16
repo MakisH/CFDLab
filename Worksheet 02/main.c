@@ -7,7 +7,7 @@
 #include "visualLB.h"
 #include "boundary.h"
 int main(int argc, char *argv[]){
-	printf("Hi!\n");
+
 	double *collideField = NULL;
 	double *streamField = NULL;
 	int *flagField = NULL;
@@ -23,9 +23,10 @@ int main(int argc, char *argv[]){
 	printf("tau = %f \n", tau);
 	printf("timesteps = %d \n", timesteps);
 	printf("timestepsPerPlotting = %d \n", timestepsPerPlotting);
-	printf("velocityWall[1] = %f \n", velocityWall[0]);
-	printf("velocityWall[2] = %f \n", velocityWall[1]);
-	printf("velocityWall[3] = %f \n", velocityWall[2]);
+
+	printf("velocityWall[0] = %f \n", velocityWall[0]);
+	printf("velocityWall[1] = %f \n", velocityWall[1]);
+	printf("velocityWall[2] = %f \n", velocityWall[2]);
 
 	// Three main arrays allocation..
 	int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);
@@ -40,7 +41,7 @@ int main(int argc, char *argv[]){
 	// return 0;
 
 	for(int t = 0; t <= timesteps; t++){
-		printf("t = %d \n", t);
+
 		double *swap = NULL;
 		doStreaming( collideField, streamField, flagField, xlength );
 		//printf("Streaming Complete!\n");
@@ -55,12 +56,12 @@ int main(int argc, char *argv[]){
 		//printf("treat Boundary Complete!\n %d %d",t,timestepsPerPlotting);
 
 		if ( t % timestepsPerPlotting == 0 ){
-			writeVtkOutput( collideField, flagField, "pics/", t, xlength );
+		  printf("t = %d \n", t);
+			writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
 		}
 		//printf("vtkOutputs Complete!\n");
 
 	}
-	printf("Bye!\n");
 
 	return 0;
 }

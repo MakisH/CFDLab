@@ -8,15 +8,12 @@ void write_vtkHeader(FILE *fp, int xlength);
 void write_vtkPointCoordinates( FILE *fp, int xlength);
 
 void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int xlength) {
-	 printf("Enter VTK!\n");
 
 // Opening the file.
 	FILE *fp = NULL;
 	char sZFilename[80];
-	 printf("Before sprint!\n");
 
-	sprintf (sZFilename, "%s%i.vtk", filename, t);
-	 printf("after hell? !\n");
+	sprintf (sZFilename, "%s.%i.vtk", filename, t);
 
 	fp = fopen(sZFilename, "w");
 	if (fp == NULL) {
@@ -37,40 +34,33 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	double velocity[3];
 	double density;
 
+  fprintf(fp, "\nPOINT_DATA %d \n", (xlength+2)*(xlength+2)*(xlength+2) );
+
 	/* DENSITIES */
-	fprintf(fp,"DIMENSIONS  %i %i %i \n", (xlength+2), (xlength+2), (xlength+2));
-	fprintf(fp,"POINTS %i float\n", (xlength+2)*(xlength+2)*(xlength+2) );
-	fprintf(fp,"DENSITIES. \n\n");
-
-        for (x = 0; x < xlength + 2; x++) {
-                for(y = 0; y < xlength + 2; y++) {
-                        for (z = 0; z < xlength + 2; z++){
-
-                                computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
-
-                                fprintf(fp, "%f\n", density);
-                        }
-                }
-        }
+	fprintf(fp, "SCALARS density float 1 \n");
+  fprintf(fp, "LOOKUP_TABLE default \n");
+  for (x = 0; x < xlength + 2; x++) {
+    for (y = 0; y < xlength + 2; y++) {
+      for (z = 0; z < xlength + 2; z++){
+          computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
+          fprintf(fp, "%f\n", density);
+      }
+    }
+  }
 
 
 	/* VELOCITIES */
-        fprintf(fp,"DIMENSIONS  %i %i %i \n", (xlength+2), (xlength+2), (xlength+2));
-        fprintf(fp,"POINTS %i float\n", (xlength+2)*(xlength+2)*(xlength+2) );
-        fprintf(fp,"VELOCITIES. \n\n");
-
+	fprintf(fp, "\nVECTORS velocity float \n");
 	for (x = 0; x < xlength + 2; x++) {
 		for(y = 0; y < xlength + 2; y++) {
 			for (z = 0; z < xlength + 2; z++){
-
-                                computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
-                                computeVelocity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density, velocity);
-
+        computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
+        computeVelocity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density, velocity);
 				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
 			}
 		}
 	}
-	 printf("VTK Complete!\n");
+
 }
 
 void write_vtkHeader( FILE *fp, int xlength) {

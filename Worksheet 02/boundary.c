@@ -3,204 +3,115 @@
 #include "computeCellValues.h"
 
 void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
-  /* TODO */
 
-  int inv_i;
-  int currentCell;
-  int neighborCell;
-  double f_inv_i;
-  double density;
-  double c_uwall;
+  int i, inv_i, currentCell, neighborCell;
+  int x_start, x_end, y_start, y_end, z_start, z_end;
+  double f_inv_i, density, c_uwall;
   
-  double * each;
+  double each[5]; // trick to implement a "foreach" loop, for every i to be touched
   int each_size;
 
-  // z-boundaries
-  for (int x = 0; x <= xlength+1; x++) {
-    for (int y = 0; y <= xlength+1; y++) {
-      // z = -1 plane 
-      // i affected:             1,  2,  3,  4,  5
-      // corresponding inv(i):  19, 18, 17, 16, 15
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      currentCell = x + y*(xlength+2) -1*(xlength+2)*(xlength+2);
-      for (int i = 1; i<=5; i++) {
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
+  double SizeX = (xlength+2);
+  double SizeY = (xlength+2);
+  double SizeZ = (xlength+2);
+  double SizeXY = SizeX * SizeY;
 
-        if ( flagField[currentCell] == NO_SLIP ) {
+  for (int boundary = 1; boundary <= 6; boundary++) {
 
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
+    // which boundary am I processing now?
+    switch (boundary) {
+      // z = 0 (no-slip by default)
+      case 1 :
+        x_start = 0;      x_end = SizeX;
+        y_start = 0;      y_end = SizeY;
+        z_start = 0;      z_end = 0;
+        each = {1, 2, 3, 4, 5}; eachSize = 5;
+        break;
 
-        } else if (flagField[currentCell] == MOVING_WALL) {
+      // z = SizeZ (moving wall by default)
+      case 2 :
+        x_start = 0;      x_end = SizeX;
+        y_start = 0;      y_end = SizeY;
+        z_start = SizeZ;  z_end = SizeZ;
+        each = {15, 16, 17, 18, 19}; eachSize = 5;
+        break;
 
-          computeDensity(collideField+neighborCell, &density);
+      // y = 0 (no-slip by default)
+      case 3 :
+        x_start = 0;      x_end = SizeX;
+        y_start = 0;      y_end = 0;
+        z_start = 0;      z_end = SizeZ;
+        each = {6, 7, 8}; eachSize = 3;
+        break;
 
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
+      // y = SizeY (no-slip by default)
+      case 4 :
+        x_start = 0;      x_end = SizeX;
+        y_start = SizeY;  y_end = SizeY;
+        z_start = 0;      z_end = SizeZ;
+        each = {12, 13, 14}; eachSize = 3;
+        break;
 
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
+      // x = 0 (no-slip by default)
+      case 5 :
+        x_start = 0;      x_end = 0;
+        y_start = 0;      y_end = SizeY;
+        z_start = 0;      z_end = SizeZ;
+        each = {9}; eachSize = 1;
+        break;
 
-        }
-      }
-
-      // z = +1 plane
-      // i affected:            15, 16, 17, 18, 19
-      // corresponding inv(i):   5,  4,  3,  2,  1
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      currentCell = x + y*(xlength+2) +1*(xlength+2)*(xlength+2);
-      for (int i = 15; i<=19; i++) {
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
-
-        if ( flagField[currentCell] == NO_SLIP ) {
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
-
-        } else if (flagField[currentCell] == MOVING_WALL) {
-
-          computeDensity(collideField+neighborCell, &density);
-
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
-
-        }
-      }
+      // x = SizeX (no-slip by default)
+      case 6 :
+        x_start = SizeX;  x_end = SizeX;
+        y_start = 0;      y_end = SizeY;
+        z_start = 0;      z_end = SizeZ;
+        each = {11}; eachSize = 1;
+        break;
     }
-  }
 
-  // y-boundaries
-  for (int x=0; x<=xlength+1; x++) {
-    for (int z=0; z<=xlength+1; z++) {
+    // TODO: check correctness of index limits
+    for (int x = x_start; x <= x_end; x++) {
+      for (int y = y_start; y <= y_end; y++) {
+        for (int z = z_start; z <= z_end; z++) {
+       
+          // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
+          currentCell = x + y*SizeX + z*SizeXY;
 
-      // y = -1 plane 
-      // i affected:             1*,  6,  7,  8, 15*
-      // corresponding inv(i):  19, 14, 13,  2,  5
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      // *: already touched
-      currentCell = x -1*(xlength+2) + z*(xlength+2)*(xlength+2);
-      each = {6, 7, 8}; each_size = 3;
-      for (int e=0; e<each_size; e++) {
-        i = each[e];
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
+          for (int e=0; e<each_size; e++) { 
+            // "Foreach" i on the boundary. We may kill prefetching but there is no foreach in C...
+            i = each[e];
+            // inv(i) - inverse direction of i
+            inv_i = Q_NUMBER + 1 - i;
+            // Neighbor cell of current cell in inv(i) direction
+            neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1] + LATTICEVELOCITIES[inv_i][2]*SizeX + LATTICEVELOCITIES[inv_i][3]*SizeXY;
+            // We use f*_inv(i) in both cases (no-slip and moving wall)
+            f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
 
-        if ( flagField[currentCell] == NO_SLIP ) {
+            // What type of boundary condition do we have?
+            if ( flagField[currentCell] == NO_SLIP ) {
 
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
+              // update the boundary
+              collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
 
-        } else if (flagField[currentCell] == MOVING_WALL) {
+            } else if (flagField[currentCell] == MOVING_WALL) {
 
-          computeDensity(collideField+neighborCell, &density);
+              // density in the neighbor cell
+              computeDensity(collideField+neighborCell, &density);
 
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
+              // vector product c_i * u_wall
+              c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
 
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
+              // update the boundary
+              collideField[ Q_NUMBER*currentCell + i] = f_inv_i + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
 
-        }
-      }
+            } // if flag
+          } // for each    
 
-      // y = +1 plane 
-      // i affected:             5*,  12, 13, 14, 19*
-      // corresponding inv(i):  15,  8,  7,  6,  1
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      // *: already touched
-      currentCell = x +1*(xlength+2) + z*(xlength+2)*(xlength+2);
-      each = {12, 13, 14}; each_size = 3;
-      for (int e=0; e<each_size; e++) {
-        i = each[e];
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
+        } // for z
+      } // for y
+    } // for x
 
-        if ( flagField[currentCell] == NO_SLIP ) {
+  } // for boundary
 
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
-
-        } else if (flagField[currentCell] == MOVING_WALL) {
-
-          computeDensity(collideField+neighborCell, &density);
-
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
-
-        }
-      }
-    }
-  }
-
-  // x-boundaries
-  for (int y=0; y<=xlength+1; y++) {
-    for (int z=0; z<=xlength+1; z++) {
-      
-      // x = -1 plane 
-      // i affected:             2*,  6*,  9, 12*, 16*
-      // corresponding inv(i):  18, 14, 11, 18,  4
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      // *: already touched
-      currentCell = -1 + y*(xlength+2) + z*(xlength+2)*(xlength+2);
-      each = {9}; each_size = 1;
-      for (int e=0; e<each_size; e++) {
-        i = each[e];
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
-
-        if ( flagField[currentCell] == NO_SLIP ) {
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
-
-        } else if (flagField[currentCell] == MOVING_WALL) {
-
-          computeDensity(collideField+neighborCell, &density);
-
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
-
-        }
-      }
-
-      // x = +1 plane 
-      // i affected:             4*,  8*, 11, 14*, 18*
-      // corresponding inv(i):  16, 12,  9,  6,  2
-      // general rule: inv(i) = Q_NUMBER + 1 - i
-      // *: already touched
-      currentCell = +1 + y*(xlength+2) + z*(xlength+2)*(xlength+2);
-      each = {11}; each_size = 1;
-      for (int e=0; e<each_size; e++) {
-        i = each[e];
-        inv_i = Q_NUMBER + 1 - i;
-        neighborCell = currentCell + LATTICEVELOCITIES[inv_i][1]*xlength + LATTICEVELOCITIES[inv_i][2]*xlength*xlength + LATTICEVELOCITIES[inv_i][3]*xlength*xlength*xlength;
-        f_inv_i = collideField[ Q_NUMBER*neighborCell + inv_i];
-
-        if ( flagField[currentCell] == NO_SLIP ) {
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
-
-        } else if (flagField[currentCell] == MOVING_WALL) {
-
-          computeDensity(collideField+neighborCell, &density);
-
-          c_uwall = LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2] + LATTICEVELOCITIES[i][3] * wallVelocity[3];
-
-          collideField[ Q_NUMBER*currentCell + i] = f_inv_i
-            + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
-
-        }
-      }
-    }
-  }
-
-
-
-}
+} // function
 

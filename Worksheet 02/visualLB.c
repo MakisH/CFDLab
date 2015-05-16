@@ -8,11 +8,15 @@ void write_vtkHeader(FILE *fp, int xlength);
 void write_vtkPointCoordinates( FILE *fp, int xlength);
 
 void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int xlength) {
+	 printf("Enter VTK!\n");
 
 // Opening the file.
 	FILE *fp = NULL;
 	char sZFilename[80];
+	 printf("Before sprint!\n");
+
 	sprintf (sZFilename, "%s%i.vtk", filename, t);
+	 printf("after hell? !\n");
 
 	fp = fopen(sZFilename, "w");
 	if (fp == NULL) {
@@ -66,7 +70,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
-
+	 printf("VTK Complete!\n");
 }
 
 void write_vtkHeader( FILE *fp, int xlength) {

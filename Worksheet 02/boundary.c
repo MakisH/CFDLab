@@ -1,7 +1,8 @@
 #include "LBDefinitions.h"
 #include "boundary.h"
 #include "computeCellValues.h"
-#include "stdio.h"
+
+#include <stdio.h>
 
 void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
 
@@ -104,7 +105,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     for (int x = x_start; x <= x_end; x++) {
       for (int y = y_start; y <= y_end; y++) {
         for (int z = z_start; z <= z_end; z++) {
-          printf("x = %d, y = %d, z = %d \n", x, y, z);
+
+	  	  printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
+
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 

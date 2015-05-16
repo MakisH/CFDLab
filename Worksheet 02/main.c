@@ -8,15 +8,15 @@
 #include "boundary.h"
 
 int main(int argc, char *argv[]){
-
-  double *collideField = NULL;
-  double *streamField = NULL;
-  int *flagField = NULL;
-  int xlength;
-  double tau;
-  double velocityWall[3];
-  int timesteps;
-  int timestepsPerPlotting;
+	printf("Hi!\n");
+	double *collideField = NULL;
+	double *streamField = NULL;
+	int *flagField = NULL;
+	int xlength;
+	double tau;
+	double velocityWall[3];
+	int timesteps;
+	int timestepsPerPlotting;
 
   readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
 
@@ -34,27 +34,32 @@ int main(int argc, char *argv[]){
   collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
   streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
   flagField = (int *) malloc(domain * sizeof(int));
-
+	 printf("Initialize Complete!\n");
   initialiseFields( collideField, streamField, flagField, xlength );
-
+	 printf("InitializeFields Complete!\n");
+	 printf("xlength %d Complete!\n", xlength);
   for(int t = 0; t < timesteps; t++){
     printf("t = %d \n", t);
     double *swap = NULL;
     doStreaming( collideField, streamField, flagField, xlength );
-
+		printf("Streaming Complete!\n");
     swap = collideField;
     collideField = streamField;
     streamField = swap;
 
     doCollision( collideField, flagField, &tau, xlength );
+	    printf("Collision Complete!\n");
 
     treatBoundary( collideField, flagField, velocityWall, xlength );
+	    printf("treat Boundary Complete!\n %d %d",t,timestepsPerPlotting);
 
     if ( t % timestepsPerPlotting == 0 ){
       writeVtkOutput( collideField, flagField, "pics/", t, xlength );
     }
+	    printf("vtkOutputs Complete!\n");
 
   }
+  printf("Bye!\n");
 
   return 0;
 }

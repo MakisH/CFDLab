@@ -23,7 +23,7 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
 			for (z = 1; z <= xlength; ++z){
 
 				// address to the -> first <- distribution function within the respective cell.
-				currentCell = collideField + Q_NUMBER * (z + (xlength + 2) * y + (xlength + 2) * (xlength + 2) * x);
+				currentCell = collideField + Q_NUMBER * (x + (xlength + 2) * y + (xlength + 2) * (xlength + 2) * z);
 
 				computeDensity (currentCell, &density);
 				computeVelocity (currentCell, &density, velocity);

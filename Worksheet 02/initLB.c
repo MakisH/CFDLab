@@ -20,7 +20,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 }
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
-
+	// might be faster with if-else, but it is insignificant compared to wtkoutput & co
 	int x, y, z, i;
 	int xlen2 = xlength + 2;
 	int xlen2sq = xlen2 * xlen2;
@@ -29,8 +29,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		for (y = 0; y < xlen2; ++y){
 			for (z = 0; z < xlen2; ++z){
 				for (i = 0; i < Q_NUMBER; ++i){
-					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
-					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
+					streamField[Q_NUMBER * (z + y * xlen2 + x * xlen2sq) + i] = LATTICEWEIGHTS[i];
+					collideField[Q_NUMBER * (z + y * xlen2 + x * xlen2sq) + i] = LATTICEWEIGHTS[i];
 				}
 			}
 		}
@@ -43,7 +43,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	for (x = 1; x <= xlength; ++x) {
 		for (y = 1; y <= xlength; ++y) {
 			for (z = 1; z <= xlength; ++z) {
-				flagField[x + y * xlen2 + z * xlen2sq] = FLUID;
+				flagField[z + y * xlen2 + x * xlen2sq] = FLUID;
 			}
 		}
 	}

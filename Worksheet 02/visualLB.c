@@ -42,7 +42,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
   for (x = 0; x < xlength + 2; x++) {
     for (y = 0; y < xlength + 2; y++) {
       for (z = 0; z < xlength + 2; z++){
-          computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
+          computeDensity (collideField + Q_NUMBER * (z + (xlength+2)*y + (xlength+2)*(xlength+2)*x), &density);
           fprintf(fp, "%f\n", density);
       }
     }
@@ -54,8 +54,8 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	for (x = 0; x < xlength + 2; x++) {
 		for(y = 0; y < xlength + 2; y++) {
 			for (z = 0; z < xlength + 2; z++){
-        computeDensity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density);
-        computeVelocity (collideField + Q_NUMBER * (x + (xlength+2)*y + (xlength+2)*(xlength+2)*z), &density, velocity);
+        computeDensity (collideField + Q_NUMBER * (z + (xlength+2)*y + (xlength+2)*(xlength+2)*x), &density);
+        computeVelocity (collideField + Q_NUMBER * (z + (xlength+2)*y + (xlength+2)*(xlength+2)*x), &density, velocity);
 				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
 			}
 		}
@@ -101,7 +101,7 @@ void write_vtkPointCoordinates( FILE *fp, int xlength) {
   for (x = 0; x < xlength + 2; x++){
         for (y = 0; y < xlength + 2; y++){
                 for (z = 0; z < xlength + 2; z++){
-                        fprintf(fp, "%f %f %f\n", originX+(x*dx), originY+(y*dy), originZ+(z*dz) );
+                        fprintf(fp, "%f %f %f\n", originZ+(z*dz), originY+(y*dy), originX+(x*dx) );
                 }
         }
   }

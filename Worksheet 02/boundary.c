@@ -18,7 +18,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   double SizeXY = SizeX * SizeY;
 
   for (int boundary = 1; boundary <= 6; boundary++) {
-    printf("boundary = %d \n", boundary);
+    //printf("boundary = %d \n", boundary);
     // which boundary am I processing now?
     switch (boundary) {
       // z = 0 (no-slip by default)
@@ -104,7 +104,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
     for (int x = x_start; x <= x_end; x++) {
       for (int y = y_start; y <= y_end; y++) {
         for (int z = z_start; z <= z_end; z++) {
-          printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
+         // printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
           // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
           currentCell = x + y*SizeX + z*SizeXY;
 
@@ -112,7 +112,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             // "Foreach" i on the boundary. We may kill prefetching but there is no foreach in C...
             i = each[e];
             // inv(i) - inverse direction of i
-            inv_i = Q_NUMBER + 1 - i;
+            inv_i = Q_NUMBER - i;
             // Neighbor cell of current cell in inv(i) direction
             neighborCell = currentCell + LATTICEVELOCITIES[inv_i][0] + LATTICEVELOCITIES[inv_i][1]*SizeX + LATTICEVELOCITIES[inv_i][2]*SizeXY;
             // We use f*_inv(i) in both cases (no-slip and moving wall)

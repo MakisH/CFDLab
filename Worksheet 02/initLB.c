@@ -25,12 +25,12 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int xlen2 = xlength + 2;
 	int xlen2sq = xlen2 * xlen2;
 	/* stream & collide Fields initialization. */
-	for (x = 0; x < xlen2; ++x){
+	for (z = 0; z < xlen2; ++z){
 		for (y = 0; y < xlen2; ++y){
-			for (z = 0; z < xlen2; ++z){
+			for (x = 0; x < xlen2; ++x){
 				for (i = 0; i < Q_NUMBER; ++i){
-					streamField[Q_NUMBER * (z + y * xlen2 + x * xlen2sq) + i] = LATTICEWEIGHTS[i];
-					collideField[Q_NUMBER * (z + y * xlen2 + x * xlen2sq) + i] = LATTICEWEIGHTS[i];
+					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
+					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
 				}
 			}
 		}
@@ -40,17 +40,16 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	/* Why that many for statements? We used the loop unrolling approach to get rid of the if-statements, which would be present in the third for loop. */
 
 	// Fluid init (inner part of flagField).
-	for (x = 1; x <= xlength; ++x) {
+	for (z = 1; z <= xlength; ++z) {
 		for (y = 1; y <= xlength; ++y) {
-			for (z = 1; z <= xlength; ++z) {
-				flagField[z + y * xlen2 + x * xlen2sq] = FLUID;
+			for (x= 1; x <= xlength; ++x) {
+				flagField[x + y * xlen2 + z * xlen2sq] = FLUID;
 			}
 		}
 	}
 
-	//unsigned int iter1,iter2, fixed_iter_xy; <- Why do we need that?
 	z = xlength + 1;
-	for (x = 0; x < xlen2; ++x){
+	for (x = 0; x < xlen2; ++x){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
 		for (y = 0; y < xlen2; ++y){
 			// add all other walls in the same loop, simply switch the indices
 			// - x and y are iterators, use x with xlensq for memory locality

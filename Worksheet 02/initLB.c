@@ -24,6 +24,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int x, y, z, i;
 	int xlen2 = xlength + 2;
 	int xlen2sq = xlen2 * xlen2;
+
 	/* stream & collide Fields initialization. */
 	for (z = 0; z < xlen2; ++z){
 		for (y = 0; y < xlen2; ++y){
@@ -37,7 +38,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 	/* flagField init: boundary vs. fluid. */
 	/* Boundary initialization: (5 walls: no-slip; 1 wall: moving wall). Fluid: inner part. */
-	/* Why that many for statements? We used the loop unrolling approach to get rid of the if-statements, which would be present in the third for loop. */
 
 	// Fluid init (inner part of flagField).
 	for (z = 1; z <= xlength; ++z) {
@@ -48,6 +48,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 	}
 
+	// Boundary init.
 	z = xlength + 1;
 	for (x = 0; x < xlen2; ++x){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
 		for (y = 0; y < xlen2; ++y){
@@ -65,48 +66,4 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			flagField[y + x * xlen2 + z * xlen2sq	] = MOVING_WALL;	// z+ dimension
 		}
 	}
-
-/*
-	// No slip. For every y, z we set x = 0.
-	x = 0;
-	for (y=0; y<xlength+2; y++){
-		for (z=0; z<xlength+2; z++){
-			flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
-		}
-	}
-
-	// No slip. For every x, z we set y = 0.
-	y = 0;
-	for (x = 0; x < xlength+2; x++){
-		for (z = 0; z < xlength+2; z++){
-			flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
-		}
-	}
-
-	// No slip. For every x, y we set z = 0.
-	z = 0;
-		for (x = 0; x < xlength+2; x++){
-				for (y = 0; y < xlength+2; y++){
-						flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
-				}
-		}
-
-	// No slip. For every y, z we set x = xlength+1.
-	x=xlength+1;
-		for (y = 0; y < xlength+2; y++){
-				for (z = 0; z < xlength+2; z++){
-						flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
-				}
-		}
-
-	// No slip. For every x, z we set y = xlength+1;
-		y = xlength+1;
-		for (x = 0; x < xlength+2; x++){
-				for (z = 0; z < xlength+2; z++){
-						flagField[x + y*xlength + z*xlength*xlength] = NO_SLIP;
-				}
-		}
-
-*/
-
 }

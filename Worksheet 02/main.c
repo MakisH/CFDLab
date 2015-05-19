@@ -63,6 +63,10 @@ int main(int argc, char *argv[]){
 
 	}
 
+
+	free(collideField);
+	free(streamField);
+	free(flagField);
 	return 0;
 }
 

@@ -98,9 +98,10 @@ void write_vtkPointCoordinates( FILE *fp, int xlength) {
 	dy = 1.0 / (xlength - 1);
 	dz = 1.0 / (xlength - 1);
 	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
-	for (z = 0; z <= 1; z+=dz){
-		for (y = 0; y <= 1; y+=dy){
-			for (x = 0; x <= 1; x+=dx){
+	// dscretization error appears if we don't include an additional "epsilon" factor 
+	for (z = 0; z <= 1 + dx * 0.5; z += dz){
+		for (y = 0; y <= 1 + dy * 0.5; y += dy){
+			for (x = 0; x <= 1 + dz * 0.5; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}

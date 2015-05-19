@@ -25,7 +25,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	}
 
 
-
+//	  printf("start Point Coordinates\n");
 	write_vtkHeader(fp, xlength); // Write the header.
 	write_vtkPointCoordinates(fp, xlength);
 
@@ -37,7 +37,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	int xlen2 = xlength + 2;
 	int xlen2sq = xlen2 * xlen2;
   fprintf(fp, "\nPOINT_DATA %d \n", xlength * xlength * xlength );
-
+ // printf("start Density\n");
 	/* DENSITIES */
 	fprintf(fp, "SCALARS density float 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
@@ -49,6 +49,8 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
+
+//  printf("start Velocity\n");
 
 	/* VELOCITIES */
 	fprintf(fp, "\nVECTORS velocity float \n");
@@ -62,6 +64,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
+	//  free(density_arr);
 }
 
 void write_vtkHeader( FILE *fp, int xlength) {
@@ -86,7 +89,7 @@ void write_vtkHeader( FILE *fp, int xlength) {
 
 
 void write_vtkPointCoordinates( FILE *fp, int xlength) {
-	int x, y, z;
+	double x, y, z;
 	// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1)
 	double dx, dy, dz;
 	// start at 0 and finish at 1.0 => len-1
@@ -94,13 +97,30 @@ void write_vtkPointCoordinates( FILE *fp, int xlength) {
 	dx = 1.0 / (xlength - 1);
 	dy = 1.0 / (xlength - 1);
 	dz = 1.0 / (xlength - 1);
-
-	for (z = 0; z < xlength; ++z){
-		for (y = 0; y < xlength; ++y){
-			for (x = 0; x < xlength; ++x){
-				fprintf(fp, "%f %f %f\n", x * dx , y * dy, z * dz);
+	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
+	for (z = 0; z <= 1; z+=dz){
+		for (y = 0; y <= 1; y+=dy){
+			for (x = 0; x <= 1; x+=dx){
+				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}
 	}
 }
-
+//void write_vtkPointCoordinates( FILE *fp, int xlength) {
+//	int x, y, z;
+//	// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1)
+//	double dx, dy, dz;
+//	// start at 0 and finish at 1.0 => len-1
+//	// e.g. for 15 points there are 14 "cells"
+//	dx = 1.0 / (xlength - 1);
+//	dy = 1.0 / (xlength - 1);
+//	dz = 1.0 / (xlength - 1);
+//
+//	for (z = 0; z < xlength; ++z){
+//		for (y = 0; y < xlength; ++y){
+//			for (x = 0; x < xlength; ++x){
+//				fprintf(fp, "%f %f %f\n", x * dx , y * dy, z * dz);
+//			}
+//		}
+//	}
+//}

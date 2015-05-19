@@ -10,7 +10,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 	int x_start, x_end, y_start, y_end, z_start, z_end;
 	double f_inv_i, density, c_uwall;
 
-	// each: array that stores each of the i-directions of the boundary walls that are going
+	// each is an array that stores each of the i-directions of the boundary walls that are going
 	// to be updated each time.
 	int each[5]; // trick to implement a "foreach" loop, for every i direction to be touched
 
@@ -101,7 +101,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 		for (int x = x_start; x <= x_end; ++x) {
 			for (int y = y_start; y <= y_end; ++y) {
 				for (int z = z_start; z <= z_end; ++z) {
-					// printf(" iteration %d %d %d Started boundary %d!\n",x,y,z,boundary);
+
 					// Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
 					currentCell = x + y*SizeX + z*SizeXY; // current boundary cell
 
@@ -112,23 +112,28 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
 						// inv(i) - inverse direction of i
 						inv_i = Q_NUMBER - i - 1;
+
 						// Neighbor cell of current cell in i-direction
 						neighborX = x + LATTICEVELOCITIES[i][0];
 						neighborY = y + LATTICEVELOCITIES[i][1];
 						neighborZ = z + LATTICEVELOCITIES[i][2];
+
 						// Check if the neighbor cell coordinates are valid (and not on or outside the limits, that is, boundaries)
 						if ( neighborX > 0 && neighborX < SizeX-1 && neighborY > 0 && neighborY < SizeY-1 && neighborZ > 0 && neighborZ < SizeZ-1 ) {
-							
+
 							neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+
 							// We use f*_inv(i) in both cases (no-slip and moving wall)
 							f_inv_i = collideField[ Q_NUMBER * neighborCell + inv_i];
 
 							// What type of boundary condition do we have? We could avoid this if by hard-coding different loops for different
 							// kinds of boundary conditions, by we would decrease generality.
 							if ( flagField[currentCell] == NO_SLIP ) {
+
 								// update the boundary
 								collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
 							} else if (flagField[currentCell] == MOVING_WALL) {
+
 								// density in the neighbor cell
 								computeDensity(collideField+Q_NUMBER*neighborCell, &density);
 

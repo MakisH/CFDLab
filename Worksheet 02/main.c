@@ -17,52 +17,36 @@ int main(int argc, char *argv[]){
 	int timesteps;
 	int timestepsPerPlotting;
 
-	readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv );
-	// DEBUG: Print what we read
-	printf("xlength = %d \n", xlength);
-	printf("tau = %f \n", tau);
-	printf("timesteps = %d \n", timesteps);
-	printf("timestepsPerPlotting = %d \n", timestepsPerPlotting);
+	readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv ); // reading parameters from the file.
 
-	printf("velocityWall[0] = %f \n", velocityWall[0]);
-	printf("velocityWall[1] = %f \n", velocityWall[1]);
-	printf("velocityWall[2] = %f \n", velocityWall[2]);
-
-	// Three main arrays allocation..
+	// Allocating the main three arrays.
 	int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);
 	collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	flagField = (int *) malloc(domain * sizeof(int));
 
+	// Init the main three arrays.
 	initialiseFields( collideField, streamField, flagField, xlength );
-	//printf("InitializeFields Complete!\n");
-	// writeVtkOutput( collideField, flagField, "pics/", 0, xlength );
-	// printf("xlength %d Complete!\n", xlength);
-	// return 0;
 
 	for(int t = 0; t <= timesteps; t++){
-
 		double *swap = NULL;
 		doStreaming( collideField, streamField, flagField, xlength );
-		//printf("Streaming Complete!\n");
+
 		swap = collideField;
 		collideField = streamField;
 		streamField = swap;
 
 		doCollision( collideField, flagField, &tau, xlength );
-		//printf("Collision Complete!\n");
 
 		treatBoundary( collideField, flagField, velocityWall, xlength );
-		//printf("treat Boundary Complete!\n %d %d",t,timestepsPerPlotting);
 
-		if ( t % timestepsPerPlotting == 0 ){
-		  printf("t = %d \n", t);
-			writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
-		}
-		//printf("vtkOutputs Complete!\n");
-
+		if ( t % timestepsPerPlotting == 0 ) writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
 	}
 
+
+	free(collideField);
+	free(streamField);
+	free(flagField);
 	return 0;
 }
 

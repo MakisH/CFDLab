@@ -12,7 +12,7 @@ tau                         1.0
 #               time steps
 #--------------------------------------------
 timesteps                   80
-timestepsPerPlotting        1
+timestepsPerPlotting        2
 
 #--------------------------------------------
 #               boundaries

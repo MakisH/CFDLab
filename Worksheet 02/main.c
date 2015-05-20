@@ -40,7 +40,11 @@ int main(int argc, char *argv[]){
 
 		treatBoundary( collideField, flagField, velocityWall, xlength );
 
-		if ( t % timestepsPerPlotting == 0 ) writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
+		if ( t % timestepsPerPlotting == 0 ) {
+      printf("Writing the vtk file for timestep # %d \n", t);
+      writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
+    }
+    
 	}
 
 

@@ -61,6 +61,8 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
+	
+	fclose(fp);
 }
 
 void write_vtkHeader( FILE *fp, int xlength) {

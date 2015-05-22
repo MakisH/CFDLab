@@ -12,7 +12,7 @@ CFLAGS=-Werror -pedantic -Wall -std=c99
 LDFLAGS= 
 
 OBJECTS=$(SOURCES:.c=.o)
-EXECUTABLE=lbsim
+EXECUTABLE=sim
 
 all: $(EXECUTABLE)
 

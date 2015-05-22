@@ -9,9 +9,13 @@
 
 	static const double C_S = 0.577350269189626;
 
-	static const unsigned int FLUID = 0;
-	static const unsigned int NO_SLIP = 1;
+	static const unsigned int FLUID       = 0;
+	static const unsigned int NO_SLIP     = 1;
 	static const unsigned int MOVING_WALL = 2;
+  static const unsigned int FREE_SLIP   = 3;
+  static const unsigned int INFLOW      = 4;
+  static const unsigned int OUTFLOW     = 5;
+  static const unsigned int PRESSURE_IN = 6;
 
 	// Precalculations for performance
 	static const double C_S_sq = 0.577350269189626 * 0.577350269189626;

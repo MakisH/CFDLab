@@ -3,7 +3,7 @@
 #include "computeCellValues.h"
 #include <stdio.h>
 
-void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int *xlength){
+void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
 
   int i, inv_i, currentCell, neighborCell;
   int neighborX, neighborY, neighborZ;
@@ -14,9 +14,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   // to be updated each time.
   int each[5]; // trick to implement a "foreach" loop, for every i direction to be touched
 
-  int SizeX = (xlength[0] + 2); // Size of the extended domain in each direction
-  int SizeY = (xlength[1] + 2);
-  int SizeZ = (xlength[2] + 2);
+  int SizeX = (xlength + 2); // Size of the extended domain in each direction
+  int SizeY = (xlength + 2);
+  int SizeZ = (xlength + 2);
   int SizeXY = SizeX * SizeY; // Size of the XY plane of the extended domain
 
   for (int boundary = 1; boundary <= 6; boundary++) {

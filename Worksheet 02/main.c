@@ -11,16 +11,16 @@ int main(int argc, char *argv[]){
 	double *collideField = NULL;
 	double *streamField = NULL;
 	int *flagField = NULL;
-	int xlength[3];
+	int xlength;
 	double tau;
 	double velocityWall[3];
 	int timesteps;
 	int timestepsPerPlotting;
 
-	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv ); // reading parameters from the file.
+	readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv ); // reading parameters from the file.
 
 	// Allocating the main three arrays.
-	int domain = (xlength[0] + 2) * (xlength[1] + 2) * (xlength[2] + 2);
+	int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);
 	collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	flagField = (int *) malloc(domain * sizeof(int));
@@ -41,10 +41,10 @@ int main(int argc, char *argv[]){
 		treatBoundary( collideField, flagField, velocityWall, xlength );
 
 		if ( t % timestepsPerPlotting == 0 ) {
-		printf("Writing the vtk file for timestep # %d \n", t);
-		writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
-	}
-	
+      printf("Writing the vtk file for timestep # %d \n", t);
+      writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
+    }
+    
 	}
 
 

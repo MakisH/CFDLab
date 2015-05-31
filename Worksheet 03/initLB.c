@@ -28,7 +28,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 	return 0;
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem){
+void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, const char *problem){
 	// TO DO - implement exit if scenario is wrong
 	// TO DO - think about the direction of initiliasiation - a) is initialized with x starting from upper left corner, whereas c is initialised with x starting from bottomleft corner
 	int x, y, z, i;
@@ -50,7 +50,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	**/
 	/* Boundary initialization: According to scenario */
 
-	if (problem == "A tilted plane")
+	if (problem == "karman_vortex_street")
 	{
 
 		X_min = NO_SLIP;		// x- dimension	
@@ -71,7 +71,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		int xsize, ysize;
 		int i1, j1;
 		int **pic = NULL;
-		const char *filename = "lbm_tilted_plate.vtk";
+		const char *filename = "./configs/lbm_tilted_plate.vtk";
 		int scale_x;
 		int scale_y;
 		if ((input=fopen(filename,"rb"))==0)
@@ -136,11 +136,10 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					for (z = xsize * scale_x; z < xsize * scale_x + scale_x; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
 							for (x = ysize * scale_y; x < ysize * scale_y + scale_y; ++x) {
-								flagField[x + y * ylen2 + z * xylen2] = byte;//pic[i1][ysize+1-j1] = byte;
+								flagField[x + y * ylen2 + z * xylen2] = byte;
 							}
 						}
 					}
-					//printf("%d,%d: %d\n", i1,ysize+1-j1,byte);
 				}
 			}
 		}
@@ -148,7 +147,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		fclose(input);
 
 	}
-	else if (problem == "Plane shear flow")
+	else if (problem == "plane_shear_flow")
 	{
 
 		X_min = FREE_SLIP;	// x- dimension	
@@ -169,7 +168,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	}
-	else if (problem == "Flow over a step")
+	else if (problem == "flow_over_step")
 	{
 
 		X_min = NO_SLIP;	// x- dimension	

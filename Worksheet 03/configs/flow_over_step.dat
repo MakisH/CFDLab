@@ -6,24 +6,24 @@
 #---------------------------------------------------
 #  "problem" argument
 #---------------------------------------------------
-problem			flow_over_step
+problem			          flow_over_step
 
 #---------------------------------------------------
 #  size of the domain             
 #---------------------------------------------------
-xlength			30
-ylength			30
-zlength			50
+xlength			          30
+ylength			          30
+zlength			          50
 
 #---------------------------------------------------
 #  relaxation time
 #---------------------------------------------------
-tau			0.6
+tau			              0.6
 
 #---------------------------------------------------
 #  time steps
 #---------------------------------------------------
-timesteps			10000
+timesteps			        10000
 timestepsPerPlotting	100
 
 #---------------------------------------------------
@@ -31,19 +31,19 @@ timestepsPerPlotting	100
 #  (use 0 to ignore velocity boundary conditions)
 #  (use -1 to ignore density boundary conditions)
 #---------------------------------------------------
-velocityInX		0
-velocityInY		0
-velocityInZ		0.05
+velocityInX		        0
+velocityInY		        0
+velocityInZ		        0.05
 
-densityIn			-1
-densityRef		-1
+densityIn			        -1
+densityRef		        -1
 
 #--------------------------------------------
 #              Moving wall velocity|(if any)
 #--------------------------------------------
-velocityWall1 		0.01
-velocityWall2 		0.0
-velocityWall3 		0.0
+velocityWall1 		    0.01
+velocityWall2 		    0.0
+velocityWall3 		    0.0
 
 #---------------------------------------------------
 # Types of the left, right, top, bottom boundaries
@@ -55,11 +55,11 @@ velocityWall3 		0.0
 #   5   : OUTFLOW
 #   6   : PRESSURE_IN
 #---------------------------------------------------
-wallLeft			4             
-wallRight			5
-wallTop			1
-wallBottom		1
-wallBackground		3
-wallForeground		3
+wallLeft			        4             
+wallRight			        5
+wallTop			          1
+wallBottom		        1
+wallBackground		    3
+wallForeground		    3
 
 

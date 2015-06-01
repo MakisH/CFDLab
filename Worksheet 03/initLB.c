@@ -176,7 +176,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
 					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
-					printf("%d ",x + y * ylen2 + z * xylen2);
+					//printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}

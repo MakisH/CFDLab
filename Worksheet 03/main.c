@@ -46,7 +46,7 @@ int main(int argc, char *argv[]){
 
 		doCollision( collideField, flagField, &tau, xlength );
 
-		treatBoundary( collideField, flagField, velocityWall, xlength );
+		treatBoundary( collideField, flagField, velocityWall, xlength, &densityRef, &velocityIn, &densityIn );
 
 		if ( t % timestepsPerPlotting == 0 ) {
 			printf("Writing the vtk file for timestep # %d \n", t);

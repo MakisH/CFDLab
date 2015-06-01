@@ -237,7 +237,8 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
           if (flagField[x + y * ylen2 + (z+1) * xylen2] == FLUID) counter++;          
         }
         if (counter > 2) {
-          printf("The domain contains forbidden boundary cells, that is, boundary cells with more than 2 fluid neighbors.");
+          printf("The domain contains forbidden boundary cells, that is, boundary cells with more than 2 fluid neighbors.\n");
+          printf("Coordinates: x = %d, y = %d, z = %d \n", x, y, z);
           return 1;
         }
       }

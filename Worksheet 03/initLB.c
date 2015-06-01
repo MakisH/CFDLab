@@ -85,7 +85,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		int xsize, ysize;
 		int i1, j1;
 //		int **pic = NULL;
-		const char *filename = "./configs/mystuff.pgm";//lbm_tilted_plate.vtk";
+		const char *filename = "./configs/lbm_tilted_plate.pgm";//lbm_tilted_plate.vtk";
 		int scale_x;
 		int scale_y;
 		if ((input=fopen(filename,"rb"))==0)

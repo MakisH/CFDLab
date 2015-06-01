@@ -201,21 +201,45 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-	  computeDensity(collideField + currentCell*Q_NUMBER, &density);
-	  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
-
-            computeFeq(ref_density, &velocity, feq);
-            collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
-            break;
             
+            // Neighbor cell of current cell in i-direction
+            neighborX = x + LATTICEVELOCITIES[i][0];
+            neighborY = y + LATTICEVELOCITIES[i][1];
+            neighborZ = z + LATTICEVELOCITIES[i][2];
+
+            // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+            neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+            
+            // Check if the neighbor cell is fluid and if its coordinates are valid
+            if ( flagField[neighborCell] == FLUID && neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+              computeDensity(collideField + currentCell*Q_NUMBER, &density);
+              computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+
+              computeFeq(ref_density, &velocity, feq);
+              collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
+            }
+
+            break;
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-	  computeDensity(collideField + currentCell*Q_NUMBER, &density);
-	  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+            // Neighbor cell of current cell in i-direction
+            neighborX = x + LATTICEVELOCITIES[i][0];
+            neighborY = y + LATTICEVELOCITIES[i][1];
+            neighborZ = z + LATTICEVELOCITIES[i][2];
 
-            computeFeq(density_in, &velocity, feq);
-            collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
+            // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+            neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+            
+            // Check if the neighbor cell is fluid and if its coordinates are valid
+            if ( flagField[neighborCell] == FLUID && neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+              computeDensity(collideField + currentCell*Q_NUMBER, &density);
+              computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+
+              computeFeq(density_in, &velocity, feq);
+              collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
+            }
+            
             break;
             
         } // switch flagField

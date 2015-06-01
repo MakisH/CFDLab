@@ -160,7 +160,14 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 /*
 SPECIAL BOUNDARY CASES TO BE ADDED TO THE MAIN CODE.
 
-double feq[Q_NUMBER]; // To add to begining.
+// Variables to add to the begining of this file.
+double feq[Q_NUMBER]; 
+read the ref_velocity;
+read ref_density;
+read density_in;
+double density;
+double velocity;
+
 
 if ( flagField[currentCell] == INFLOW ){
 	computeFeq(ref_density, ref_velocity, feq);

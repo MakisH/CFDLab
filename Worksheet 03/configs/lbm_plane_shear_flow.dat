@@ -1,0 +1,66 @@
+#---------------------------------------------------
+#  Configuration file for the problem:
+#  Plane shear flow
+#---------------------------------------------------
+
+#---------------------------------------------------
+#  "problem" argument
+#---------------------------------------------------
+problem			          lbm_plane_shear_flow
+
+#---------------------------------------------------
+#  size of the domain             
+#---------------------------------------------------
+xlength			          8
+ylength			          8
+zlength			          20
+
+#---------------------------------------------------
+#  relaxation time
+#---------------------------------------------------
+tau			              1.8
+
+#---------------------------------------------------
+#  time steps
+#---------------------------------------------------
+timesteps			        5000
+timestepsPerPlotting	100
+
+#---------------------------------------------------
+#  boundary conditions
+#  (use 0 to ignore velocity boundary conditions)
+#  (use -1 to ignore density boundary conditions)
+#---------------------------------------------------
+velocityInX		        0
+velocityInY		        0
+velocityInZ		        0  
+
+densityIn			        1.005
+densityRef 		        1
+
+#--------------------------------------------
+#              Moving wall velocity|(if any)
+#--------------------------------------------
+velocityWall1		      0.01
+velocityWall2		      0.0
+velocityWall3		      0.0
+
+#---------------------------------------------------
+# Types of the left, right, top, bottom boundaries
+# Valid values:
+#   1   : NO_SLIP
+#   2   : MOVING_WALL
+#   3   : FREE_SLIP
+#   4   : INFLOW
+#   5   : OUTFLOW
+#   6   : PRESSURE_IN
+#---------------------------------------------------
+wallLeft 			        4             
+wallRight			        5
+wallTop			          1
+wallBottom		        1
+wallBackground		    3
+wallForeground		    3               
+
+
+

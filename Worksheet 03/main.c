@@ -38,6 +38,7 @@ int main(int argc, char *argv[]){
 	if ( initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) return 1;
 	for(int t = 0; t <= timesteps; t++){
 		double *swap = NULL;
+		printf("martosss is done\n");
 		doStreaming( collideField, streamField, flagField, xlength );
 
 		swap = collideField;

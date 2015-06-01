@@ -3,11 +3,14 @@
 #include "computeCellValues.h"
 #include <stdio.h>
 
-void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int xlength){
+void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int *xlength, const double * const ref_density, const double * const ref_velocity,
+		   const double * const density_in){
 
   int i, inv_i, mirror_i, currentCell, neighborCell;
   int neighborX, neighborY, neighborZ;
-  double f_inv_i, density, c_uwall;
+  double f_inv_i, density, c_uwall, velocity;
+
+  double feq[Q_NUMBER];
 
   int SizeX = (xlength + 2); // Size of the extended domain in each direction
   int SizeY = (xlength + 2);
@@ -190,19 +193,28 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- INFLOW ------------------------------------------------------------------------//  
           case INFLOW :
-            
+	    computeFeq(*ref_density, *ref_velocity, feq);
+	    collideField[Q_NUMBER * currentCell + i] = feq[i];
             break;
             
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-            
+	  computeDensity(currentCell, &density);
+	  computeVelocity(currentCell, density, &velocity);
+
+	  computeFeq(*ref_density, velocity, feq);
+	  collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
             break;
             
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-            
+	  computeDensity(currentCell, &density);
+	  computeVelocity(currentCell, density, &velocity);
+
+	  computeFeq(*density_in, velocity, feq);
+	  collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
             break;
             
             

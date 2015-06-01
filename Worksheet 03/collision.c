@@ -18,14 +18,14 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
 	double feq[Q_NUMBER];
 	double *currentCell;
 
-	for (x = 1; x <= xlength; ++x){
-		for (y = 1; y <= xlength; ++y){
-			for (z = 1; z <= xlength; ++z){
+	for (z = 1; z <= xlength[2]; ++z){
+		for (y = 1; y <= xlength[1]; ++y){
+			for (x = 1; x <= xlength[0]; ++x){
 
-				if (flagField[z + (xlength + 2) * y + (xlength + 2) * (xlength + 2) * x] == FLUID)
+				if (flagField[x + (xlength[1] + 2) * y + (xlength[2] + 2) * (xlength[2] + 2) * z] == FLUID)
 				{
 					// address to the -> first <- distribution function within the respective cell.
-					currentCell = collideField + Q_NUMBER * (z + (xlength + 2) * y + (xlength + 2) * (xlength + 2) * x);
+					currentCell = collideField + Q_NUMBER * (x + (xlength[1] + 2) * y + (xlength[2] + 2) * (xlength[2] + 2) * z);
 					computeDensity (currentCell, &density);
 					computeVelocity (currentCell, &density, velocity);
 					computeFeq (&density, velocity, feq);

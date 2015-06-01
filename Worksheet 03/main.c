@@ -36,7 +36,7 @@ int main(int argc, char *argv[]){
 	printf("before init \n");
 	// Init the 3 main arrays.
 	if ( initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) return 1;
-	for(int t = 0; t <= timesteps; t++){
+	for(int t = 0; t < timesteps; t++){
 		double *swap = NULL;
 		doStreaming( collideField, streamField, flagField, xlength );
 

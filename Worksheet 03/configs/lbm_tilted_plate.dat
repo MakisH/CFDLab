@@ -10,9 +10,9 @@ problem			          lbm_tilted_plate
 #---------------------------------------------------
 #  size of the domain             
 #---------------------------------------------------
-xlength			          212
-ylength			          3
-zlength			          492
+xlength			          210
+ylength			          1
+zlength			          490
 
 #---------------------------------------------------
 #  relaxation time

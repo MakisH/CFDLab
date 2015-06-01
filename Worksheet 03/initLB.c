@@ -20,7 +20,7 @@ int readParameters(char		*problem,
 	// we need to read the problem char variable and act accordingly to read the other variables(switch....) 
 	// ... or read all and think later :)
 	if ( argc != 2 ) {
-		printf("Usage: ./lbsim input_file");
+		printf("Usage: ./sim input_file");
 		return 1;
 	}
 	else {
@@ -72,9 +72,9 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	int xylen2 = xlen2 * ylen2;
 //	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
 
-	if (!strcmp(problem,"karman_vortex_street"))
+	if (!strcmp(problem,"lbm_tilted_plate"))
 	{
-		printf("sc1 %d\n", strcmp(problem,"karman_vortex_street"));
+		printf("sc1 %d\n", strcmp(problem,"lbm_tilted_plate"));
 	// need to scale input file according to dimensions, if they're different we throw an error
 	// this is a repetitions of the pgm_read() function,
 	//		but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
@@ -85,7 +85,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		int xsize, ysize;
 		int i1, j1;
 //		int **pic = NULL;
-		const char *filename = "./configs/lbm_tilted_plate.vtk";
+		const char *filename = "./configs/mystuff.pgm";//lbm_tilted_plate.vtk";
 		int scale_x;
 		int scale_y;
 		if ((input=fopen(filename,"rb"))==0)
@@ -130,6 +130,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		}
 		else if(xlength[2] % xsize != 0 || xlength[0] % ysize != 0)
 		{
+			printf("xlen2 %d\nxsize %d\nxlen0 %d\nysize %d \n",xlength[2],xsize,xlength[0],ysize);
 			printf("Dimensions and xlength mismatch!\n");
 			return 1;
 		}
@@ -149,12 +150,14 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 				else
 				{
+			//		if(i1 < 150 && i1 > 100) printf("%d ",byte);
 // every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
 					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
 					for (z = (i1 - 1) * scale_x + 1; z <= i1 * scale_x + scale_x; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
 							for (x = (j1 - 1) * scale_y + 1; x <= j1 * scale_y + scale_y; ++x) {
 								flagField[x + y * ylen2 + z * xylen2] = byte;
+								//printf("%d ",x + y * ylen2 + z * xylen2);
 							}
 						}
 					}
@@ -165,9 +168,9 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		fclose(input);
 
 	}
-	else if (!strcmp(problem,"plane_shear_flow"))
+	else if (!strcmp(problem,"lbm_plane_shear_flow"))
 	{
-		printf("sc2 %d\n", strcmp(problem,"plane_shear_flow"));
+		printf("sc2 %d\n", strcmp(problem,"lbm_plane_shear_flow"));
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
@@ -179,14 +182,15 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		}
 
 	}
-	else if (!strcmp(problem,"flow_over_step"))
+	else if (!strcmp(problem,"lbm_flow_over_step"))
 	{
-		printf("sc3 %d\n", strcmp(problem,"flow_over_step"));
+		printf("sc3 %d\n", strcmp(problem,"lbm_flow_over_step"));
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
 					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
+				//	printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
@@ -196,6 +200,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]/2; ++x) { //cube is in the 2nd half of the x dimension
 					flagField[x + y * ylen2 + z * xylen2] = NO_SLIP;
+					//printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
@@ -203,7 +208,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	else
 	{
-				printf("sc4 %d\n", strcmp(problem,"flow_over_step"));
+				printf("sc4 %d\n", strcmp(problem,"lbm_flow_over_step"));
 
 		printf("\n\nUnknown / Misspelled scenario name!\n\n");
 		printf("Known scenarios are:\n\n");
@@ -244,6 +249,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 					// the only question is whether this is OK with the cache memory
 					// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
 					flagField[	  y * ylen2 + z * xylen2	] = initxyzXYZ[0];						// x- dimension	
+										// printf("%d ",y * ylen2 + z * xylen2);
 					flagField[x							+ z * xylen2	] = initxyzXYZ[1];						// y- dimension
 					flagField[x + y * ylen2								] = initxyzXYZ[2];						// z- dimension
 
@@ -253,5 +259,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 			}
 		}
+		printf("init done done\n");
 		return 0;
 }

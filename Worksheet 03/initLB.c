@@ -5,8 +5,20 @@
 //#include <errno.h>
 //#include <stdio.h>
 
-int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int argc, char *argv[]){
-	// we need to read the problem char variable and act accordingly to read the other variables(switch....)
+int readParameters(char		*problem,
+									 int		*xlength,
+									 double *tau,
+									 int		*timesteps,
+									 int		*timestepsPerPlotting,
+									 double *velocityIn,
+									 double *densityIn,
+									 double *densityRef,
+									 double *velocityWall,
+									 int		*initxyzXYZ,
+									 int		argc,
+									 char		*argv[]){
+	// we need to read the problem char variable and act accordingly to read the other variables(switch....) 
+	// ... or read all and think later :)
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
 		return 1;
@@ -14,23 +26,44 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 	else {
 		const char *szFileName = NULL;
 		szFileName = argv[1];  
-		READ_INT( szFileName, xlength[0] );
-		READ_INT( szFileName, xlength[1] );
-		READ_INT( szFileName, xlength[2] );
+
+		READ_STRING(szFileName, problem);
+
+		read_int( szFileName, "xlength", &xlength[0] );
+		read_int( szFileName, "ylength", &xlength[1] );
+		read_int( szFileName, "zlength", &xlength[2] );
+
 		READ_DOUBLE( szFileName, *tau );
 
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );
+
+		read_double( szFileName, "velocityInX", &velocityIn[0] );
+		read_double( szFileName, "velocityInY", &velocityIn[1] );
+		read_double( szFileName, "velocityInZ", &velocityIn[2] );
+
+		READ_DOUBLE(szFileName, *densityIn);
+		READ_DOUBLE(szFileName, *densityRef);
+
 		read_double( szFileName, "velocityWall1", &velocityWall[0] );
 		read_double( szFileName, "velocityWall2", &velocityWall[1] );
 		read_double( szFileName, "velocityWall3", &velocityWall[2] );
+		
+		// careful here!
+		read_int( szFileName, "WallLeft",				&initxyzXYZ[2] ); // z-
+		read_int( szFileName, "WallRight",			&initxyzXYZ[5] ); // z+
+		read_int( szFileName, "WallTop",				&initxyzXYZ[0] ); // x-
+		read_int( szFileName, "WallBottom",			&initxyzXYZ[3] ); // x+
+		read_int( szFileName, "WalBackground",	&initxyzXYZ[4] ); // y+ 
+		read_int( szFileName, "WallForeground", &initxyzXYZ[1] ); // y-
+
 	}
 	return 0;
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, const char *problem){
+void initialiseFields(double *collideField, double *streamField, int *flagField, const int *xlength, const char *problem, const int *initxyzXYZ){
 	// TO DO - implement exit if scenario is wrong
-	// TO DO - think about the direction of initiliasiation - a) is initialized with x starting from upper left corner, whereas c is initialised with x starting from bottomleft corner
+	// TO DO - should be fixed - think about the direction of initiliasiation - all scenarios should start numbering from top left corner
 	int x, y, z, i;
 	int xlen2 = xlength[0] + 2;
 	int ylen2 = xlength[1] + 2;
@@ -39,31 +72,11 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int xylen2 = xlen2 * ylen2;
 	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
 
-	/** flagField init: 
-		* 0 - FLUID
-		* 1 - NO_SLIP
-		* 2 - MOVING_WALL
-		* 3 - FREE-SLIP
-		* 4 - INFLOW
-		* 5 - OUTFLOW
-		* 6 - PRESSURE_IN
-	**/
-	/* Boundary initialization: According to scenario */
-
 	if (problem == "karman_vortex_street")
 	{
-
-		X_min = NO_SLIP;		// x- dimension	
-		Y_min = FREE_SLIP;	// y- dimension
-		Z_min = PRESSURE_IN;// z- dimension
-
-		X_max = NO_SLIP;		// x+ dimension
-		Y_max = FREE_SLIP;	// y+ dimension
-		Z_max = OUTFLOW;		// z+ dimension
-
-// hard part
 // need to scale input file according to dimensions, if they're different we throw an error
-// this is a repetitions of the pgm_read() function, but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
+// this is a repetitions of the pgm_read() function,
+//		but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
 
 		FILE *input = NULL;
 		char line[1024];
@@ -133,6 +146,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				else
 				{
 // every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
+					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
 					for (z = xsize * scale_x; z < xsize * scale_x + scale_x; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
 							for (x = ysize * scale_y; x < ysize * scale_y + scale_y; ++x) {
@@ -149,15 +163,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 	else if (problem == "plane_shear_flow")
 	{
-
-		X_min = FREE_SLIP;	// x- dimension	
-		Y_min = NO_SLIP;		// y- dimension
-		Z_min = PRESSURE_IN;// z- dimension
-
-		X_max = FREE_SLIP;	// x+ dimension
-		Y_max = NO_SLIP;		// y+ dimension
-		Z_max = OUTFLOW;		// z+ dimension
-
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
@@ -170,15 +175,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 	else if (problem == "flow_over_step")
 	{
-
-		X_min = NO_SLIP;	// x- dimension	
-		Y_min = NO_SLIP;	// y- dimension
-		Z_min = INFLOW;		// z- dimension
-
-		X_max = NO_SLIP;	// x+ dimension
-		Y_max = NO_SLIP;	// y+ dimension
-		Z_max = OUTFLOW;	// z+ dimension
-
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
@@ -188,10 +184,10 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			}
 		}
 
-		// add "step" initialization - "cube" has z = x = xlen/2, y = ylen
+		// add "step" initialization - "cube" has z = x = xlen/2, y = ylen ... x-> dimension starts from top left!
 		for (z = 1; z <= xlength[0]/2; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
-				for (x = 1; x <= xlength[0]/2; ++x) {
+				for (x = xlength[0]/2 + 1; x <= xlength[0]; ++x) { //cube is in the 2nd half of the x dimension
 					flagField[x + y * ylen2 + z * xylen2] = NO_SLIP;
 				}
 			}
@@ -220,8 +216,17 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			collideField[i+x] = LATTICEWEIGHTS[i];
 		}
 	}
+		/** flagField init: 
+		* 0 - FLUID
+		* 1 - NO_SLIP
+		* 2 - MOVING_WALL
+		* 3 - FREE-SLIP
+		* 4 - INFLOW
+		* 5 - OUTFLOW
+		* 6 - PRESSURE_IN
+	**/
+	/* Boundary initialization: using input parameters */
 
-		// Boundary initialization.
 		for (z = 0; z < zlen2; ++z){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
 			for (y = 0; y < ylen2; ++y){
 				for (x = 0; x < xlen2; ++x){
@@ -230,13 +235,13 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					// z is "0" or "xlength + 1"
 					// the only question is whether this is OK with the cache memory
 					// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
-					flagField[	  y * ylen2 + z * xylen2	] = X_min;						// x- dimension	
-					flagField[x							+ z * xylen2	] = Y_min;						// y- dimension
-					flagField[x + y * ylen2								] = Z_min;						// z- dimension
+					flagField[	  y * ylen2 + z * xylen2	] = initxyzXYZ[0];						// x- dimension	
+					flagField[x							+ z * xylen2	] = initxyzXYZ[1];						// y- dimension
+					flagField[x + y * ylen2								] = initxyzXYZ[2];						// z- dimension
 
-					flagField[xlen2 - 1 +	y * ylen2 + z * xylen2		] = X_max;	// x+ dimension
-					flagField[x + (ylen2 - 1) * ylen2 + z * xylen2	] = Y_max;	// y+ dimension
-					flagField[x + y * ylen2 + (zlen2 - 1) * xylen2	] = Z_max;	// z+ dimension
+					flagField[xlen2 - 1 +	y * ylen2 + z * xylen2		] = initxyzXYZ[3];	// x+ dimension
+					flagField[x + (ylen2 - 1) * ylen2 + z * xylen2	] = initxyzXYZ[4];	// y+ dimension
+					flagField[x + y * ylen2 + (zlen2 - 1) * xylen2	] = initxyzXYZ[5];	// z+ dimension
 				}
 			}
 		}

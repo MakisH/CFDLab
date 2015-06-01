@@ -4,34 +4,46 @@
 #---------------------------------------------------
 
 #---------------------------------------------------
+#  "problem" argument
+#---------------------------------------------------
+problem			plane_shear_flow
+
+#---------------------------------------------------
 #  size of the domain             
 #---------------------------------------------------
-xlength                 8
-ylength                 8
-zlength                 20
+xlength			8
+ylength			8
+zlength			20
 
 #---------------------------------------------------
 #  relaxation time
 #---------------------------------------------------
-tau                     1.8
+tau			1.8
 
 #---------------------------------------------------
 #  time steps
 #---------------------------------------------------
-timesteps               5000
-timestepsPerPlotting    100
+timesteps			5000
+timestepsPerPlotting	100
 
 #---------------------------------------------------
 #  boundary conditions
 #  (use 0 to ignore velocity boundary conditions)
 #  (use -1 to ignore density boundary conditions)
 #---------------------------------------------------
-velocityInX             0
-velocityInY             0
-velocityInZ             0  
+velocityInX		0
+velocityInY		0
+velocityInZ		0  
 
-densityIn               1.005
-densityRef              1
+densityIn			1.005
+densityRef 		1
+
+#--------------------------------------------
+#              Moving wall velocity|(if any)
+#--------------------------------------------
+velocityWall1		0.01
+velocityWall2		0.0
+velocityWall3		0.0
 
 #---------------------------------------------------
 # Types of the left, right, top, bottom boundaries
@@ -43,12 +55,12 @@ densityRef              1
 #   5   : OUTFLOW
 #   6   : PRESSURE_IN
 #---------------------------------------------------
-wallLeft                4             
-wallRight               5
-wallTop                 1
-wallBottom              1
-wallBackground          3
-wallForeground          3               
+wallLeft 			4             
+wallRight			5
+wallTop			1
+wallBottom		1
+wallBackground		3
+wallForeground		3               
 
 
 

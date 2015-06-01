@@ -8,7 +8,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
   int i, inv_i, currentCell, neighborCell;
   int neighborX, neighborY, neighborZ;
-  double f_inv_i, density, c_uwall, velocity;
+  double f_inv_i, f_mirror, density, c_uwall, velocity;
   double feq[Q_NUMBER];
 
   int SizeX = (xlength[0] + 2); // Size of the extended domain in each direction
@@ -194,27 +194,27 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- INFLOW ------------------------------------------------------------------------//  
           case INFLOW :
-            computeFeq(*ref_density, *ref_velocity, feq);
+            computeFeq(ref_density, ref_velocity, feq);
             collideField[Q_NUMBER * currentCell + i] = feq[i];
             break;
             
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-            computeDensity(currentCell, &density);
-            computeVelocity(currentCell, density, &velocity);
+            computeDensity(collideField + currentCell, &density);
+            computeVelocity(collideField + currentCell, &density, &velocity);
 
-            computeFeq(*ref_density, velocity, feq);
+            computeFeq(ref_density, &velocity, feq);
             collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
             break;
             
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-            computeDensity(currentCell, &density);
-            computeVelocity(currentCell, density, &velocity);
+            computeDensity(collideField + currentCell, &density);
+            computeVelocity(collideField + currentCell, &density, &velocity);
 
-            computeFeq(*density_in, velocity, feq);
+            computeFeq(density_in, &velocity, feq);
             collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
             break;
             

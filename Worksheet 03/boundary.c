@@ -29,7 +29,6 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
         // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
         currentCell = x + y*SizeX + z*SizeXY; // current boundary cell
-
         // What kind of (boundary) cell do we process now?
         switch (flagField[currentCell]) {
           
@@ -62,7 +61,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
                 // update the boundary
                 collideField[ Q_NUMBER*currentCell + i ] = f_inv_i;
-                
+                printf("boundary temp %d\n", inv_i);
+
               } // if neighbor
             } // for each direction
             break;
@@ -194,36 +194,42 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- INFLOW ------------------------------------------------------------------------//  
           case INFLOW :
-            computeFeq(ref_density, ref_velocity, feq);
-            collideField[Q_NUMBER * currentCell + i] = feq[i];
+            for (int i = 0; i < Q_NUMBER; ++i) {
+	    	computeFeq(ref_density, ref_velocity, feq);
+            	collideField[Q_NUMBER * currentCell + i] = feq[i];
+	    }
             break;
             
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-            
-            // Neighbor cell of current cell in i-direction
-            neighborX = x + LATTICEVELOCITIES[i][0];
-            neighborY = y + LATTICEVELOCITIES[i][1];
-            neighborZ = z + LATTICEVELOCITIES[i][2];
+            for (int i = 0; i < Q_NUMBER; ++i) { 
+            	// Neighbor cell of current cell in i-direction
+            	neighborX = x + LATTICEVELOCITIES[i][0];
+            	neighborY = y + LATTICEVELOCITIES[i][1];
+            	neighborZ = z + LATTICEVELOCITIES[i][2];
 
-            // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
-            neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+	            // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+        	    neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
             
-            // Check if the neighbor cell is fluid and if its coordinates are valid
-            if ( flagField[neighborCell] == FLUID && neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
-              computeDensity(collideField + currentCell*Q_NUMBER, &density);
-              computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+	            // Check if the neighbor cell is fluid and if its coordinates are valid
+        	    if ( flagField[neighborCell] == FLUID && neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+              		computeDensity(collideField + currentCell*Q_NUMBER, &density);
+              		computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
-              computeFeq(ref_density, &velocity, feq);
-              collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
-            }
+			inv_i = Q_NUMBER - i - 1;
+
+	              computeFeq(ref_density, &velocity, feq);
+        	      collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
+            	    }
+	    }
 
             break;
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-            // Neighbor cell of current cell in i-direction
+           for (int i = 0; i < Q_NUMBER; ++i) { 
+	    // Neighbor cell of current cell in i-direction
             neighborX = x + LATTICEVELOCITIES[i][0];
             neighborY = y + LATTICEVELOCITIES[i][1];
             neighborZ = z + LATTICEVELOCITIES[i][2];
@@ -236,10 +242,11 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
               computeDensity(collideField + currentCell*Q_NUMBER, &density);
               computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
+	      inv_i = Q_NUMBER - i - 1;
               computeFeq(density_in, &velocity, feq);
               collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
             }
-            
+           } 
             break;
             
         } // switch flagField

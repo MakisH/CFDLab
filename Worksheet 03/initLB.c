@@ -1,9 +1,9 @@
 #include "initLB.h"
 
 ///// we might need some of these for the initialiseFields() function - for the pgm part
-//#include <ctype.h>
-//#include <errno.h>
-//#include <stdio.h>
+#include <ctype.h>
+#include <errno.h>
+#include <stdio.h>
 
 int readParameters(char		*problem,
 									 int		*xlength,
@@ -61,7 +61,7 @@ int readParameters(char		*problem,
 	return 0;
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, const int *xlength, const char *problem, const int *initxyzXYZ){
+int initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem, int *initxyzXYZ){
 	// TO DO - implement exit if scenario is wrong
 	// TO DO - should be fixed - think about the direction of initiliasiation - all scenarios should start numbering from top left corner
 	int x, y, z, i;
@@ -70,9 +70,9 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int zlen2 = xlength[2] + 2;
 	int xyz_field_domain = xlen2 * ylen2 * zlen2 * Q_NUMBER;
 	int xylen2 = xlen2 * ylen2;
-	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
+//	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
 
-	if (problem == "karman_vortex_street")
+	if (strcmp(problem,"karman_vortex_street"))
 	{
 // need to scale input file according to dimensions, if they're different we throw an error
 // this is a repetitions of the pgm_read() function,
@@ -83,7 +83,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		int levels;
 		int xsize, ysize;
 		int i1, j1;
-		int **pic = NULL;
+//		int **pic = NULL;
 		const char *filename = "./configs/lbm_tilted_plate.vtk";
 		int scale_x;
 		int scale_y;
@@ -92,6 +92,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		   char szBuff[80];
 		       sprintf( szBuff, "Can not read file %s !!!", filename );
 		       ERROR( szBuff );
+					 return 1;
 		}
 
 		/* check for the right "magic number" */
@@ -99,6 +100,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		{
 		        fclose(input);
 		        ERROR("Error Wrong Magic field!");
+						return 1;
 		}
 
 		/* skip the comments */
@@ -123,12 +125,12 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		if( xsize == 0 ||  ysize == 0)
 		{
 			printf("Dimensions are invalid(0)!\n");
-			return;
+			return 1;
 		}
 		else if(xlength[2] % xsize != 0 || xlength[0] % ysize != 0)
 		{
 			printf("Dimensions and xlength mismatch!\n");
-			return;
+			return 1;
 		}
 		// need independent dim-s, so xlength has to be multiple of corresponding(!) xsize and ysize
 		scale_x = xlength[2] / xsize; // our implementation uses different naming
@@ -136,12 +138,13 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		for(j1 = 1; j1 < ysize + 1; ++j1){
 			for (i1 = 1; i1 < xsize+1; ++i1){
 				int byte;
-				if(fscanf(input, "%d", &byte));
+				if(fscanf(input, "%d", &byte)); // can someone explain the if-statement ?
 
 				if (byte==EOF)
 				{
 					fclose(input);
 					ERROR("read failed");
+					return 1;
 				}
 				else
 				{
@@ -161,7 +164,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		fclose(input);
 
 	}
-	else if (problem == "plane_shear_flow")
+	else if (strcmp(problem,"plane_shear_flow"))
 	{
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
@@ -173,7 +176,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	}
-	else if (problem == "flow_over_step")
+	else if (strcmp(problem,"flow_over_step"))
 	{
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
@@ -202,7 +205,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		printf("A tilted plane\n");
 		printf("Plane shear flow\n");
 		printf("Flow over a step\n");
-		return;
+		return 1;
 		// we could implement a loop to input the correct name, or 0 to exit
 
 	}
@@ -245,5 +248,5 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				}
 			}
 		}
-
+		return 0;
 }

@@ -18,7 +18,7 @@ int readParameters(char		*problem,							// scenario name - "flow_over_step", "k
 									 char		*argv[]){							// argv[1] shall contain the path to the config file 
 
 /* initialises the particle distribution functions and the flagfield */
-void initialiseFields(double *collideField, double *streamField, int *flagField, const int *xlength, const char *problem, const int *initxyzXYZ);
+int initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem, int *initxyzXYZ);
 
 #endif
 

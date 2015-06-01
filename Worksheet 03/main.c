@@ -6,28 +6,35 @@
 #include "initLB.h"
 #include "visualLB.h"
 #include "boundary.h"
-int main(int argc, char *argv[]){
+#include <string.h>
 
+int main(int argc, char *argv[]){
+	// declare all input variables
 	double *collideField = NULL;
 	double *streamField = NULL;
 	int *flagField = NULL;
+	char problem[32]; // could be smaller ?
 	int xlength[3];
 	double tau;
-	double velocityWall[3];
 	int timesteps;
 	int timestepsPerPlotting;
-
-	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv ); // reading parameters from the file.
-
-	// Allocating the main three arrays.
+	double velocityIn;
+	double densityIn;
+	double densityRef;
+	int		initxyzXYZ[6];
+	double velocityWall[3];
+	// those parameters are becoming too many ... but do we care and can we do something about it ?
+	// reading parameters from the file.
+	if( !readParameters( problem, xlength, &tau, &timesteps, &timestepsPerPlotting, &velocityIn, &densityIn, &densityRef, velocityWall, initxyzXYZ, argc, argv )) return 1; 
+	char * problem_path = strcat("results/",problem,"/",problem);
+	// Allocating the 3 main arrays.
 	int domain = (xlength[0] + 2) * (xlength[1] + 2) * (xlength[2] + 2);
 	collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	flagField = (int *) malloc(domain * sizeof(int));
 
-	// Init the main three arrays.
-	initialiseFields( collideField, streamField, flagField, xlength );
-
+	// Init the 3 main arrays.
+	if (! initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) return 1;
 	for(int t = 0; t <= timesteps; t++){
 		double *swap = NULL;
 		doStreaming( collideField, streamField, flagField, xlength );
@@ -41,9 +48,9 @@ int main(int argc, char *argv[]){
 		treatBoundary( collideField, flagField, velocityWall, xlength );
 
 		if ( t % timestepsPerPlotting == 0 ) {
-		printf("Writing the vtk file for timestep # %d \n", t);
-		writeVtkOutput( collideField, flagField, "pics/simLB", t, xlength );
-	}
+			printf("Writing the vtk file for timestep # %d \n", t);
+			writeVtkOutput( collideField, flagField, problem_path, t, xlength ); // needs fixing
+		}
 	
 	}
 

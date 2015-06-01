@@ -153,3 +153,34 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   } // for boundary
 
 } // function
+
+
+
+
+/*
+SPECIAL BOUNDARY CASES TO BE ADDED TO THE MAIN CODE.
+
+double feq[Q_NUMBER]; // To add to begining.
+
+if ( flagField[currentCell] == INFLOW ){
+	computeFeq(ref_density, ref_velocity, feq);
+	collideField[Q_NUMBER * currentCell + i] = feq[i];
+}
+
+if ( flagField[currentCell] == OUTFLOW ){
+	computeDensity(currentCell, &density);
+	computeVelocity(currentCell, density, &velocity);
+
+	computeFeq(ref_density, velocity, feq);
+	collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
+}
+
+if ( flagField[currentCell] == INPRESSURE ){
+	computeDensity(currentCell, &density);
+	computeVelocity(currentCell, density, &velocity);
+
+	computeFeq(density_in, velocity, feq);
+	collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
+}
+
+*/

@@ -49,20 +49,20 @@ int readParameters(char		*problem,
 		read_double( szFileName, "velocityWall2", &velocityWall[1] );
 		read_double( szFileName, "velocityWall3", &velocityWall[2] );
 		
-		// careful here!
-		read_int( szFileName, "WallLeft",				&initxyzXYZ[2] ); // z-
-		read_int( szFileName, "WallRight",			&initxyzXYZ[5] ); // z+
-		read_int( szFileName, "WallTop",				&initxyzXYZ[0] ); // x-
-		read_int( szFileName, "WallBottom",			&initxyzXYZ[3] ); // x+
-		read_int( szFileName, "WalBackground",	&initxyzXYZ[4] ); // y+ 
-		read_int( szFileName, "WallForeground", &initxyzXYZ[1] ); // y-
+		// careful here! // domain starts from bottom left
+		read_int( szFileName, "wallLeft",				&initxyzXYZ[2] ); // z-
+		read_int( szFileName, "wallRight",			&initxyzXYZ[5] ); // z+
+		read_int( szFileName, "wallTop",				&initxyzXYZ[3] ); // x-
+		read_int( szFileName, "wallBottom",			&initxyzXYZ[0] ); // x+
+		read_int( szFileName, "wallBackground",	&initxyzXYZ[4] ); // y+ 
+		read_int( szFileName, "wallForeground", &initxyzXYZ[1] ); // y-
 
 	}
 	return 0;
 }
 
 int initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem, int *initxyzXYZ){
-	// TO DO - implement exit if scenario is wrong
+	// TO DO - should be fixed - implement exit if scenario is wrong
 	// TO DO - should be fixed - think about the direction of initiliasiation - all scenarios should start numbering from top left corner
 	int x, y, z, i;
 	int xlen2 = xlength[0] + 2;
@@ -72,11 +72,12 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	int xylen2 = xlen2 * ylen2;
 //	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
 
-	if (strcmp(problem,"karman_vortex_street"))
+	if (!strcmp(problem,"karman_vortex_street"))
 	{
-// need to scale input file according to dimensions, if they're different we throw an error
-// this is a repetitions of the pgm_read() function,
-//		but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
+		printf("sc1 %d\n", strcmp(problem,"karman_vortex_street"));
+	// need to scale input file according to dimensions, if they're different we throw an error
+	// this is a repetitions of the pgm_read() function,
+	//		but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
 
 		FILE *input = NULL;
 		char line[1024];
@@ -135,8 +136,8 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		// need independent dim-s, so xlength has to be multiple of corresponding(!) xsize and ysize
 		scale_x = xlength[2] / xsize; // our implementation uses different naming
 		scale_y = xlength[0] / ysize; // - xsize is xlength[2] and ysize is xlength[0]  
-		for(j1 = 1; j1 < ysize + 1; ++j1){
-			for (i1 = 1; i1 < xsize+1; ++i1){
+		for(j1 = 1; j1 <= ysize; ++j1){
+			for (i1 = 1; i1 <= xsize; ++i1){
 				int byte;
 				if(fscanf(input, "%d", &byte)); // can someone explain the if-statement ?
 
@@ -150,9 +151,9 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				{
 // every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
 					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
-					for (z = xsize * scale_x; z < xsize * scale_x + scale_x; ++z) {
+					for (z = (i1 - 1) * scale_x + 1; z <= i1 * scale_x + scale_x; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
-							for (x = ysize * scale_y; x < ysize * scale_y + scale_y; ++x) {
+							for (x = (j1 - 1) * scale_y + 1; x <= j1 * scale_y + scale_y; ++x) {
 								flagField[x + y * ylen2 + z * xylen2] = byte;
 							}
 						}
@@ -164,20 +165,23 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		fclose(input);
 
 	}
-	else if (strcmp(problem,"plane_shear_flow"))
+	else if (!strcmp(problem,"plane_shear_flow"))
 	{
+		printf("sc2 %d\n", strcmp(problem,"plane_shear_flow"));
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
 					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
+					printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
 
 	}
-	else if (strcmp(problem,"flow_over_step"))
+	else if (!strcmp(problem,"flow_over_step"))
 	{
+		printf("sc3 %d\n", strcmp(problem,"flow_over_step"));
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
@@ -188,17 +192,18 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		}
 
 		// add "step" initialization - "cube" has z = x = xlen/2, y = ylen ... x-> dimension starts from top left!
-		for (z = 1; z <= xlength[0]/2; ++z) {
+		for (z = 1; z <= xlength[2]/2; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
-				for (x = xlength[0]/2 + 1; x <= xlength[0]; ++x) { //cube is in the 2nd half of the x dimension
+				for (x = 1; x <= xlength[0]/2; ++x) { //cube is in the 2nd half of the x dimension
 					flagField[x + y * ylen2 + z * xylen2] = NO_SLIP;
 				}
 			}
 		}
-
+		printf("init done!\n");
 	}
 	else
 	{
+				printf("sc4 %d\n", strcmp(problem,"flow_over_step"));
 
 		printf("\n\nUnknown / Misspelled scenario name!\n\n");
 		printf("Known scenarios are:\n\n");

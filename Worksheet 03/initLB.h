@@ -15,7 +15,7 @@ int readParameters(char		*problem,							// scenario name - "flow_over_step", "k
 									 double *velocityWall,				// velocity of the lid. Parameter name: "characteristicvelocity" 
 									 int		*initxyzXYZ,					// boundary flags array - 1-6 for no_slip, moving_wall, free_slip, inflow, outflow, pressure_in
 									 int		argc,									// number of arguments. Should equal 2 (program + name of config file 
-									 char		*argv[]){							// argv[1] shall contain the path to the config file 
+									 char		*argv[]);							// argv[1] shall contain the path to the config file 
 
 /* initialises the particle distribution functions and the flagfield */
 int initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem, int *initxyzXYZ);

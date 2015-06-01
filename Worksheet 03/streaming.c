@@ -13,13 +13,15 @@ void doStreaming(double *collideField, double *streamField,int *flagField,int *x
 
 			for(unsigned int x = 1; x <= xlength[0]; ++x){
 				unsigned int current_idx = (x + jy + izz) * Q_NUMBER;
-
+				unsigned int current_idx_flag = x + jy + izz;
 				for(unsigned int Q_iter = 0; Q_iter < Q_NUMBER; ++Q_iter){	// iterate through all directions
 					// this is very cache ineficient, because ~9 different cache lines are accessed for each cell update(3 per z-plane for each row)
 
 					// - find neighboring cells and take their respective directions ... tricky...
 					// - we need the opposite cell to the Q - direction(hence the "-" sign in front of the offset with Lattice velocities)
 					// with the velocity in the same direction(hence the 2nd Q_iter without minus)
+
+					if (flagField[current_idx_flag] == FLUID)
 					streamField[current_idx + Q_iter] = 
 						collideField[current_idx	- (LATTICEVELOCITIES[Q_iter][0]
 																			+  LATTICEVELOCITIES[Q_iter][1] * (xlength[1] + 2)

@@ -10,7 +10,34 @@ void computePostCollisionDistributions(double *currentCell, const double * const
 
 // TO DO - better simply go through all cells and check whether FLUID or not - the only solution for an arbitrary geometry?
 void doCollision(double *collideField, int *flagField, const double * const tau, int *xlength){
-	unsigned int xylen2 = (xlength[0] + 2) * (xlength[1] + 2);
+
+	int x, y, z;
+
+	double density;
+	double velocity[3];
+	double feq[Q_NUMBER];
+	double *currentCell;
+
+	for (z = 1; z <= xlength[2]; ++z){
+		for (y = 1; y <= xlength[1]; ++y){
+			for (x = 1; x <= xlength[0]; ++x){
+
+				if (flagField[x + (xlength[1] + 2) * y + (xlength[2] + 2) * (xlength[2] + 2) * z] == FLUID)
+				{
+					// address to the -> first <- distribution function within the respective cell.
+					currentCell = collideField + Q_NUMBER * (x + (xlength[1] + 2) * y + (xlength[2] + 2) * (xlength[2] + 2) * z);
+					computeDensity (currentCell, &density);
+					computeVelocity (currentCell, &density, velocity);
+					computeFeq (&density, velocity, feq);
+					computePostCollisionDistributions (currentCell, tau, feq);
+				}
+			}
+		}
+	}
+
+
+// OPTIMIZED VERSION
+/*	unsigned int xylen2 = (xlength[0] + 2) * (xlength[1] + 2);
 	double density;
 	double velocity[3];
 	double feq[Q_NUMBER];
@@ -25,13 +52,17 @@ void doCollision(double *collideField, int *flagField, const double * const tau,
 	for (stopz			= collideField + xylen2 * xlength[2] * Q_NUMBER;collideField < stopz; collideField += 2 * Q_NUMBER * (xlength[0] + 2)){ // skip y-boundary rows at plane end
 		for (stopy		= collideField + stopy_offset;			collideField < stopy; collideField += 2 * Q_NUMBER){ // skip x-boundary cells at row end
 			for (stopx	= collideField + stopx_offset;			collideField < stopx; collideField += Q_NUMBER){
-				// locally update cells, can be easily parallelized
-				computeDensity (collideField, &density);
-				computeVelocity (collideField, &density, velocity);
-				computeFeq (&density, velocity, feq);
-				computePostCollisionDistributions (collideField, tau, feq);
+				if (*(flagField + collideField) == FLUID)
+				{
+					// locally update cells, can be easily parallelized
+					computeDensity (collideField, &density);
+					computeVelocity (collideField, &density, velocity);
+					computeFeq (&density, velocity, feq);
+					computePostCollisionDistributions (collideField, tau, feq);
+				}
 			}
 		}
 	}
+*/
 }
 

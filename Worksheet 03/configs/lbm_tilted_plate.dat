@@ -1,0 +1,64 @@
+#---------------------------------------------------
+#  Configuration file for the problem:
+#  Karman vortex street
+#---------------------------------------------------
+#---------------------------------------------------
+#  "problem" argument
+#---------------------------------------------------
+problem			          lbm_tilted_plate
+
+#---------------------------------------------------
+#  size of the domain             
+#---------------------------------------------------
+xlength			          210
+ylength			          1
+zlength			          490
+
+#---------------------------------------------------
+#  relaxation time
+#---------------------------------------------------
+tau			              0.59
+
+#---------------------------------------------------
+#  time steps
+#---------------------------------------------------
+timesteps			        20000
+timestepsPerPlotting	100
+
+#---------------------------------------------------
+#  boundary conditions
+#  (use 0 to ignore velocity boundary conditions)
+#  (use -1 to ignore density boundary conditions)
+#---------------------------------------------------
+velocityInX		        0
+velocityInY		        0
+velocityInZ		        0.035  
+
+densityIn			        -1
+densityRef		        1
+
+#--------------------------------------------
+#              Moving wall velocity|(if any)
+#--------------------------------------------
+velocityWall1		      0.01
+velocityWall2		      0.0
+velocityWall3		      0.0
+
+#---------------------------------------------------
+# Types of the left, right, top, bottom boundaries
+# Valid values:
+#   1   : NO_SLIP
+#   2   : MOVING_WALL
+#   3   : FREE_SLIP
+#   4   : INFLOW
+#   5   : OUTFLOW
+#   6   : PRESSURE_IN
+#---------------------------------------------------
+wallLeft			        4             
+wallRight			        5
+wallTop			          1
+wallBottom		        1
+wallBackground		    3
+wallForeground		    3
+
+

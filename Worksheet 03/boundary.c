@@ -200,8 +200,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-	  computeDensity(collideField + currentCell, &density);
-	  computeVelocity(collideField + currentCell, &density, &velocity);
+	  computeDensity(collideField + currentCell*Q_NUMBER, &density);
+	  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
 	  computeFeq(ref_density, &velocity, feq);
 	  collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];
@@ -210,8 +210,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-	  computeDensity(collideField + currentCell, &density);
-	  computeVelocity(collideField + currentCell, &density, &velocity);
+	  computeDensity(collideField + currentCell*Q_NUMBER, &density);
+	  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
 	  computeFeq(density_in, &velocity, feq);
 	  collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * currentCell + inv_i];

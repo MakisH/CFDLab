@@ -230,13 +230,15 @@ void treatBoundary(double *collideField,
 						
 							// Check if the the coordinates of the neighbor cell are valid
 							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
-								// Check if the neighbor cell is fluid                
+
+                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+                neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
+                
+                // Check if the neighbor cell is fluid                
 								if ( flagField[neighborCell] == FLUID ) {
-								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
-								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
-								computeDensity(collideField + neighborCell * Q_NUMBER, &density);
-								computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
-								computeFeq(ref_density, &velocity, feq);
+                  computeDensity(collideField + neighborCell * Q_NUMBER, &density);
+                  computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
+                  computeFeq(ref_density, &velocity, feq);
 
 									inv_i = Q_NUMBER - i - 1;
 									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
@@ -256,10 +258,12 @@ void treatBoundary(double *collideField,
 							
 							// Check if the the coordinates of the neighbor cell are valid
 							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
-								// Check if the neighbor cell is fluid
+
+                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+                neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+                
+                // Check if the neighbor cell is fluid
 								if ( flagField[neighborCell] == FLUID ) {
-									// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
-									neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
 									computeDensity(collideField + neighborCell * Q_NUMBER, &density);
 									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
 									computeFeq(density_in, &velocity, feq);

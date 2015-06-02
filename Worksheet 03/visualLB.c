@@ -59,7 +59,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 				const double * const idx = collideField + Q_NUMBER * (x + xlen2 * y + xylen2 * z);
 				computeDensity (idx, &density);
 				computeVelocity (idx, &density, velocity);
-				fprintf(fp, "%f %f %f\n", velocity[0]+2, velocity[1]+2, velocity[2]+2);
+				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
 			}
 		}
 	}

@@ -24,8 +24,9 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 		return;
 	}
 
-
+	printf("before header\n");
 	write_vtkHeader(fp, xlength); // Write the header.
+	printf("before coord\n");
 	write_vtkPointCoordinates(fp, xlength);
 
 	// write the densities and velocities.
@@ -37,32 +38,32 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	int ylen2 = xlength[1] + 2;
 	int xylen2 = xlen2 * ylen2;
 	fprintf(fp, "\nPOINT_DATA %d \n", xlength[0] * xlength[1] * xlength[2] );
-
+	printf("before dens\n");
 	/* DENSITIES */
 	fprintf(fp, "SCALARS density float 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
 	for (z = 1; z <= xlength[2]; ++z) {
 		for (y = 1; y <= xlength[1]; ++y) {
 			for (x = 1; x <= xlength[0]; ++x){
-				computeDensity (collideField + Q_NUMBER * (x + ylen2 * y + xylen2 * z), &density);
+				computeDensity (collideField + Q_NUMBER * (x + xlen2 * y + xylen2 * z), &density);
 				fprintf(fp, "%f\n", density);
 			}
 		}
 	}
-
+	printf("before velocity\n");
 	/* VELOCITIES */
 	fprintf(fp, "\nVECTORS velocity float \n");
 	for (z = 1; z <= xlength[2]; ++z) {
 		for(y = 1; y <= xlength[1]; ++y) {
 			for (x = 1; x <= xlength[0]; ++x){
-				const double * const idx = collideField + Q_NUMBER * (x + ylen2 * y + xylen2 * z);
+				const double * const idx = collideField + Q_NUMBER * (x + xlen2 * y + xylen2 * z);
 				computeDensity (idx, &density);
 				computeVelocity (idx, &density, velocity);
 				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
 			}
 		}
 	}
-	
+	printf("done\n");
 	fclose(fp);
 }
 
@@ -95,9 +96,10 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength) {
 
 	// start at 0 and finish at 1.0 => len-1
 	// e.g. for 15 points there are 14 "cells"
-	dx = 1.0 / (xlength[0] - 1);
-	dy = 1.0 / (xlength[1] - 1);
-	dz = 1.0 / (xlength[2] - 1);
+	// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
+	dx = ((xlength[0]  == 1 )? 3 : 1.0 / (xlength[0] - 1));
+	dy = ((xlength[1]  == 1 )? 3 : 1.0 / (xlength[1] - 1));
+	dz = ((xlength[2]  == 1 )? 3 : 1.0 / (xlength[2] - 1));
 
 	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
 	// discretization error appears if we don't include an additional "epsilon" factor.

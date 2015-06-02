@@ -23,22 +23,28 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
   // Traverse all the (extended) domain (we need this as we don't have information about the obstacles)
   // Note: we could improve performance by providing a "hint" about in which regions boundaries exist.
   //       Then, we could process the outer boundaries like in Worksheet2 and process just the obstacle regions separately. 
-  for (int z = 0; z <= SizeZ-1; ++z) {
-    for (int y = 0; y <= SizeY-1; ++y) {
-      for (int x = 0; x <= SizeX-1; ++x) {
-
+	//printf("Sizes X Y Z XY %d %d %d %d\n", SizeX, SizeY, SizeZ, SizeXY);
+	
+	for (int z = 0; z < SizeZ; ++z) {
+    for (int y = 0; y < SizeY; ++y) {
+      for (int x = 0; x < SizeX; ++x) {
         // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
         currentCell = x + y*SizeX + z*SizeXY; // current boundary cell
+			//	if(flagField[currentCell] != FLUID) printf("%d %d start \n",currentCell,flagField[currentCell]);
+			//	if(flagField[currentCell] == 1) printf("%d is NO SLIP\n",currentCell);
+			//	if( 636 <  currentCell) printf("%d\n", flagField[currentCell]);
         // What kind of (boundary) cell do we process now?
         switch (flagField[currentCell]) {
           
           //----- FLUID -------------------------------------------------------------------------//
           case FLUID :
+					//	printf("%d \n",currentCell);
             break;
           
             
           //----- NO_SLIP -----------------------------------------------------------------------//
           case NO_SLIP :
+					//	printf("Enter No-Hell %d is NO SLIP\n",currentCell);
             // For each direction in the current cell
             for (int i = 0; i < Q_NUMBER; ++i) {
 
@@ -64,11 +70,12 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
                   // update the boundary
                   collideField[ Q_NUMBER*currentCell + i ] = f_inv_i;
-                  printf("boundary temp %d\n", inv_i);
+                //  printf("boundary temp %d\n", inv_i);
 
                 } // if neighbor is fluid
               } // if neighbor coordinates
             } // for each direction
+				//		printf("%d \n",currentCell);
             break;
             
             
@@ -109,6 +116,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
                 } // if neighbor is fluid
               } // if neighbor coordinates
             } // for each direction 
+			//			printf("%d \n",currentCell);
             break;
             
             
@@ -199,6 +207,7 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
                 } // if neighbor is fluid
               } // if neighbor coordinates
             } // for each direction 
+			//			printf("%d \n",currentCell);
             break;           
             
             
@@ -211,16 +220,13 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             for (int i = 0; i < Q_NUMBER; ++i) {
               // Update the boundary
             	collideField[Q_NUMBER * currentCell + i] = feq[i];
-            }
+						}
+		//				printf("%d \n",currentCell);
             break;
             
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
-
-	    computeDensity(collideField + currentCell*Q_NUMBER, &density);
-            computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
-            computeFeq(ref_density, &velocity, feq);
 
             // For each direction in the current cell
             for (int i = 0; i < Q_NUMBER; ++i) { 
@@ -230,11 +236,15 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             	neighborZ = z + LATTICEVELOCITIES[i][2];
             
               // Check if the the coordinates of the neighbor cell are valid
-        	    if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+              if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
 
                 // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
                 neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
-                
+                computeDensity(collideField + neighborCell*Q_NUMBER, &density);
+                computeVelocity(collideField + neighborCell*Q_NUMBER, &density, &velocity);
+                computeFeq(ref_density, &velocity, feq);
+
+
                 // Check if the neighbor cell is fluid                
                 if ( flagField[neighborCell] == FLUID ) {
 
@@ -249,9 +259,6 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
-	    computeDensity(collideField + currentCell*Q_NUMBER, &density);
-            computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
-            computeFeq(density_in, &velocity, feq);
 
             // For each direction in the current cell
             for (int i = 0; i < Q_NUMBER; ++i) { 
@@ -265,6 +272,10 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
                 // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
                 neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+                computeDensity(collideField + neighborCell*Q_NUMBER, &density);
+                computeVelocity(collideField + neighborCell*Q_NUMBER, &density, &velocity);
+                computeFeq(density_in, &velocity, feq);
+
 
                 // Check if the neighbor cell is fluid                                
                 if ( flagField[neighborCell] == FLUID ) {
@@ -278,9 +289,9 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             break;
             
         } // switch flagField
-        
-      } // for z
+     //  printf("%d done \n",currentCell);
+      } // for x
     } // for y
-  } // for x
+  } // for z
 
 } // function

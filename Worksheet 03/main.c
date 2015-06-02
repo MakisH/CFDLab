@@ -33,23 +33,23 @@ int main(int argc, char *argv[]){
 	collideField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	streamField = (double *) malloc(Q_NUMBER * domain * sizeof(double));
 	flagField = (int *) malloc(domain * sizeof(int));
-	printf("before init \n");
+	//printf("before init \n");
 	// Init the 3 main arrays.
 	if ( initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) {return 1; printf("why?\n");}
 	printf("xlength %d\nylength %d\nzlength %d\ntau %f\n, timesteps %d\n, velIn[0] %f\n, velIn[1] %f\n,, velIn[2] %f\n denIn %f\n, denRef %f\n, wall[0] %f\n, wall[1] %f\n, wall[2] %f\n,",xlength[0], xlength[1], xlength[2], tau, timesteps, velocityIn[0],velocityIn[1], velocityIn[2],  densityIn, densityRef, velocityWall[0], velocityWall[1], velocityWall[2]);
 	for(int t = 0; t < timesteps; t++){
 		double *swap = NULL;
-		printf("before streaming\n");
+		//printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, xlength );
 
 		swap = collideField;
 		collideField = streamField;
 		streamField = swap;
-		printf("before collision\n");
+		//printf("before collision\n");
 		doCollision( collideField, flagField, &tau, xlength );
-		printf("before boundaries\n");
+		//printf("before boundaries\n");
 		treatBoundary( collideField, flagField, velocityWall, xlength, &densityRef, velocityIn, &densityIn );
-		printf("before printing\n");
+		//printf("before printing\n");
 		if ( t % timestepsPerPlotting == 0 ) {
 			printf("Writing the vtk file for timestep # %d \n", t);
 			writeVtkOutput( collideField, flagField, problem_path, t, xlength ); // needs fixing

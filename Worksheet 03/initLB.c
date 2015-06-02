@@ -283,24 +283,42 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 
 
-	// check for forbidden boundary cells
-	int counter;
+	// Check for forbidden boundary cells (no_slip or free_slip)
+	// fluidNeighbors: counter of neighbor cells that are fluid
+	// Although we have 3D problems, we assume that boundaries have no fluid neighbors
+	// in the y-direction (foreground-background).
+	// This check has a big optimization potential but it is executed only once at the start.
+	int fluidNeighbors;
 	for (z = 1; z <= xlength[2]; ++z) {
     for (y = 1; y <= xlength[1]; ++y) {
       for (x = 1; x <= xlength[0]; ++x) {
-        counter = 0;
+        
+        // How many fluid neighbors does the current cell have?
+        fluidNeighbors = 0;
         if (flagField[x + y * ylen2 + z * xylen2] != FLUID) {
-          if (flagField[(x-1) + y * ylen2 + z * xylen2] == FLUID) ++counter;
-          if (flagField[(x+1) + y * ylen2 + z * xylen2] == FLUID) ++counter;
-          if (flagField[x + (y-1) * ylen2 + z * xylen2] == FLUID) ++counter;
-          if (flagField[x + (y+1) * ylen2 + z * xylen2] == FLUID) ++counter;
-					if (flagField[x + y * ylen2 + (z-1) * xylen2] == FLUID) ++counter;
-          if (flagField[x + y * ylen2 + (z+1) * xylen2] == FLUID) ++counter;
+          if (flagField[(x-1) + y * ylen2 + z * xylen2] == FLUID) ++fluidNeighbors;
+          if (flagField[(x+1) + y * ylen2 + z * xylen2] == FLUID) ++fluidNeighbors;
+          if (flagField[x + y * ylen2 + (z-1) * xylen2] == FLUID) ++fluidNeighbors;
+          if (flagField[x + y * ylen2 + (z+1) * xylen2] == FLUID) ++fluidNeighbors;
         }
-        if (counter > 2) {
-          printf("The domain contains forbidden boundary cells, that is, boundary cells with more than 2 fluid neighbors.\n");
+
+        // Depending on the number of neighbors, is it an inner cell, an edge, a valid corner or something forbidden?
+        if (fluidNeighbors > 2) {
+          printf("The domain contains at least one boundary cell with more than 2 fluid neighbors.\n");
           printf("Coordinates: x = %d, y = %d, z = %d \n", x, y, z);
           return 1;
+        } else if (fluidNeighbors == 0) continue; // it is an inner obstacle cell
+        else if (fluidNeighbors == 1) continue; // it is an edge
+        else if (fluidNeighbors == 2) {
+            // Check if the two fluid neighbors share a corner (check all the possibilities, remember we don't have general 3D cases)
+            if (flagField[(x-1) + y * ylen2 + z * xylen2] == FLUID && flagField[x + y * ylen2 + (z+1) * xylen2] == FLUID) continue;
+            if (flagField[(x+1) + y * ylen2 + z * xylen2] == FLUID && flagField[x + y * ylen2 + (z+1) * xylen2] == FLUID) continue;
+            if (flagField[(x+1) + y * ylen2 + z * xylen2] == FLUID && flagField[x + y * ylen2 + (z-1) * xylen2] == FLUID) continue;
+            if (flagField[(x-1) + y * ylen2 + z * xylen2] == FLUID && flagField[x + y * ylen2 + (z-1) * xylen2] == FLUID) continue;
+            // The execution didn't move to the next iteration, so this is not a valid corner!
+            printf("The domain contains at least one boundary cell with maximum 2 fluid neighbors that is forbidden.\n");
+            printf("Coordinates: x = %d, y = %d, z = %d \n", x, y, z);
+            return 1;
         }
       }
     }

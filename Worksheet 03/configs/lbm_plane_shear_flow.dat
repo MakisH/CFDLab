@@ -41,7 +41,7 @@ densityRef 		        1
 #--------------------------------------------
 #              Moving wall velocity|(if any)
 #--------------------------------------------
-velocityWall1		      0.01
+velocityWall1		      0.0
 velocityWall2		      0.0
 velocityWall3		      0.0
 
@@ -55,7 +55,7 @@ velocityWall3		      0.0
 #   5   : OUTFLOW
 #   6   : PRESSURE_IN
 #---------------------------------------------------
-wallLeft 			        4             
+wallLeft 			        6         
 wallRight			        5
 wallTop			          1
 wallBottom		        1

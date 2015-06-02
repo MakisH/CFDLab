@@ -325,11 +325,11 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	//printf("init done done\n");
 	//printf("domain size is %d %d %d with xsize and ysize %d %d\n",xlength[0], xlength[1], xlength[2], xsize, ysize);
-	for(int i = xlength[0] + 1; i >= 0 ; --i){
-		for(int j = 0; j < xlength[2] + 2; ++j){
-			printf("%d",flagField[i + xlen2 + xylen2 * j]);
-		}
-		printf("\n");
-	}
-		return 1;
+	//for(int i = xlength[0] + 1; i >= 0 ; --i){
+	//	for(int j = 0; j < xlength[2] + 2; ++j){
+	//		printf("%d",flagField[i + xlen2 + xylen2 * j]);
+	//	}
+	//	printf("\n");
+	//}
+		return 0;
 }

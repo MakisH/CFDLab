@@ -35,7 +35,7 @@ int main(int argc, char *argv[]){
 	flagField = (int *) malloc(domain * sizeof(int));
 	//printf("before init \n");
 	// Init the 3 main arrays.
-	if ( initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) {return 1; printf("why?\n");}
+	if ( initialiseFields( collideField, streamField, flagField, xlength, problem, initxyzXYZ)) return 1;
 	printf("xlength %d\nylength %d\nzlength %d\ntau %f\n, timesteps %d\n, velIn[0] %f\n, velIn[1] %f\n,, velIn[2] %f\n denIn %f\n, denRef %f\n, wall[0] %f\n, wall[1] %f\n, wall[2] %f\n,",xlength[0], xlength[1], xlength[2], tau, timesteps, velocityIn[0],velocityIn[1], velocityIn[2],  densityIn, densityRef, velocityWall[0], velocityWall[1], velocityWall[2]);
 	for(int t = 0; t < timesteps; t++){
 		double *swap = NULL;

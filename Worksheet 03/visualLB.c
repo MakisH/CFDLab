@@ -37,14 +37,14 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	int xlen2 = xlength[0] + 2;
 	int ylen2 = xlength[1] + 2;
 	int xylen2 = xlen2 * ylen2;
-	fprintf(fp, "\nPOINT_DATA %d \n", xlength[0] * xlength[1] * xlength[2] );
+	fprintf(fp, "\nPOINT_DATA %d \n", (xlength[0]+2) * (xlength[1] +2)*( xlength[2]+2) );
 	printf("before dens\n");
 	/* DENSITIES */
 	fprintf(fp, "SCALARS density float 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
-	for (z = 1; z <= xlength[2]; ++z) {
-		for (y = 1; y <= xlength[1]; ++y) {
-			for (x = 1; x <= xlength[0]; ++x){
+	for (z = 0; z <= xlength[2]+1; ++z) {
+		for (y = 0; y <= xlength[1]+1; ++y) {
+			for (x = 0; x <= xlength[0]+1; ++x){
 				computeDensity (collideField + Q_NUMBER * (x + xlen2 * y + xylen2 * z), &density);
 				fprintf(fp, "%f\n", density);
 			}
@@ -53,13 +53,13 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	printf("before velocity\n");
 	/* VELOCITIES */
 	fprintf(fp, "\nVECTORS velocity float \n");
-	for (z = 1; z <= xlength[2]; ++z) {
-		for(y = 1; y <= xlength[1]; ++y) {
-			for (x = 1; x <= xlength[0]; ++x){
+	for (z = 0; z <= xlength[2]+1; ++z) {
+		for(y = 0; y <= xlength[1]+1; ++y) {
+			for (x = 0; x <= xlength[0]+1; ++x){
 				const double * const idx = collideField + Q_NUMBER * (x + xlen2 * y + xylen2 * z);
 				computeDensity (idx, &density);
 				computeVelocity (idx, &density, velocity);
-				fprintf(fp, "%f %f %f\n", velocity[0], velocity[1], velocity[2]);
+				fprintf(fp, "%f %f %f\n", velocity[0]+2, velocity[1]+2, velocity[2]+2);
 			}
 		}
 	}
@@ -81,8 +81,8 @@ void write_vtkHeader( FILE *fp, int *xlength) {
 	fprintf(fp,"ASCII\n");
 	fprintf(fp,"\n");
 	fprintf(fp,"DATASET STRUCTURED_GRID\n");
-	fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength[0], xlength[1], xlength[2]);
-	fprintf(fp,"POINTS %i float\n", xlength[0] * xlength[1] * xlength[2] );
+	fprintf(fp,"DIMENSIONS  %i %i %i \n", xlength[0]+2, xlength[1]+2, xlength[2]+2);
+	fprintf(fp,"POINTS %i float\n", (xlength[0]+2) * (xlength[1]+2) * (xlength[2]+2) );
 	fprintf(fp,"\n");
 }
 
@@ -97,9 +97,9 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength) {
 	// start at 0 and finish at 1.0 => len-1
 	// e.g. for 15 points there are 14 "cells"
 	// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
-	dx = ((xlength[0]  == 1 )? 3 : 1.0 / (xlength[0] - 1));
-	dy = ((xlength[1]  == 1 )? 3 : 1.0 / (xlength[1] - 1));
-	dz = ((xlength[2]  == 1 )? 3 : 1.0 / (xlength[2] - 1));
+	dx = ((xlength[0]+2  == 1 )? 3 : 1.0 / (xlength[0] + 1));
+	dy = ((xlength[1]+2  == 1 )? 3 : 1.0 / (xlength[1] + 1));
+	dz = ((xlength[2]+2  == 1 )? 3 : 1.0 / (xlength[2] + 1));
 
 	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
 	// discretization error appears if we don't include an additional "epsilon" factor.

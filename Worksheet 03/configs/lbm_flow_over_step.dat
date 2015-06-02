@@ -36,7 +36,7 @@ velocityInY		        0
 velocityInZ		        0.05
 
 densityIn			        -1
-densityRef		        -1
+densityRef		        1
 
 #--------------------------------------------
 #              Moving wall velocity|(if any)

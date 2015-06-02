@@ -128,15 +128,15 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			printf("Dimensions are invalid(0)!\n");
 			return 1;
 		}
-		else if(xlength[2] % xsize != 0 || xlength[0] % ysize != 0)
+		else if(xlength[0] % xsize != 0 || xlength[2] % ysize != 0)
 		{
 			printf("xlen2 %d\nxsize %d\nxlen0 %d\nysize %d \n",xlength[2],xsize,xlength[0],ysize);
 			printf("Dimensions and xlength mismatch!\n");
 			return 1;
 		}
 		// need independent dim-s, so xlength has to be multiple of corresponding(!) xsize and ysize
-		scale_x = xlength[2] / xsize; // our implementation uses different naming
-		scale_y = xlength[0] / ysize; // - xsize is xlength[2] and ysize is xlength[0]  
+		scale_x = xlength[0] / xsize; // our implementation uses different naming
+		scale_y = xlength[2] / ysize; // - xsize is xlength[2] and ysize is xlength[0]  
 		for(j1 = 1; j1 <= ysize; ++j1){
 			for (i1 = 1; i1 <= xsize; ++i1){
 				int byte;
@@ -150,13 +150,15 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 				else
 				{
+					//printf("%d",byte);
 				//	if(byte == 1)printf("dim x y z %d %d %d .... x y %d %d\n",xlength[0],xlength[1],xlength[2],i1,j1);
 // every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
 					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
-					for (z = (i1 - 1) * scale_x + 1; z <= i1 * scale_x + scale_x; ++z) {
+
+					for (z = (j1 - 1) * scale_y + 1; z <= j1 * scale_y + scale_y; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
-							for (x = (j1 - 1) * scale_y + 1; x <= j1 * scale_y + scale_y; ++x) {
-								flagField[x + y * ylen2 + z * xylen2] = byte;
+							for (x = (i1 - 1) * scale_x + 1; x <= i1 * scale_x + scale_x; ++x) {
+								flagField[x + y * xlen2 + z * xylen2] = byte;
 								//printf("%d ",x + y * ylen2 + z * xylen2);
 							}
 						}
@@ -305,6 +307,11 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	//printf("init done done\n");
 	//printf("domain size is %d %d %d with xsize and ysize %d %d\n",xlength[0], xlength[1], xlength[2], xsize, ysize);
-//	for(int i = 0; i < 1000; ++i) printf("%d ",flagField[i]);
-		return 0;
+	for(int i = xlength[0] + 1; i >= 0 ; --i){
+		for(int j = 0; j < xlength[2] + 2; ++j){
+			printf("%d",flagField[i + xlen2 + xylen2 * j]);
+		}
+		printf("\n");
+	}
+		return 1;
 }

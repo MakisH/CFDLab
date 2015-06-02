@@ -71,6 +71,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	int xyz_field_domain = xlen2 * ylen2 * zlen2 * Q_NUMBER;
 	int xylen2 = xlen2 * ylen2;
 //	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
+			int xsize, ysize;
 
 	if (!strcmp(problem,"lbm_tilted_plate"))
 	{
@@ -82,7 +83,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		FILE *input = NULL;
 		char line[1024];
 		int levels;
-		int xsize, ysize;
 		int i1, j1;
 //		int **pic = NULL;
 		const char *filename = "./configs/lbm_tilted_plate.pgm";//lbm_tilted_plate.vtk";
@@ -150,7 +150,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 				else
 				{
-			//		if(i1 < 150 && i1 > 100) printf("%d ",byte);
+				//	if(byte == 1)printf("dim x y z %d %d %d .... x y %d %d\n",xlength[0],xlength[1],xlength[2],i1,j1);
 // every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
 					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
 					for (z = (i1 - 1) * scale_x + 1; z <= i1 * scale_x + scale_x; ++z) {
@@ -242,25 +242,44 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	**/
 	/* Boundary initialization: using input parameters */
 
-		for (z = 0; z < zlen2; ++z){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
-			for (y = 0; y < ylen2; ++y){
-				for (x = 0; x < xlen2; ++x){
-					// add all other walls in the same loop, simply switch the indices
-					// - x and y are iterators, use x with xlensq for memory locality
-					// z is "0" or "xlength + 1"
-					// the only question is whether this is OK with the cache memory
-					// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
-					flagField[	  y * ylen2 + z * xylen2	] = initxyzXYZ[0];						// x- dimension	
-										// printf("%d ",y * ylen2 + z * xylen2);
-					flagField[x							+ z * xylen2	] = initxyzXYZ[1];						// y- dimension
-					flagField[x + y * ylen2								] = initxyzXYZ[2];						// z- dimension
-
-					flagField[xlen2 - 1 +	y * ylen2 + z * xylen2		] = initxyzXYZ[3];	// x+ dimension
-					flagField[x + (ylen2 - 1) * ylen2 + z * xylen2	] = initxyzXYZ[4];	// y+ dimension
-					flagField[x + y * ylen2 + (zlen2 - 1) * xylen2	] = initxyzXYZ[5];	// z+ dimension
-				}
-			}
+		//for (z = 0; z < zlen2; ++z){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
+		//	for (y = 0; y < ylen2; ++y){
+		//		for (x = 0; x < xlen2; ++x){
+		//			// add all other walls in the same loop, simply switch the indices
+		//			// - x and y are iterators, use x with xlensq for memory locality
+		//			// z is "0" or "xlength + 1"
+		//			// the only question is whether this is OK with the cache memory
+		//			// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
+		//			flagField[	  y * xlen2 + z * xylen2	] = initxyzXYZ[0];						// x- dimension	
+		//								
+		//			flagField[x							+ z * xylen2	] = initxyzXYZ[1];						// y- dimension
+		//			flagField[x + y * xlen2								] = initxyzXYZ[2];						// z- dimension
+		//			 printf("%d ",x + y * xlen2	);
+		//			flagField[xlen2 - 1 +	y * xlen2 + z * xylen2		] = initxyzXYZ[3];	// x+ dimension
+		//			flagField[x + (ylen2 - 1) * xlen2 + z * xylen2	] = initxyzXYZ[4];	// y+ dimension
+		//			flagField[x + y * xlen2 + (zlen2 - 1) * xylen2	] = initxyzXYZ[5];	// z+ dimension
+		//		}
+		//	}
+		//}
+	for(int y = 0; y < ylen2; ++y){
+		for(x = 0; x < xlen2; ++x){
+					flagField[x + y * xlen2													] = initxyzXYZ[2];	// z- dimension
+					flagField[x + y * xlen2 + (zlen2 - 1) * xylen2	] = initxyzXYZ[5];	// z+ dimension
 		}
+	}
+	for(int z = 0; z < zlen2; ++z){
+		for(x = 0; x < xlen2; ++x){
+					flagField[x												+ z * xylen2	] = initxyzXYZ[1];	// y- dimension
+					flagField[x + (ylen2 - 1) * xlen2 + z * xylen2	] = initxyzXYZ[4];	// y+ dimension
+		}
+	}
+	for(int z = 0; z < zlen2; ++z){
+		for(y = 0; y < ylen2; ++y){
+					flagField[						y * xlen2 + z * xylen2		] = initxyzXYZ[0];	// x- dimension	
+					flagField[xlen2 - 1 +	y * xlen2 + z * xylen2		] = initxyzXYZ[3];	// x+ dimension
+		}
+	}
+
 
 	// check for forbidden boundary cells
 	int counter;
@@ -285,5 +304,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
     }
 	}
 	printf("init done done\n");
+	printf("domain size is %d %d %d with xsize and ysize %d %d\n",xlength[0], xlength[1], xlength[2], xsize, ysize);
+//	for(int i = 0; i < 1000; ++i) printf("%d ",flagField[i]);
 		return 0;
 }

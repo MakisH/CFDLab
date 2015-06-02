@@ -104,9 +104,9 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength) {
 	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
 	// discretization error appears if we don't include an additional "epsilon" factor.
 	// We implemented eps in a way, that we are always on a safe side.
-	for (z = 0; z <= 1 + dx * 0.5; z += dz){
+	for (z = 0; z <= 1 + dz * 0.5; z += dz){
 		for (y = 0; y <= 1 + dy * 0.5; y += dy){
-			for (x = 0; x <= 1 + dz * 0.5; x += dx){
+			for (x = 0; x <= 1 + dx * 0.5; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}

@@ -54,7 +54,6 @@ int main(int argc, char *argv[]){
 			printf("Writing the vtk file for timestep # %d \n", t);
 			writeVtkOutput( collideField, flagField, problem_path, t, xlength ); // needs fixing
 		}
-	printf("t = %d\n",t);
 	}
 	printf("almost done\n");
 	free(collideField);

@@ -38,7 +38,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	int ylen2 = xlength[1] + 2;
 	int xylen2 = xlen2 * ylen2;
 	fprintf(fp, "\nPOINT_DATA %d \n", (xlength[0]+2) * (xlength[1] +2)*( xlength[2]+2) );
-	printf("before dens\n");
+
 	/* DENSITIES */
 	fprintf(fp, "SCALARS density float 1 \n");
 	fprintf(fp, "LOOKUP_TABLE default \n");
@@ -50,7 +50,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
-	printf("before velocity\n");
+
 	/* VELOCITIES */
 	fprintf(fp, "\nVECTORS velocity float \n");
 	for (z = 0; z <= xlength[2]+1; ++z) {

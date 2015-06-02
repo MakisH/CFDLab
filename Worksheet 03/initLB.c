@@ -1,6 +1,4 @@
 #include "initLB.h"
-
-///// we might need some of these for the initialiseFields() function - for the pgm part
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -62,16 +60,13 @@ int readParameters(char		*problem,
 }
 
 int initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, char *problem, int *initxyzXYZ){
-	// TO DO - should be fixed - implement exit if scenario is wrong
-	// TO DO - should be fixed - think about the direction of initiliasiation - all scenarios should start numbering from top left corner
 	int x, y, z, i;
 	int xlen2 = xlength[0] + 2;
 	int ylen2 = xlength[1] + 2;
 	int zlen2 = xlength[2] + 2;
 	int xyz_field_domain = xlen2 * ylen2 * zlen2 * Q_NUMBER;
 	int xylen2 = xlen2 * ylen2;
-//	unsigned int X_min, Y_min, Z_min, X_max, Y_max, Z_max;
-			int xsize, ysize;
+	int xsize, ysize;
 
 	if (!strcmp(problem,"lbm_tilted_plate"))
 	{
@@ -84,7 +79,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		char line[1024];
 		int levels;
 		int i1, j1;
-//		int **pic = NULL;
 		const char *filename = "./configs/lbm_tilted_plate.pgm";//lbm_tilted_plate.vtk";
 		int scale_x;
 		int scale_y;
@@ -112,15 +106,9 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		/* read the width and height */
 		sscanf(line,"%d %d\n",&xsize,&ysize);
 
-		//printf("Image size: %d x %d\n", xsize,ysize);
-
 		/* read # of gray levels */
 		if(fgets(line,sizeof line,input));
 		sscanf(line,"%d\n",&levels);
-
-		/* allocate memory for image */ // we don't need this, we have our own space !
-		//pic = imatrix(0,xsize+2,0,ysize+2);
-		//printf("Image initialised...\n");
 
 		/* read pixel row by row */
 		if( xsize == 0 ||  ysize == 0)
@@ -134,13 +122,14 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			printf("Dimensions and xlength mismatch!\n");
 			return 1;
 		}
+
 		// need independent dim-s, so xlength has to be multiple of corresponding(!) xsize and ysize
 		scale_x = xlength[0] / xsize; // our implementation uses different naming
 		scale_y = xlength[2] / ysize; // - xsize is xlength[2] and ysize is xlength[0]  
 		for(j1 = 1; j1 <= ysize; ++j1){
 			for (i1 = 1; i1 <= xsize; ++i1){
 				int byte;
-				if(fscanf(input, "%d", &byte)); // can someone explain the if-statement ?
+				if(fscanf(input, "%d", &byte));
 
 				if (byte==EOF)
 				{
@@ -150,16 +139,10 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 				else
 				{
-					//printf("%d",byte);
-				//	if(byte == 1)printf("dim x y z %d %d %d .... x y %d %d\n",xlength[0],xlength[1],xlength[2],i1,j1);
-// every read initialises a "cube" from the 3D flagField, scaled according to x-,y-,z- length
-					// could be done in different ways, e.g. save the input values and then traverse the flagField and initialize it sequentially
-
 					for (z = (j1 - 1) * scale_y + 1; z <= j1 * scale_y + scale_y; ++z) {
 						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
 							for (x = (i1 - 1) * scale_x + 1; x <= i1 * scale_x + scale_x; ++x) {
 								flagField[x + y * xlen2 + z * xylen2] = byte;
-								//printf("%d ",x + y * ylen2 + z * xylen2);
 							}
 						}
 					}
@@ -173,12 +156,12 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	else if (!strcmp(problem,"lbm_plane_shear_flow"))
 	{
 		printf("sc2 %d\n", strcmp(problem,"lbm_plane_shear_flow"));
+
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
 					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
-					//printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
@@ -192,7 +175,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
 					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
-				//	printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
@@ -202,7 +184,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]/2; ++x) { //cube is in the 2nd half of the x dimension
 					flagField[x + y * ylen2 + z * xylen2] = NO_SLIP;
-					//printf("%d ",x + y * ylen2 + z * xylen2);
 				}
 			}
 		}
@@ -243,26 +224,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		* 6 - PRESSURE_IN
 	**/
 	/* Boundary initialization: using input parameters */
-
-		//for (z = 0; z < zlen2; ++z){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
-		//	for (y = 0; y < ylen2; ++y){
-		//		for (x = 0; x < xlen2; ++x){
-		//			// add all other walls in the same loop, simply switch the indices
-		//			// - x and y are iterators, use x with xlensq for memory locality
-		//			// z is "0" or "xlength + 1"
-		//			// the only question is whether this is OK with the cache memory
-		//			// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
-		//			flagField[	  y * xlen2 + z * xylen2	] = initxyzXYZ[0];						// x- dimension	
-		//								
-		//			flagField[x							+ z * xylen2	] = initxyzXYZ[1];						// y- dimension
-		//			flagField[x + y * xlen2								] = initxyzXYZ[2];						// z- dimension
-		//			 printf("%d ",x + y * xlen2	);
-		//			flagField[xlen2 - 1 +	y * xlen2 + z * xylen2		] = initxyzXYZ[3];	// x+ dimension
-		//			flagField[x + (ylen2 - 1) * xlen2 + z * xylen2	] = initxyzXYZ[4];	// y+ dimension
-		//			flagField[x + y * xlen2 + (zlen2 - 1) * xylen2	] = initxyzXYZ[5];	// z+ dimension
-		//		}
-		//	}
-		//}
 	for(int y = 0; y < ylen2; ++y){
 		for(x = 0; x < xlen2; ++x){
 					flagField[x + y * xlen2													] = initxyzXYZ[2];	// z- dimension
@@ -290,9 +251,8 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	// This check has a big optimization potential but it is executed only once at the start.
 	int fluidNeighbors;
 	for (z = 1; z <= xlength[2]; ++z) {
-    for (y = 1; y <= xlength[1]; ++y) {
+	for (y = 1; y <= xlength[1]; ++y) {
       for (x = 1; x <= xlength[0]; ++x) {
-        
         // How many fluid neighbors does the current cell have?
         fluidNeighbors = 0;
         if (flagField[x + y * ylen2 + z * xylen2] != FLUID) {
@@ -323,13 +283,5 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
       }
     }
 	}
-	//printf("init done done\n");
-	//printf("domain size is %d %d %d with xsize and ysize %d %d\n",xlength[0], xlength[1], xlength[2], xsize, ysize);
-	//for(int i = xlength[0] + 1; i >= 0 ; --i){
-	//	for(int j = 0; j < xlength[2] + 2; ++j){
-	//		printf("%d",flagField[i + xlen2 + xylen2 * j]);
-	//	}
-	//	printf("\n");
-	//}
 		return 0;
 }

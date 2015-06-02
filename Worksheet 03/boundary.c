@@ -217,6 +217,11 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- OUTFLOW -----------------------------------------------------------------------//           
           case OUTFLOW :
+
+	    computeDensity(collideField + currentCell*Q_NUMBER, &density);
+            computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+            computeFeq(ref_density, &velocity, feq);
+
             // For each direction in the current cell
             for (int i = 0; i < Q_NUMBER; ++i) { 
             	// Neighbor cell of current cell in i-direction
@@ -232,13 +237,10 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
                 
                 // Check if the neighbor cell is fluid                
                 if ( flagField[neighborCell] == FLUID ) {
-                  computeDensity(collideField + currentCell*Q_NUMBER, &density);
-                  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
                   inv_i = Q_NUMBER - i - 1;
-
-                  computeFeq(ref_density, &velocity, feq);
                   collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
+
                 } // if neighbor is fluid
                 
               } // if neighbor coordinates
@@ -247,6 +249,10 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
             
           //----- PRESSURE_IN -------------------------------------------------------------------//
           case PRESSURE_IN :
+	    computeDensity(collideField + currentCell*Q_NUMBER, &density);
+            computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
+            computeFeq(density_in, &velocity, feq);
+
             // For each direction in the current cell
             for (int i = 0; i < Q_NUMBER; ++i) { 
               // Neighbor cell of current cell in i-direction
@@ -262,11 +268,8 @@ void treatBoundary(double *collideField, int* flagField, const double * const wa
 
                 // Check if the neighbor cell is fluid                                
                 if ( flagField[neighborCell] == FLUID ) {
-                  computeDensity(collideField + currentCell*Q_NUMBER, &density);
-                  computeVelocity(collideField + currentCell*Q_NUMBER, &density, &velocity);
 
                   inv_i = Q_NUMBER - i - 1;
-                  computeFeq(density_in, &velocity, feq);
                   collideField[Q_NUMBER * currentCell + i] = feq[i] + feq[inv_i] - collideField[Q_NUMBER * neighborCell + inv_i];
                 } // if neighbor is fluid
                 

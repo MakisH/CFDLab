@@ -185,13 +185,18 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		}
 
 		// add "step" initialization - "cube" has z = x = xlen/2, y = ylen ... x-> dimension starts from top left!
-		for (z = 1; z <= xlength[2]/2; ++z) {
-			for (y = 1; y <= xlength[1]; ++y) {
-				for (x = 1; x <= xlength[0]/2; ++x) { //cube is in the 2nd half of the x dimension
-					flagField[x + y * xlen2 + z * xylen2] = NO_SLIP;
-				}
-			}
-		}
+		if (2*xlength[2] < xlength[0]) {
+      printf("Error: for the flow over a step scenario, z-dimension has to be greater than xlength/2. \n");
+      return 1;
+		} else {
+      for (z = 1; z <= xlength[0]/2; ++z) {
+        for (y = 1; y <= xlength[1]; ++y) {
+          for (x = 1; x <= xlength[0]/2; ++x) { //cube is in the 2nd half of the x dimension
+            flagField[x + y * xlen2 + z * xylen2] = NO_SLIP;
+          }
+        }
+      }
+    }
 		printf("init done!\n");
 	}
 	else

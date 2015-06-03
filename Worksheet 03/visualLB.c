@@ -24,9 +24,9 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 		return;
 	}
 
-	printf("before header\n");
+
 	write_vtkHeader(fp, xlength); // Write the header.
-	printf("before coord\n");
+
 	write_vtkPointCoordinates(fp, xlength);
 
 	// write the densities and velocities.
@@ -63,7 +63,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 			}
 		}
 	}
-	printf("done\n");
+
 	fclose(fp);
 }
 

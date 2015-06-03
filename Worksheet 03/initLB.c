@@ -15,8 +15,7 @@ int readParameters(char		*problem,
 									 int		*initxyzXYZ,
 									 int		argc,
 									 char		*argv[]){
-	// we need to read the problem char variable and act accordingly to read the other variables(switch....) 
-	// ... or read all and think later :)
+
 	if ( argc != 2 ) {
 		printf("Usage: ./sim input_file");
 		return 1;
@@ -47,7 +46,7 @@ int readParameters(char		*problem,
 		read_double( szFileName, "velocityWall2", &velocityWall[1] );
 		read_double( szFileName, "velocityWall3", &velocityWall[2] );
 		
-		// careful here! // domain starts from bottom left
+		// careful here! domain starts from bottom left
 		read_int( szFileName, "wallLeft",				&initxyzXYZ[2] ); // z-
 		read_int( szFileName, "wallRight",			&initxyzXYZ[5] ); // z+
 		read_int( szFileName, "wallTop",				&initxyzXYZ[3] ); // x-
@@ -70,7 +69,7 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 
 	if (!strcmp(problem,"lbm_tilted_plate"))
 	{
-		printf("sc1 %d\n", strcmp(problem,"lbm_tilted_plate"));
+
 	// need to scale input file according to dimensions, if they're different we throw an error
 	// this is a repetitions of the pgm_read() function,
 	//		but without using the tricky array functions and scaling to support different x-,y-,z- dimensions.
@@ -155,13 +154,16 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	else if (!strcmp(problem,"lbm_plane_shear_flow"))
 	{
-		printf("sc2 %d\n", strcmp(problem,"lbm_plane_shear_flow"));
+
 
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
-					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
+					flagField[x + y * ylen2 + z * xylen2] = FLUID; 
+          // we could use a single pointer instead of calculating the 
+          // whole offset multiple times ... requires effort vs small 
+          // performance gain since only 1 call
 				}
 			}
 		}
@@ -169,12 +171,15 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	else if (!strcmp(problem,"lbm_flow_over_step"))
 	{
-		printf("sc3 %d\n", strcmp(problem,"lbm_flow_over_step"));
+
 		// Fluid init (inner part of flagField).
 		for (z = 1; z <= xlength[2]; ++z) {
 			for (y = 1; y <= xlength[1]; ++y) {
 				for (x = 1; x <= xlength[0]; ++x) {
-					flagField[x + y * ylen2 + z * xylen2] = FLUID; // we could use a single pointer instead of calculating the whole offset multiple times ... requires effort vs small performance since only 1 call
+					flagField[x + y * ylen2 + z * xylen2] = FLUID; 
+          // we could use a single pointer instead of calculating the 
+          // whole offset multiple times ... requires effort vs small 
+          // performance gain since only 1 call
 				}
 			}
 		}
@@ -191,7 +196,6 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 	}
 	else
 	{
-				printf("sc4 %d\n", strcmp(problem,"lbm_flow_over_step"));
 
 		printf("\n\nUnknown / Misspelled scenario name!\n\n");
 		printf("Known scenarios are:\n\n");

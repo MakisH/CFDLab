@@ -187,7 +187,7 @@ void treatBoundary(double *collideField,
 											affected[4] = 18; mirror[4] = 4;
 											break;
 
-										default : printf("Error we should never be here!\n"); break;
+                    default : printf("Error in free slip condition neighbor direction!\n"); break;
 									} // switch i                  
 									
 									// foreach affected direction

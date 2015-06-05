@@ -1,0 +1,43 @@
+#include<mpi.h>
+
+Communicators:
+MPI_COMM_WORLD (all the processors)
+MPI_COMM_SELF (me)
+
+compiler: mpicc
+execute: mpiexec -np n ./prog (or mpirun)
+
+int size;
+MPI_Comm_size(MPI_COMM_WORLD, &size);
+
+int rank;
+MPI_Comm_rank(MPI_COMM_WORLD, &rank);
+
+Communication between two processors (point-to-point) or all processors (collective communications, e.g. broadcast).
+
+-- Point-to-point:
+MPI_Send(buf, count (how many values to send?), MPI_DOUBLE (type of variables), nrank (where to send?), tag (id of the message));
+MPI_Recv(buf, count (how many values to receive?), MPI_DOUBLE (type of variables), nrank (from where to receive?), tag (id of the message));
+
+Why to use "MPI_" types instead of standard? --> Because machines with different bit architectures may communicate.
+
+Useful: MPI_ANY_RANK, MPI_ANY_TAG
+
+The above are "buffered send/receive". There are also synchronous (blocking) send/receive (add an "S" in the name of the function?).
+MPI_Sendrecv: shortcut for the buffered MPI_Send, MPI_Recv.
+
+Also asynchronous functions that immediately return: MPI_Isend, MPI_Irecv. (fast but dangerous!)
+
+See structure MPI_Request*.
+
+Use MPI_Wait and MPI_Waitall to wait for MPI_Isend, MPI_Irecv. These two paired give the same result as synchronous send/recv,
+but we can do some other work in the meanwhile.
+
+-- Collective:
+MPI_Barrier(MPI_COMM_WORLD);
+MPI_Bcast( buf, count, type, root, comm);
+MPI_Gather, MPI_Scatter
+MPI_Reduce( send buf, recv buf, count, type, operation, root, comm )
+operation may be e.g. MPI_SUM or MPI_MIN.
+
+MPIIO to read/write in files parallely.

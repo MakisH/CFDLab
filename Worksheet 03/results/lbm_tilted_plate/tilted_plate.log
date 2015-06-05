@@ -1,0 +1,226 @@
+makish@makish-baloon:~/cfd_lab/Worksheet 03$ time ./sim configs/lbm_tilted_plate.dat 
+File: configs/lbm_tilted_plate.dat    problem        = lbm_tilted_plate
+File: configs/lbm_tilted_plate.dat    xlength        = 210
+File: configs/lbm_tilted_plate.dat    ylength        = 1
+File: configs/lbm_tilted_plate.dat    zlength        = 490
+File: configs/lbm_tilted_plate.dat    *tau           = 0.590000
+File: configs/lbm_tilted_plate.dat    *timesteps     = 20000
+File: configs/lbm_tilted_plate.dat    *timestepsPerPlotting= 100
+File: configs/lbm_tilted_plate.dat    velocityInX    = 0.000000
+File: configs/lbm_tilted_plate.dat    velocityInY    = 0.000000
+File: configs/lbm_tilted_plate.dat    velocityInZ    = 0.035000
+File: configs/lbm_tilted_plate.dat    *densityIn     = -1.000000
+File: configs/lbm_tilted_plate.dat    *densityRef    = 1.000000
+File: configs/lbm_tilted_plate.dat    velocityWall1  = 0.000000
+File: configs/lbm_tilted_plate.dat    velocityWall2  = 0.000000
+File: configs/lbm_tilted_plate.dat    velocityWall3  = 0.000000
+File: configs/lbm_tilted_plate.dat    wallLeft       = 4
+File: configs/lbm_tilted_plate.dat    wallRight      = 5
+File: configs/lbm_tilted_plate.dat    wallTop        = 1
+File: configs/lbm_tilted_plate.dat    wallBottom     = 1
+File: configs/lbm_tilted_plate.dat    wallBackground = 3
+File: configs/lbm_tilted_plate.dat    wallForeground = 3
+Writing the vtk file for timestep # 0 
+Writing the vtk file for timestep # 100 
+Writing the vtk file for timestep # 200 
+Writing the vtk file for timestep # 300 
+Writing the vtk file for timestep # 400 
+Writing the vtk file for timestep # 500 
+Writing the vtk file for timestep # 600 
+Writing the vtk file for timestep # 700 
+Writing the vtk file for timestep # 800 
+Writing the vtk file for timestep # 900 
+Writing the vtk file for timestep # 1000 
+Writing the vtk file for timestep # 1100 
+Writing the vtk file for timestep # 1200 
+Writing the vtk file for timestep # 1300 
+Writing the vtk file for timestep # 1400 
+Writing the vtk file for timestep # 1500 
+Writing the vtk file for timestep # 1600 
+Writing the vtk file for timestep # 1700 
+Writing the vtk file for timestep # 1800 
+Writing the vtk file for timestep # 1900 
+Writing the vtk file for timestep # 2000 
+Writing the vtk file for timestep # 2100 
+Writing the vtk file for timestep # 2200 
+Writing the vtk file for timestep # 2300 
+Writing the vtk file for timestep # 2400 
+Writing the vtk file for timestep # 2500 
+Writing the vtk file for timestep # 2600 
+Writing the vtk file for timestep # 2700 
+Writing the vtk file for timestep # 2800 
+Writing the vtk file for timestep # 2900 
+Writing the vtk file for timestep # 3000 
+Writing the vtk file for timestep # 3100 
+Writing the vtk file for timestep # 3200 
+Writing the vtk file for timestep # 3300 
+Writing the vtk file for timestep # 3400 
+Writing the vtk file for timestep # 3500 
+Writing the vtk file for timestep # 3600 
+Writing the vtk file for timestep # 3700 
+Writing the vtk file for timestep # 3800 
+Writing the vtk file for timestep # 3900 
+Writing the vtk file for timestep # 4000 
+Writing the vtk file for timestep # 4100 
+Writing the vtk file for timestep # 4200 
+Writing the vtk file for timestep # 4300 
+Writing the vtk file for timestep # 4400 
+Writing the vtk file for timestep # 4500 
+Writing the vtk file for timestep # 4600 
+Writing the vtk file for timestep # 4700 
+Writing the vtk file for timestep # 4800 
+Writing the vtk file for timestep # 4900 
+Writing the vtk file for timestep # 5000 
+Writing the vtk file for timestep # 5100 
+Writing the vtk file for timestep # 5200 
+Writing the vtk file for timestep # 5300 
+Writing the vtk file for timestep # 5400 
+Writing the vtk file for timestep # 5500 
+Writing the vtk file for timestep # 5600 
+Writing the vtk file for timestep # 5700 
+Writing the vtk file for timestep # 5800 
+Writing the vtk file for timestep # 5900 
+Writing the vtk file for timestep # 6000 
+Writing the vtk file for timestep # 6100 
+Writing the vtk file for timestep # 6200 
+Writing the vtk file for timestep # 6300 
+Writing the vtk file for timestep # 6400 
+Writing the vtk file for timestep # 6500 
+Writing the vtk file for timestep # 6600 
+Writing the vtk file for timestep # 6700 
+Writing the vtk file for timestep # 6800 
+Writing the vtk file for timestep # 6900 
+Writing the vtk file for timestep # 7000 
+Writing the vtk file for timestep # 7100 
+Writing the vtk file for timestep # 7200 
+Writing the vtk file for timestep # 7300 
+Writing the vtk file for timestep # 7400 
+Writing the vtk file for timestep # 7500 
+Writing the vtk file for timestep # 7600 
+Writing the vtk file for timestep # 7700 
+Writing the vtk file for timestep # 7800 
+Writing the vtk file for timestep # 7900 
+Writing the vtk file for timestep # 8000 
+Writing the vtk file for timestep # 8100 
+Writing the vtk file for timestep # 8200 
+Writing the vtk file for timestep # 8300 
+Writing the vtk file for timestep # 8400 
+Writing the vtk file for timestep # 8500 
+Writing the vtk file for timestep # 8600 
+Writing the vtk file for timestep # 8700 
+Writing the vtk file for timestep # 8800 
+Writing the vtk file for timestep # 8900 
+Writing the vtk file for timestep # 9000 
+Writing the vtk file for timestep # 9100 
+Writing the vtk file for timestep # 9200 
+Writing the vtk file for timestep # 9300 
+Writing the vtk file for timestep # 9400 
+Writing the vtk file for timestep # 9500 
+Writing the vtk file for timestep # 9600 
+Writing the vtk file for timestep # 9700 
+Writing the vtk file for timestep # 9800 
+Writing the vtk file for timestep # 9900 
+Writing the vtk file for timestep # 10000 
+Writing the vtk file for timestep # 10100 
+Writing the vtk file for timestep # 10200 
+Writing the vtk file for timestep # 10300 
+Writing the vtk file for timestep # 10400 
+Writing the vtk file for timestep # 10500 
+Writing the vtk file for timestep # 10600 
+Writing the vtk file for timestep # 10700 
+Writing the vtk file for timestep # 10800 
+Writing the vtk file for timestep # 10900 
+Writing the vtk file for timestep # 11000 
+Writing the vtk file for timestep # 11100 
+Writing the vtk file for timestep # 11200 
+Writing the vtk file for timestep # 11300 
+Writing the vtk file for timestep # 11400 
+Writing the vtk file for timestep # 11500 
+Writing the vtk file for timestep # 11600 
+Writing the vtk file for timestep # 11700 
+Writing the vtk file for timestep # 11800 
+Writing the vtk file for timestep # 11900 
+Writing the vtk file for timestep # 12000 
+Writing the vtk file for timestep # 12100 
+Writing the vtk file for timestep # 12200 
+Writing the vtk file for timestep # 12300 
+Writing the vtk file for timestep # 12400 
+Writing the vtk file for timestep # 12500 
+Writing the vtk file for timestep # 12600 
+Writing the vtk file for timestep # 12700 
+Writing the vtk file for timestep # 12800 
+Writing the vtk file for timestep # 12900 
+Writing the vtk file for timestep # 13000 
+Writing the vtk file for timestep # 13100 
+Writing the vtk file for timestep # 13200 
+Writing the vtk file for timestep # 13300 
+Writing the vtk file for timestep # 13400 
+Writing the vtk file for timestep # 13500 
+Writing the vtk file for timestep # 13600 
+Writing the vtk file for timestep # 13700 
+Writing the vtk file for timestep # 13800 
+Writing the vtk file for timestep # 13900 
+Writing the vtk file for timestep # 14000 
+Writing the vtk file for timestep # 14100 
+Writing the vtk file for timestep # 14200 
+Writing the vtk file for timestep # 14300 
+Writing the vtk file for timestep # 14400 
+Writing the vtk file for timestep # 14500 
+Writing the vtk file for timestep # 14600 
+Writing the vtk file for timestep # 14700 
+Writing the vtk file for timestep # 14800 
+Writing the vtk file for timestep # 14900 
+Writing the vtk file for timestep # 15000 
+Writing the vtk file for timestep # 15100 
+Writing the vtk file for timestep # 15200 
+Writing the vtk file for timestep # 15300 
+Writing the vtk file for timestep # 15400 
+Writing the vtk file for timestep # 15500 
+Writing the vtk file for timestep # 15600 
+Writing the vtk file for timestep # 15700 
+Writing the vtk file for timestep # 15800 
+Writing the vtk file for timestep # 15900 
+Writing the vtk file for timestep # 16000 
+Writing the vtk file for timestep # 16100 
+Writing the vtk file for timestep # 16200 
+Writing the vtk file for timestep # 16300 
+Writing the vtk file for timestep # 16400 
+Writing the vtk file for timestep # 16500 
+Writing the vtk file for timestep # 16600 
+Writing the vtk file for timestep # 16700 
+Writing the vtk file for timestep # 16800 
+Writing the vtk file for timestep # 16900 
+Writing the vtk file for timestep # 17000 
+Writing the vtk file for timestep # 17100 
+Writing the vtk file for timestep # 17200 
+Writing the vtk file for timestep # 17300 
+Writing the vtk file for timestep # 17400 
+Writing the vtk file for timestep # 17500 
+Writing the vtk file for timestep # 17600 
+Writing the vtk file for timestep # 17700 
+Writing the vtk file for timestep # 17800 
+Writing the vtk file for timestep # 17900 
+Writing the vtk file for timestep # 18000 
+Writing the vtk file for timestep # 18100 
+Writing the vtk file for timestep # 18200 
+Writing the vtk file for timestep # 18300 
+Writing the vtk file for timestep # 18400 
+Writing the vtk file for timestep # 18500 
+Writing the vtk file for timestep # 18600 
+Writing the vtk file for timestep # 18700 
+Writing the vtk file for timestep # 18800 
+Writing the vtk file for timestep # 18900 
+Writing the vtk file for timestep # 19000 
+Writing the vtk file for timestep # 19100 
+Writing the vtk file for timestep # 19200 
+Writing the vtk file for timestep # 19300 
+Writing the vtk file for timestep # 19400 
+Writing the vtk file for timestep # 19500 
+Writing the vtk file for timestep # 19600 
+Writing the vtk file for timestep # 19700 
+Writing the vtk file for timestep # 19800 
+Writing the vtk file for timestep # 19900 
+
+real  35m9.960s
+user  34m58.671s
+sys 0m7.633s

@@ -1,0 +1,76 @@
+makish@makish-baloon:~/cfd_lab/Worksheet 03$ time ./sim configs/lbm_plane_shear_flow.dat 
+File: configs/lbm_plane_shear_flow.dat    problem        = lbm_plane_shear_flow
+File: configs/lbm_plane_shear_flow.dat    xlength        = 8
+File: configs/lbm_plane_shear_flow.dat    ylength        = 8
+File: configs/lbm_plane_shear_flow.dat    zlength        = 20
+File: configs/lbm_plane_shear_flow.dat    *tau           = 1.800000
+File: configs/lbm_plane_shear_flow.dat    *timesteps     = 5000
+File: configs/lbm_plane_shear_flow.dat    *timestepsPerPlotting= 100
+File: configs/lbm_plane_shear_flow.dat    velocityInX    = 0.000000
+File: configs/lbm_plane_shear_flow.dat    velocityInY    = 0.000000
+File: configs/lbm_plane_shear_flow.dat    velocityInZ    = 0.000000
+File: configs/lbm_plane_shear_flow.dat    *densityIn     = 1.005000
+File: configs/lbm_plane_shear_flow.dat    *densityRef    = 1.000000
+File: configs/lbm_plane_shear_flow.dat    velocityWall1  = 0.000000
+File: configs/lbm_plane_shear_flow.dat    velocityWall2  = 0.000000
+File: configs/lbm_plane_shear_flow.dat    velocityWall3  = 0.000000
+File: configs/lbm_plane_shear_flow.dat    wallLeft       = 6
+File: configs/lbm_plane_shear_flow.dat    wallRight      = 5
+File: configs/lbm_plane_shear_flow.dat    wallTop        = 1
+File: configs/lbm_plane_shear_flow.dat    wallBottom     = 1
+File: configs/lbm_plane_shear_flow.dat    wallBackground = 3
+File: configs/lbm_plane_shear_flow.dat    wallForeground = 3
+Writing the vtk file for timestep # 0 
+Writing the vtk file for timestep # 100 
+Writing the vtk file for timestep # 200 
+Writing the vtk file for timestep # 300 
+Writing the vtk file for timestep # 400 
+Writing the vtk file for timestep # 500 
+Writing the vtk file for timestep # 600 
+Writing the vtk file for timestep # 700 
+Writing the vtk file for timestep # 800 
+Writing the vtk file for timestep # 900 
+Writing the vtk file for timestep # 1000 
+Writing the vtk file for timestep # 1100 
+Writing the vtk file for timestep # 1200 
+Writing the vtk file for timestep # 1300 
+Writing the vtk file for timestep # 1400 
+Writing the vtk file for timestep # 1500 
+Writing the vtk file for timestep # 1600 
+Writing the vtk file for timestep # 1700 
+Writing the vtk file for timestep # 1800 
+Writing the vtk file for timestep # 1900 
+Writing the vtk file for timestep # 2000 
+Writing the vtk file for timestep # 2100 
+Writing the vtk file for timestep # 2200 
+Writing the vtk file for timestep # 2300 
+Writing the vtk file for timestep # 2400 
+Writing the vtk file for timestep # 2500 
+Writing the vtk file for timestep # 2600 
+Writing the vtk file for timestep # 2700 
+Writing the vtk file for timestep # 2800 
+Writing the vtk file for timestep # 2900 
+Writing the vtk file for timestep # 3000 
+Writing the vtk file for timestep # 3100 
+Writing the vtk file for timestep # 3200 
+Writing the vtk file for timestep # 3300 
+Writing the vtk file for timestep # 3400 
+Writing the vtk file for timestep # 3500 
+Writing the vtk file for timestep # 3600 
+Writing the vtk file for timestep # 3700 
+Writing the vtk file for timestep # 3800 
+Writing the vtk file for timestep # 3900 
+Writing the vtk file for timestep # 4000 
+Writing the vtk file for timestep # 4100 
+Writing the vtk file for timestep # 4200 
+Writing the vtk file for timestep # 4300 
+Writing the vtk file for timestep # 4400 
+Writing the vtk file for timestep # 4500 
+Writing the vtk file for timestep # 4600 
+Writing the vtk file for timestep # 4700 
+Writing the vtk file for timestep # 4800 
+Writing the vtk file for timestep # 4900 
+
+real  0m6.049s
+user  0m6.004s
+sys 0m0.032s

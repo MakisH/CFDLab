@@ -21,3 +21,9 @@ velocityWall1               0.1
 velocityWall2               0.0
 velocityWall3               0.0  
 
+#--------------------------------------------
+#             MPI parameters
+#--------------------------------------------
+iProc                       2
+jProc                       2
+kProc                       2

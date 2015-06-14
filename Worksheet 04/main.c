@@ -16,8 +16,9 @@ int main(int argc, char *argv[]){
 	double velocityWall[3];
 	int timesteps;
 	int timestepsPerPlotting;
+  int iProc, jProc, kProc;
 
-	readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, argc, argv ); // reading parameters from the file.
+	readParameters( &xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
 	// Allocating the main three arrays.
 	int domain = (xlength + 2) * (xlength + 2) * (xlength + 2);

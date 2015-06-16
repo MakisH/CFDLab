@@ -166,8 +166,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		for (y = 0; y < xlen2; ++y){
 			for (x = 0; x < xlen2; ++x){
 				for (i = 0; i < Q_NUMBER; ++i){
-					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
-					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2sq) + i] = LATTICEWEIGHTS[i];
+					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
+					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
 				}
 			}
 		}
@@ -177,7 +177,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	for (z = 1; z <= xlength[2]; ++z) {
 		for (y = 1; y <= xlength[1]; ++y) {
 			for (x= 1; x <= xlength[0]; ++x) {
-				flagField[x + y * xlen2 + z * xlen2sq] = FLUID;
+				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
 			}
 		}
 	}

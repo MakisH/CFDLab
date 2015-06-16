@@ -25,7 +25,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 }
 
 
-void initialiseBuffers(double *sendBuffer[], double *readBuffer[], int *xlength){
+void initialiseBuffers(double *sendBuffer, double *readBuffer,  int *xlength){
 
 	int x = xlength[0];
 	int y = xlength[1];

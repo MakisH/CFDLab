@@ -24,8 +24,8 @@ int main(int argc, char *argv[]){
 
   // send and read buffers for all possible directions :
   // [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
-   double *sendBuffer[6];
-   double *readBuffer[6];
+   double sendBuffer[6];
+   double readBuffer[6];
 
   // Start MPI
   initializeMPI( &rank, &number_of_ranks, argc, argv );
@@ -35,6 +35,7 @@ int main(int argc, char *argv[]){
 
 	// Each CPU is going to work in its own subdomain.
 	int cpuDomain[3];
+	int cpuDomain_size;
 	cpuDomain[0] = xlength[0]/iProc;
 	cpuDomain[1] = xlength[1]/jProc;
 	cpuDomain[2] = xlength[2]/kProc;

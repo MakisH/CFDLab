@@ -34,38 +34,38 @@ int main(int argc, char *argv[]){
 	readParameters( &xlength[0], &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
 	// Each CPU is going to work in its own subdomain.
-	int innerDomain[3];
-	innerDomain[0] = xlength[0]/iProc + 2;
-	innerDomain[1] = xlength[1]/jProc + 2;
-	innerDomain[2] = xlength[2]/kProc + 2;
-	innerDomain_size = innerDomain[0] * innerDomain[1] * innerDomain[2];
+	int cpuDomain[3];
+	cpuDomain[0] = xlength[0]/iProc;
+	cpuDomain[1] = xlength[1]/jProc;
+	cpuDomain[2] = xlength[2]/kProc;
+	cpuDomain_size = (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2);
 
 	// Allocating the main three arrays.
-	collideField = (double *) malloc(Q_NUMBER * innerDomain_size * sizeof(double));
-	streamField = (double *) malloc(Q_NUMBER * innerDomain_size * sizeof(double));
-	flagField = (int *) malloc(innerDomain_size * sizeof(int));
+	collideField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
+	streamField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
+	flagField = (int *) malloc(cpuDomain_size * sizeof(int));
 
 	// Init the main three arrays.
-	initialiseFields( collideField, streamField, flagField, innerDomain );
+	initialiseFields( collideField, streamField, flagField, cpuDomain );
 
 	// allocate the buffers
-	initialiseBuffers(sendBuffer, readBuffer, innerDomain);
+	initialiseBuffers(sendBuffer, readBuffer, cpuDomain);
 
 	for(int t = 0; t <= timesteps; t++){
 		double *swap = NULL;
-		doStreaming( collideField, streamField, flagField, innerDomain );
+		doStreaming( collideField, streamField, flagField, cpuDomain );
 
 		swap = collideField;
 		collideField = streamField;
 		streamField = swap;
 
-		doCollision( collideField, flagField, &tau, innerDomain );
+		doCollision( collideField, flagField, &tau, cpuDomain );
 
-		treatBoundary( collideField, flagField, velocityWall, innerDomain );
+		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
 
 		if ( t % timestepsPerPlotting == 0 ) {
       printf("Writing the vtk file for timestep # %d \n", t);
-      writeVtkOutput( collideField, flagField, "pics/simLB", t, innerDomain );
+      writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain );
     }
     
 	}

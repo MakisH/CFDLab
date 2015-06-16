@@ -34,7 +34,7 @@ int main(int argc, char *argv[]){
 	readParameters( &xlength[0], &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
 	// Each CPU is going to work in its own subdomain.
-	int cpuDomain[3];
+	int cpuDomain[3], cpuDomain_size;
 	cpuDomain[0] = xlength[0]/iProc;
 	cpuDomain[1] = xlength[1]/jProc;
 	cpuDomain[2] = xlength[2]/kProc;

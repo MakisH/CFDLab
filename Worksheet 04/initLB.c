@@ -31,6 +31,8 @@ void initialiseBuffers(double *sendBuffer, double *readBuffer,  int *xlength){
 	int y = xlength[1];
 	int z = xlength[2];
 
+	int domain = 5; // because we have 5 possible directions to be extracted to buffer
+
 	// We initilise 6 different buffers.
 	// sendBuffer planes[0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 	sendBuffer[0] = (double *) malloc(y*z * domain * sizeof(double)); // left plane
@@ -53,15 +55,25 @@ void initialiseBuffers(double *sendBuffer, double *readBuffer,  int *xlength){
 void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank){
 
 
-
-
         int x, y, z, i;
         int xlen2 = xlength[0] + 2;
 	int ylen2 = xlength[1] + 2;
 	int zlen2 = xlength[2] + 2;
 
-	// Boundary init.
+	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 
+	// Example (CUBE iProc*jProc*kProc = 4 * 3 * 2: -> for columns, three rows, two slices
+	// first x,z plane
+	// 8 9 10 11
+	// 4 5 6 7
+	// 1 2 3 4
+
+	// second x,z plane
+	// 20 21 22 23
+	// 16 17 18 19
+	// 12 13 14 15
+
+	// Boundary init.
 	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
 	if (rank % iProc == 0){
 		for (z = 0; z < zlen2; z++) {

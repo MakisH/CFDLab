@@ -8,7 +8,9 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 	else {
 		const char *szFileName = NULL;
 		szFileName = argv[1];  
-		READ_INT( szFileName, *xlength );
+		read_int( szFileName, "xlength", xlength );
+		read_int( szFileName, "ylength", xlength+1 );
+		read_int( szFileName, "zlength", xlength+2 );
 		READ_DOUBLE( szFileName, *tau );
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );
@@ -20,6 +22,32 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
     READ_INT( szFileName, *kProc );
 	}
 	return 0;
+}
+
+
+void initialiseBuffers(double *sendBuffer[], double *readBuffer[], int *xlength){
+
+	int x = xlength[0];
+	int y = xlength[1];
+	int z = xlength[2];
+
+	// We initilise 6 different buffers.
+	// sendBuffer planes[0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
+	sendBuffer[0] = (double *) malloc(y*z * domain * sizeof(double)); // left plane
+	sendBuffer[1] = (double *) malloc(y*z * domain * sizeof(double)); // right plane
+	sendBuffer[2] = (double *) malloc(x*y * domain * sizeof(double)); // top plane
+	sendBuffer[3] = (double *) malloc(x*y * domain * sizeof(double)); // bottom plane
+	sendBuffer[4] = (double *) malloc(x*z * domain * sizeof(double)); // front plane
+        sendBuffer[5] = (double *) malloc(x*z * domain * sizeof(double)); // back plane
+
+	// readBuffer planes[0:right sendBuffer, 1:left sendBuffer, 2:bottom sendBuffer, 3:top sendBuffer, 4:back sendBuffer, 5:front sendBuffer]
+	readBuffer[0] = (double *) malloc(y*z * domain * sizeof(double)); // left plane
+        readBuffer[1] = (double *) malloc(y*z * domain * sizeof(double)); // right plane
+        readBuffer[2] = (double *) malloc(x*y * domain * sizeof(double)); // top plane
+        readBuffer[3] = (double *) malloc(x*y * domain * sizeof(double)); // bottom plane
+        readBuffer[4] = (double *) malloc(x*z * domain * sizeof(double)); // front plane
+        readBuffer[5] = (double *) malloc(x*z * domain * sizeof(double)); // back plane
+
 }
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){

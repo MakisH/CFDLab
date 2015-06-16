@@ -50,11 +50,116 @@ void initialiseBuffers(double *sendBuffer[], double *readBuffer[], int *xlength)
 
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int xlength){
-	// might be faster with if-else, but it is insignificant compared to wtkoutput & co
-	int x, y, z, i;
-	int xlen2 = xlength + 2;
-	int xlen2sq = xlen2 * xlen2;
+void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank){
+
+
+
+
+        int x, y, z, i;
+        int xlen2 = xlength[0] + 2;
+	int ylen2 = xlength[1] + 2;
+	int zlen2 = xlength[2] + 2;
+
+	// Boundary init.
+
+	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
+	if (rank % iProc == 0){
+		for (z = 0; z < zlen2; z++) {
+			for (y = 0; y < ylen2; y++) {
+				flagField[y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
+			}
+		}
+	} else {
+
+                for (z = 0; z < zlen2; z++) {
+                        for (y = 0; y < ylen2; y++) {
+                                flagField[y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+	}
+
+
+	// Right boundary. If true, then we pick the right plane A=A(x=xlen, y, z) of this process and define it as no-slip.
+	if (rank % iProc == iProc - 1){
+                for (z = 0; z < zlen2; z++) {
+                        for (y = 0; y < ylen2; y++) {
+                                flagField[xlen2 + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
+                        }
+                }
+        } else {
+
+                for (z = 0; z < zlen2; z++) {
+                        for (y = 0; y < ylen2; y++) {
+                                flagField[xlen2 + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+        }
+
+
+	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
+        if (rank <= iProc*kProc - 1){
+                for (z = 0; z < zlen2; z++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + z * xlen2*ylen2] = NO_SLIP;
+                        }
+                }
+        } else {
+
+                for (z = 0; z < zlen2; z++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+        }
+
+	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
+	if (rank <= iProc*jProc*kProc - 1 && rank >= iProc*(jProc-1)*kProc - 1){
+                for (z = 0; z < zlen2; z++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + ylen2*xlen2 + z * xlen2*ylen2] = NO_SLIP;
+                        }
+                }
+        } else {
+
+                for (z = 0; z < zlen2; z++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + ylen2*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+        }
+
+	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
+	if (rank % iProc*jProc <= iProc*kProc - 1 && rank % iProc*jProc >= iProc*(kProc - 1)) {
+                for (y = 0; y < ylen2; y++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + y*xlen2 + zlen2 * xlen2*ylen2] = MOVING_WALL;
+                        }
+                }
+        } else {
+
+                for (y = 0; y < ylen2; y++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + y*xlen2 + zlen2 * xlen2*ylen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+        }
+
+	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
+	if (rank % iProc*jProc < iProc - 1) {
+                for (y = 0; y < ylen2; y++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + y*xlen2] = NO_SLIP;
+                        }
+                }
+        } else {
+
+                for (y = 0; y < ylen2; y++) {
+                        for (x = 0; x < xlen2; x++) {
+                                flagField[x + y*xlen2] = PARALLEL_BOUNDARY;
+                        }
+                }
+        }
+
 
 	/* stream & collide Fields initialization. */
 	for (z = 0; z < xlen2; ++z){
@@ -67,34 +172,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			}
 		}
 	}
-	/* flagField init: boundary vs. fluid. */
-	/* Boundary initialization: (5 walls: no-slip; 1 wall: moving wall). Fluid: inner part. */
 
 	// Fluid init (inner part of flagField).
-	for (z = 1; z <= xlength; ++z) {
-		for (y = 1; y <= xlength; ++y) {
-			for (x= 1; x <= xlength; ++x) {
+	for (z = 1; z <= xlength[2]; ++z) {
+		for (y = 1; y <= xlength[1]; ++y) {
+			for (x= 1; x <= xlength[0]; ++x) {
 				flagField[x + y * xlen2 + z * xlen2sq] = FLUID;
 			}
 		}
 	}
 
-	// Boundary init.
-	z = xlength + 1;
-	for (x = 0; x < xlen2; ++x){ // treat x, y and z as pure iterators, the dimension depends on where we have 0 or xlength+1 and iteration happens.
-		for (y = 0; y < xlen2; ++y){
-			// add all other walls in the same loop, simply switch the indices
-			// - x and y are iterators, use x with xlensq for memory locality
-			// z is "0" or "xlength + 1"
-			// the only question is whether this is OK with the cache memory
-			// in fact we can move these iterations above at line 19(before the third loop from 0 to xlength + 1)
-			flagField[	  y * xlen2 + x * xlen2sq	] = NO_SLIP;		// x- dimension	
-			flagField[y				+ x * xlen2sq	] = NO_SLIP;		// y- dimension
-			flagField[y + x * xlen2					] = NO_SLIP;		// z- dimension
-
-			flagField[z + y * xlen2 + x * xlen2sq	] = NO_SLIP;		// x+ dimension
-			flagField[y + z * xlen2 + x * xlen2sq	] = NO_SLIP;		// y+ dimension
-			flagField[y + x * xlen2 + z * xlen2sq	] = MOVING_WALL;	// z+ dimension
-		}
-	}
 }

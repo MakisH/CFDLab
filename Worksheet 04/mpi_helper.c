@@ -154,8 +154,8 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
       break;
   }
   
-  MPI_Send(&sendBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
-  MPI_Recv(&readBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
+  MPI_Send(sendBuffer[boundary], sizeBuffer[boundary], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
+  MPI_Recv(readBuffer[boundary], sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
   
 }
 
@@ -260,9 +260,9 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
   
   int cell = 0;
   
-  for (int x = x_start; x <= x_end; ++x) {
+  for (int z = z_start; z <= z_end; ++z) {
     for (int y = y_start; y <= y_end; ++y) {
-      for (int z = z_start; z <= z_end; ++z) {
+      for (int x = x_start; x <= x_end; ++x) {
         
         cell++;
         currentCell = x + y*SizeX + z*SizeXY;
@@ -378,9 +378,9 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
   
   int cell = 0;
   
-  for (int x = x_start; x <= x_end; ++x) {
+  for (int z = z_start; z <= z_end; ++z) {
     for (int y = y_start; y <= y_end; ++y) {
-      for (int z = z_start; z <= z_end; ++z) {
+      for (int x = x_start; x <= x_end; ++x) {
         
         cell++;
         currentCell = x + y*SizeX + z*SizeXY;

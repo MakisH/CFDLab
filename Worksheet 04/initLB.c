@@ -64,9 +64,9 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
 
 	int x, y, z, i;
-	int xlen2 = xlength[0] + 2;
-	int ylen2 = xlength[1] + 2;
-	int zlen2 = xlength[2] + 2;
+	int xlen2 = xlength[0]+2;
+	int ylen2 = xlength[1]+2;
+	int zlen2 = xlength[2]+2;
 
 	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 
@@ -104,15 +104,15 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	if (rank % iProc == iProc - 1){
 		for (z = 0; z < zlen2; z++) {
 			for (y = 0; y < ylen2; y++) {
-				flagField[xlen2 + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
+				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
 	} else {
 			for (z = 0; z < zlen2; z++) {
-			for (y = 0; y < ylen2; y++) {
-			flagField[xlen2 + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+				for (y = 0; y < ylen2; y++) {
+				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+			}
 		}
-	}
 }
 
 
@@ -132,17 +132,17 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
-	if (rank <= iProc*jProc*kProc - 1 && rank >= iProc*(jProc-1)*kProc - 1){
+	if (rank >= iProc*(jProc-1)*kProc){
 		for (z = 0; z < zlen2; z++) {
 			for (x = 0; x < xlen2; x++) {
-				flagField[x + ylen2*xlen2 + z * xlen2*ylen2] = NO_SLIP;
+				flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
 	} else {
 
 			for (z = 0; z < zlen2; z++) {
 				for (x = 0; x < xlen2; x++) {
-					flagField[x + ylen2*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+					flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
 	}
@@ -151,14 +151,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	if (rank % iProc*jProc <= iProc*kProc - 1 && rank % iProc*jProc >= iProc*(kProc - 1)) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
-				flagField[x + y*xlen2 + zlen2 * xlen2*ylen2] = MOVING_WALL;
+				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
 			}
 		}
 	} else {
 
 			for (y = 0; y < ylen2; y++) {
 				for (x = 0; x < xlen2; x++) {
-					flagField[x + y*xlen2 + zlen2 * xlen2*ylen2] = PARALLEL_BOUNDARY;
+					flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
 		}
@@ -181,8 +181,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
 
 	/* stream & collide Fields initialization. */
-	for (z = 0; z < xlen2; ++z){
-		for (y = 0; y < xlen2; ++y){
+	for (z = 0; z < zlen2; ++z){
+		for (y = 0; y < ylen2; ++y){
 			for (x = 0; x < xlen2; ++x){
 				for (i = 0; i < Q_NUMBER; ++i){
 					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
@@ -193,9 +193,9 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 	// Fluid init (inner part of flagField).
-	for (z = 1; z <= xlength[2]; ++z) {
-		for (y = 1; y <= xlength[1]; ++y) {
-			for (x= 1; x <= xlength[0]; ++x) {
+	for (z = 1; z <= zlen2-2; ++z) {
+		for (y = 1; y <= ylen2-2; ++y) {
+			for (x= 1; x <= xlen2-2; ++x) {
 				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
 			}
 		}

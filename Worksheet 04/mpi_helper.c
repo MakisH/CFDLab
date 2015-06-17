@@ -32,7 +32,7 @@ void finalizeMPI() {
   MPI_Finalize();
 }
 
-void swap(double *sendBuffer, double *readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
+void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
   
   int neighbor_distance = 0;
   int neighborId_send = MPI_PROC_NULL;
@@ -159,7 +159,7 @@ void swap(double *sendBuffer, double *readBuffer, int *sizeBuffer, int direction
   
 }
 
-void extraction(double *collideField, int *flagField, int *xlength, double *sendBuffer[], int boundary) {
+void extraction(double *collideField, int *flagField, int *xlength, double **sendBuffer, int boundary) {
   
   int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
   int x_start, x_end, y_start, y_end, z_start, z_end;
@@ -277,7 +277,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double *send
   
 }
 
-void injection(double *collideField, int *flagField, int *xlength, double *readBuffer[], int boundary) {
+void injection(double *collideField, int *flagField, int *xlength, double **readBuffer, int boundary) {
   
   int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
   int x_start, x_end, y_start, y_end, z_start, z_end;

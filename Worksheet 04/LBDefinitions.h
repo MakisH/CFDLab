@@ -14,8 +14,8 @@
 
 #define DIRECTION_RL 0
 #define DIRECTION_LR 1
-#define DIRECTION_DT 2
-#define DIRECTION_TD 3
+#define DIRECTION_TD 2
+#define DIRECTION_DT 3
 #define DIRECTION_BF 4
 #define DIRECTION_FB 5
 

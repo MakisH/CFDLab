@@ -82,6 +82,18 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	// 12 13 14 15
 
 
+	// Fluid init (inner part of flagField).
+	for (z = 1; z <= zlen2-2; ++z) {
+		for (y = 1; y <= ylen2-2; ++y) {
+			for (x= 1; x <= xlen2-2; ++x) {
+				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
+			}
+		}
+	}
+
+
+
+
 	// Boundary init.
 	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
 	if (rank % iProc == 0){
@@ -188,15 +200,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
 					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
 				}
-			}
-		}
-	}
-
-	// Fluid init (inner part of flagField).
-	for (z = 1; z <= zlen2-2; ++z) {
-		for (y = 1; y <= ylen2-2; ++y) {
-			for (x= 1; x <= xlen2-2; ++x) {
-				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
 			}
 		}
 	}

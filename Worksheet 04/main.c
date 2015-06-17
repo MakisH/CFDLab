@@ -56,53 +56,53 @@ int main(int argc, char *argv[]){
 
 	// allocate the buffers
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
-	int t = 0;
-	//for(int t = 0; t <= timesteps; t++){
-	//	double *swap = NULL;
- //   
- //   // TODO: maybe move all these to a separate function?
- //   // Do extraction, swap, injection for x+ (left to right)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, 1, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 1 );
- //   
- //   // Do extraction, swap, injection for x- (right to left)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 0 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, 0, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 0 );
+
+
+	for(int t = 0; t <= timesteps; t++){
+		double *tmp = NULL;
+
+    // TODO: maybe move all these to a separate function?
+    // Do extraction, swap, injection for x+ (left to right)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, 1, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 1 );
+
+    // Do extraction, swap, injection for x- (right to left)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 0 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, 0, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 0 );
  //   
  //   // Do extraction, swap, injection for y+ (back to forth)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, 4, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 4 );
- //   
- //   // Do extraction, swap, injection for y- (forth to back)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, 5, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 5 );
- //   
- //   // Do extraction, swap, injection for z+ (down to up)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DU, 2, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 2 );
- //   
- //   // Do extraction, swap, injection for z- (up to down)
- //   extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
- //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_UD, 3, iProc, kProc, jProc, rank)
- //   injection( collideField, flagField, cpuDomain, readBuffer, 3 );
- //   
-	//	doStreaming( collideField, streamField, flagField, cpuDomain );
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, 4, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 4 );
 
-	//	swap = collideField;
-	//	collideField = streamField;
-	//	streamField = swap;
+   // Do extraction, swap, injection for y- (forth to back)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, 5, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 5 );
 
-	//	doCollision( collideField, flagField, &tau, cpuDomain );
+   // Do extraction, swap, injection for z+ (down to up)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, 2, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 2 );
+    
+    // Do extraction, swap, injection for z- (up to down)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
+    swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, 3, iProc, kProc, jProc, rank);
+    injection( collideField, flagField, cpuDomain, readBuffer, 3 );
 
-	//	treatBoundary( collideField, flagField, velocityWall, cpuDomain );
-	//	printf("haha\n");
+		doStreaming( collideField, streamField, flagField, cpuDomain );
 
-	//	if ( t % timestepsPerPlotting == 0 ) {
+		tmp = collideField;
+		collideField = streamField;
+		streamField = tmp;
+
+		doCollision( collideField, flagField, &tau, cpuDomain );
+
+		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
+
+		if ( t % timestepsPerPlotting == 0 ) {
 				printf("%d cpu x\n", cpuDomain[0]);
 				printf("%d cpu y\n", cpuDomain[1]);
 				printf("%d cpu z\n", cpuDomain[2]);
@@ -116,9 +116,8 @@ int main(int argc, char *argv[]){
 				printf("Writing the vtk file for timestep # %d \n", t);
       writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
 
- //   }
- //   
-	//}
+    }
+	}
 
 	free(collideField);
 	free(streamField);

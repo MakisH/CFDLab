@@ -82,8 +82,6 @@ void write_vtkHeader( FILE *fp, int *xlength) {
 	fprintf(fp,"\n");
 }
 
-
-
 void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int iProc, int jProc, int kProc, int rank) {
 	double x, y, z;
 
@@ -126,7 +124,6 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int
 	printf("xEnd %f\n", xEnd);
 	printf("yEnd %f\n", yEnd);
 	printf("zEnd %f\n\n", zEnd);
-	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
 	// discretization error appears if we don't include an additional "epsilon" factor.
 	// We implemented eps in a way, that we are always on a safe side.
 	for (z = zStart; z < zEnd + dz * 0.5; z += dz){

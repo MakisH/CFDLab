@@ -4,12 +4,8 @@
 #include "helper.h"
 #include <stdio.h>
 
-
-void write_vtkHeader(FILE *fp, int *xlength);
-void write_vtkPointCoordinates( FILE *fp, int *xlength);
-
-void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int *xlength, int rank, int *xlength_global
-										int iProc, int jProc, int kProc) {
+void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename,
+										unsigned int t, int *xlength, int rank, int *xlength_global, int iProc, int jProc, int kProc) {
 
 	// Opening the file.
 	FILE *fp = NULL;

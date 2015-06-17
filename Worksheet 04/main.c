@@ -47,10 +47,11 @@ int main(int argc, char *argv[]){
 	flagField = (int *) malloc(cpuDomain_size * sizeof(int));
 
 	// Init the main three arrays.
-	initialiseFields( collideField, streamField, flagField, xlength, iProc, jProc, kProc, rank);
+	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
 
 	// allocate the buffers
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain);
+	printf("haha\n");
 
 	for(int t = 0; t <= timesteps; t++){
 		double *swap = NULL;
@@ -95,6 +96,7 @@ int main(int argc, char *argv[]){
 		doCollision( collideField, flagField, &tau, cpuDomain );
 
 		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
+		printf("haha\n");
 
 		if ( t % timestepsPerPlotting == 0 ) {
       printf("Writing the vtk file for timestep # %d \n", t);

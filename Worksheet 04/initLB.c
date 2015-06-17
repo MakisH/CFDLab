@@ -25,7 +25,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 }
 
 
-void initialiseBuffers(double *sendBuffer[], double *readBuffer[],  int *xlength){
+void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength){
 
 	int x = xlength[0];
 	int y = xlength[1];
@@ -43,12 +43,12 @@ void initialiseBuffers(double *sendBuffer[], double *readBuffer[],  int *xlength
 	sendBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
 
 	// readBuffer planes[0:right sendBuffer, 1:left sendBuffer, 2:bottom sendBuffer, 3:top sendBuffer, 4:back sendBuffer, 5:front sendBuffer]
-	readBuffer[0] = (double *) malloc(y*z * domain * sizeof(double)); // left plane
-	readBuffer[1] = (double *) malloc(y *z * domain * sizeof(double)); // right plane
-	readBuffer[2] = (double *) malloc(x*y * domain * sizeof(double)); // top plane
-	readBuffer[3] = (double *) malloc(x*y * domain * sizeof(double)); // bottom plane
-	readBuffer[4] = (double *) malloc(x*z * domain * sizeof(double)); // front plane
-	readBuffer[5] = (double *) malloc(x*z * domain * sizeof(double)); // back plane
+	readBuffer[0] = (double *) malloc(y * z * domain * sizeof(double)); // left plane
+	readBuffer[1] = (double *) malloc(y * z * domain * sizeof(double)); // right plane
+	readBuffer[2] = (double *) malloc(x * y * domain * sizeof(double)); // top plane
+	readBuffer[3] = (double *) malloc(x * y * domain * sizeof(double)); // bottom plane
+	readBuffer[4] = (double *) malloc(x * z * domain * sizeof(double)); // front plane
+	readBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
 
 }
 

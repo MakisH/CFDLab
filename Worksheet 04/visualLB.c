@@ -21,7 +21,6 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 		return;
 	}
 
-
 	write_vtkHeader(fp, xlength); // Write the header.
 
 	write_vtkPointCoordinates(fp, xlength, xlength_global, iProc, jProc, kProc, rank);

@@ -14,4 +14,13 @@ void initializeMPI(
 // Terminates the MPI session
 void finalizeMPI();
 
+// Do the extraction
+void extraction(
+      double *collideField, 
+      int *flagField, 
+      int *xlength, 
+      double *sendBuffer[], 
+      int boundary
+);
+
 #endif

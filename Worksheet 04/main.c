@@ -53,6 +53,38 @@ int main(int argc, char *argv[]){
 
 	for(int t = 0; t <= timesteps; t++){
 		double *swap = NULL;
+    
+    // TODO: maybe move all these to a separate function?
+    // Do extraction, swap, injection for x+ (left to right)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 6 );
+    // TODO: swap
+    // TODO: injection
+    
+    // Do extraction, swap, injection for x- (right to left)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
+    // TODO: swap
+    // TODO: injection
+    
+    // Do extraction, swap, injection for y+ (back to forth)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
+    // TODO: swap
+    // TODO: injection
+    
+    // Do extraction, swap, injection for y- (forth to back)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
+    // TODO: swap
+    // TODO: injection    
+    
+    // Do extraction, swap, injection for z+ (down to up)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
+    // TODO: swap
+    // TODO: injection
+    
+    // Do extraction, swap, injection for z- (up to down)
+    extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
+    // TODO: swap
+    // TODO: injection
+    
 		doStreaming( collideField, streamField, flagField, cpuDomain );
 
 		swap = collideField;

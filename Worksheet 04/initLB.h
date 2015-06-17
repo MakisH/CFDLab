@@ -21,6 +21,6 @@ int readParameters(
 /* initialises the particle distribution functions and the flagfield */
 void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank);
 
-void initialiseBuffers(double *sendBuffer[], double *readBuffer[],  int *xlength, int *sizeBuffer);
+void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, int *sizeBuffer);
 #endif
 

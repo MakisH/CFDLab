@@ -4,13 +4,14 @@
 #include "LBDefinitions.h"
 
 void initializeMPI( int *rank, int *number_of_ranks, int argc, char *argv[] ) {
-  
+    printf("hi from mpi\n!");
+
   // Initialize n processes
   MPI_Init( &argc, &argv );
-  
+  printf("test init\n!");
   // Ask for the size of the communicator (number_of_ranks)
   MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
-  
+  printf("mpi_comm_size\n!");
   // Ask for the local process id (rank)
   MPI_Comm_rank( MPI_COMM_WORLD, rank );
   

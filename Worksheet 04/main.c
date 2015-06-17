@@ -65,32 +65,32 @@ int main(int argc, char *argv[]){
  //   // TODO: maybe move all these to a separate function?
  //   // Do extraction, swap, injection for x+ (left to right)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, 1, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 1 );
  //   
  //   // Do extraction, swap, injection for x- (right to left)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 0 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, 0, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 0 );
  //   
  //   // Do extraction, swap, injection for y+ (back to forth)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, 4, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 4 );
  //   
  //   // Do extraction, swap, injection for y- (forth to back)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, 5, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 5 );
  //   
  //   // Do extraction, swap, injection for z+ (down to up)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DU, 2, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 2 );
  //   
  //   // Do extraction, swap, injection for z- (up to down)
  //   extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
- //   // TODO: swap
+ //   swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_UD, 3, iProc, kProc, jProc, rank)
  //   injection( collideField, flagField, cpuDomain, readBuffer, 3 );
  //   
 	//	doStreaming( collideField, streamField, flagField, cpuDomain );

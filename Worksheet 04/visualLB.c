@@ -5,17 +5,14 @@
 #include <stdio.h>
 
 
-void write_vtkHeader(FILE *fp, int *xlength);
-void write_vtkPointCoordinates( FILE *fp, int *xlength);
-
-void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int *xlength, int rank, int *xlength_global
+void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int *xlength, int rank, int *xlength_global,
 										int iProc, int jProc, int kProc) {
 
 	// Opening the file.
 	FILE *fp = NULL;
 	char sZFilename[80];
 
-	sprintf (sZFilename, "cpu_%i_%s.%i.vtk", rank, filename, t);
+	sprintf (sZFilename, "%s.cpu-%i_time-%i.vtk", filename, rank, t);
 
 	fp = fopen(sZFilename, "w");
 	if (fp == NULL) {
@@ -28,7 +25,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 	write_vtkHeader(fp, xlength); // Write the header.
 
-	write_vtkPointCoordinates(fp, xlength);
+	write_vtkPointCoordinates(fp, xlength, xlength_global, iProc, jProc, kProc, rank);
 
 	// write the densities and velocities.
 	int x, y, z;
@@ -89,28 +86,39 @@ void write_vtkHeader( FILE *fp, int *xlength) {
 
 
 
-void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int iProc, int jProc, int kProc) {
+void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int iProc, int jProc, int kProc, int rank) {
 	double x, y, z;
 
 	// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1) // -1 because spaces between points are 1 less than the number of points
 	double dx, dy, dz;
 
-
-	//double xOrigin = iProc * rank / 
-
 	// start at 0 and finish at 1.0 => len-1
 	// e.g. for 15 points there are 14 "cells"
 	// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
-	dx = ((xlength[0]+2  == 1 )? 3 : 1.0 / (xlength[0] + 1));
-	dy = ((xlength[1]+2  == 1 )? 3 : 1.0 / (xlength[1] + 1));
-	dz = ((xlength[2]+2  == 1 )? 3 : 1.0 / (xlength[2] + 1));
+	dx = ((xlength_global[0]+2  == 1 )? 3 : 1.0 / (xlength_global[0] + 1));
+	dy = ((xlength_global[1]+2  == 1 )? 3 : 1.0 / (xlength_global[1] + 1));
+	dz = ((xlength_global[2]+2  == 1 )? 3 : 1.0 / (xlength_global[2] + 1));
+
+	// A factor of mapping from local CPU cube to the global one.
+	int xFactor = rank % iProc;
+	int yFactor = rank / (iProc * kProc);
+	int zFactor = rank % (iProc * kProc)/iProc;
+
+	// The actual mapping.
+	double xStart = xFactor * iProc * dx;
+	double yStart = yFactor * jProc * dy;
+	double zStart = zFactor * kProc * dz;
+
+	double xEnd = xStart + xlength[0] * dx;
+	double yEnd = yStart + xlength[1] * dy;
+	double zEnd = zStart + xlength[2] * dz;
 
 	// " smart indexing ... 10% faster for 20 points(3sec), 3% for 100(10sec)
 	// discretization error appears if we don't include an additional "epsilon" factor.
 	// We implemented eps in a way, that we are always on a safe side.
-	for (z = 0; z <= 1 + dz * 0.5; z += dz){
-		for (y = 0; y <= 1 + dy * 0.5; y += dy){
-			for (x = 0; x <= 1 + dx * 0.5; x += dx){
+	for (z = zStart; z <= zEnd + dz * 0.5; z += dz){
+		for (y = yStart; y <= yEnd + dy * 0.5; y += dy){
+			for (x = xStart; x <= xEnd + dx * 0.5; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}

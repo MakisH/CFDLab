@@ -11,7 +11,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	FILE *fp = NULL;
 	char sZFilename[80];
 
-	sprintf (sZFilename, "%s.cpu-%i_time-%i.vtk", filename, t, rank);
+	sprintf (sZFilename, "%s.cpu-%i_time-%i.vtk", filename, rank, t);
 
 	fp = fopen(sZFilename, "w");
 	if (fp == NULL) {

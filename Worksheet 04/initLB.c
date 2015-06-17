@@ -148,7 +148,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
-	if (rank % iProc*jProc <= iProc*kProc - 1 && rank % iProc*jProc >= iProc*(kProc - 1)) {
+	if (rank % iProc*kProc >= iProc*(kProc - 1)) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;

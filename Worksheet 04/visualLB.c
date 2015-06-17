@@ -24,7 +24,8 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 	write_vtkHeader(fp, xlength); // Write the header.
 
-	write_vtkPointCoordinates(fp, xlength);
+
+write_vtkPointCoordinates( fp, xlength, xlength_global, iProc, jProc, kProc);
 
 	// write the densities and velocities.
 	int x, y, z;

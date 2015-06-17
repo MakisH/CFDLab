@@ -32,9 +32,134 @@ void finalizeMPI() {
   MPI_Finalize();
 }
 
+void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
+  
+  int neighbor_distance = 0;
+  int neighborId_send = MPI_PROC_NULL;
+  int neighborId_recv = MPI_PROC_NULL;
+  MPI_Status status;
+  
+  switch (direction) {
+    // x- direction (right-to-left)
+    case DIRECTION_RL :
+      neighbor_distance = -1;
+      if ( rank % iProc == 0 ) { 
+        // left boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;
+      } else if ( rank % iProc == iProc - 1 ) { 
+        // right boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    // x+ direction (left-to-right)
+    case DIRECTION_LR :
+      neighbor_distance = 1;
+      if ( rank % iProc == 0 ) { 
+        // left boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;
+      } else if ( rank % iProc == iProc - 1 ) { 
+        // right boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    // z+ direction (down-to-top)
+    case DIRECTION_DT :
+      neighbor_distance = iProc;
+      if ( rank % iProc*kProc < iProc ) { 
+        // bottom boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;
+      } else if ( rank % iProc*kProc >= iProc*(kProc - 1) ) { 
+        // top boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    // z- direction (top-to-down)
+    case DIRECTION_TD :
+      neighbor_distance = -iProc;
+      if ( rank % iProc*kProc < iProc ) { 
+        // bottom boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;
+      } else if ( rank % iProc*kProc >= iProc*(kProc - 1) ) { 
+        // top boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    // y+ direction (back-to-front)
+    case DIRECTION_BF :
+      neighbor_distance = iProc * kProc;
+      if ( rank >= iProc*(jProc-1)*kProc ) { 
+        // back boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;
+      } else if ( rank <= iProc*kProc - 1 ) { 
+        // front boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    // y- direction (front-to-back)
+    case DIRECTION_FB :
+      neighbor_distance = iProc * kProc;
+      if ( rank >= iProc*(jProc-1)*kProc ) { 
+        // back boundary
+        neighborId_send = MPI_PROC_NULL;
+        neighborId_recv = rank - neighbor_distance;
+      } else if ( rank <= iProc*kProc - 1 ) { 
+        // front boundary
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = MPI_PROC_NULL;        
+      } else { 
+        // inner subdomain
+        neighborId_send = rank + neighbor_distance;
+        neighborId_recv = rank - neighbor_distance;        
+      }
+      break;
+      
+    default :
+      neighborId_send = MPI_PROC_NULL;
+      neighborId_recv = MPI_PROC_NULL;      
+      break;
+  }
+  
+  MPI_Send(sendBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
+  MPI_Recv(readBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
+  
+}
 
-
-void extraction(double *collideField, int *flagField, int *xlength, double *sendBuffer[], int boundary) {
+void extraction(double *collideField, int *flagField, int *xlength, double **sendBuffer, int boundary) {
   
   int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
   int x_start, x_end, y_start, y_end, z_start, z_end;
@@ -129,6 +254,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double *send
       x_start = 0;        x_end = -1;
       y_start = 0;        y_end = -1;
       z_start = 0;        z_end = -1;
+      break;
       
   }
   
@@ -151,7 +277,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double *send
   
 }
 
-void injection(double *collideField, int *flagField, int *xlength, double *readBuffer[], int boundary) {
+void injection(double *collideField, int *flagField, int *xlength, double **readBuffer, int boundary) {
   
   int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
   int x_start, x_end, y_start, y_end, z_start, z_end;
@@ -246,6 +372,7 @@ void injection(double *collideField, int *flagField, int *xlength, double *readB
       x_start = 0;        x_end = -1;
       y_start = 0;        y_end = -1;
       z_start = 0;        z_end = -1;
+      break;
       
   }
   

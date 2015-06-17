@@ -14,12 +14,25 @@ void initializeMPI(
 // Terminates the MPI session
 void finalizeMPI();
 
+// Transfer the overlapping cells
+void swap(
+      double **sendBuffer, 
+      double **readBuffer, 
+      int *sizeBuffer, 
+      int direction,
+      int boundary,
+      int iProc, 
+      int kProc, 
+      int jProc, 
+      int rank
+);
+
 // Do the extraction
 void extraction(
       double *collideField, 
       int *flagField, 
       int *xlength, 
-      double *sendBuffer[], 
+      double **sendBuffer, 
       int boundary
 );
 
@@ -28,7 +41,7 @@ void injection(
       double *collideField, 
       int *flagField, 
       int *xlength, 
-      double *readBuffer[], 
+      double **readBuffer, 
       int boundary
 );
 

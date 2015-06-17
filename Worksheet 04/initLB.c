@@ -164,7 +164,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
-	if (rank % iProc*jProc < iProc - 1) {
+	if (rank % iProc*kProc < iProc) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2] = NO_SLIP;

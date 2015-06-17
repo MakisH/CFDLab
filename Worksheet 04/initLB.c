@@ -25,16 +25,29 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 }
 
 
+<<<<<<< HEAD
 void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength){
+=======
+void initialiseBuffers(double *sendBuffer[], double **readBuffer,  int *xlength, int *sizeBuffer){
+>>>>>>> 145a316430030f9c64bb135672a3ab0ac121d313
 
-	int x = xlength[0];
-	int y = xlength[1];
-	int z = xlength[2];
+	int x = xlength[0]+2;
+	int y = xlength[1]+2;
+	int z = xlength[2]+2;
 
 	int domain = 5; // because we have 5 possible directions to be extracted to buffer
 
+	// We should substitute the sizes in malloc, but we don't have time now.
+	sizeBuffer[0] = y * z * domain;
+	sizeBuffer[1] = y * z * domain;
+	sizeBuffer[2] = x * y * domain;
+	sizeBuffer[3] = x * y * domain;
+	sizeBuffer[4] = x * z * domain;
+	sizeBuffer[5] = x * z * domain;
+
 	// We initilise 6 different buffers.
 	// sendBuffer planes[0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
+<<<<<<< HEAD
 	sendBuffer[0] = (double *) malloc(y * z * domain * sizeof(double)); // left plane
 	sendBuffer[1] = (double *) malloc(y * z * domain * sizeof(double)); // right plane
 	sendBuffer[2] = (double *) malloc(x * y * domain * sizeof(double)); // top plane
@@ -49,6 +62,22 @@ void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength){
 	readBuffer[3] = (double *) malloc(x * y * domain * sizeof(double)); // bottom plane
 	readBuffer[4] = (double *) malloc(x * z * domain * sizeof(double)); // front plane
 	readBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
+=======
+	sendBuffer[0] = (double *) malloc(y * z * domain * sizeof (double)); // left plane
+	sendBuffer[1] = (double *) malloc(y * z * domain * sizeof (double)); // right plane
+	sendBuffer[2] = (double *) malloc(x * y * domain * sizeof (double)); // top plane
+	sendBuffer[3] = (double *) malloc(x * y * domain * sizeof (double)); // bottom plane
+	sendBuffer[4] = (double *) malloc(x * z * domain * sizeof (double)); // front plane
+	sendBuffer[5] = (double *) malloc(x * z * domain * sizeof (double)); // back plane
+
+// readBuffer planes[0:right sendBuffer, 1:left sendBuffer, 2:bottom sendBuffer, 3:top sendBuffer, 4:back sendBuffer, 5:front sendBuffer]
+	readBuffer[0] = (double *) malloc(y*z * domain * sizeof(double)); // left plane
+	readBuffer[1] = (double *) malloc(y *z * domain * sizeof(double)); // right plane
+	readBuffer[2] = (double *) malloc(x*y * domain * sizeof(double)); // top plane
+	readBuffer[3] = (double *) malloc(x*y * domain * sizeof(double)); // bottom plane
+	readBuffer[4] = (double *) malloc(x*z * domain * sizeof(double)); // front plane
+	readBuffer[5] = (double *) malloc(x*z * domain * sizeof(double)); // back plane
+>>>>>>> 145a316430030f9c64bb135672a3ab0ac121d313
 
 }
 
@@ -72,6 +101,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	// 20 21 22 23
 	// 16 17 18 19
 	// 12 13 14 15
+
 
 	// Boundary init.
 	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.

@@ -10,6 +10,12 @@
 
 int main(int argc, char *argv[]){
 
+	int rank = 5;
+  int number_of_ranks;
+
+	  // Start MPI
+  initializeMPI( &rank, &number_of_ranks, argc, argv );
+
 	double *collideField = NULL;
 	double *streamField = NULL;
 	int *flagField = NULL;
@@ -19,8 +25,7 @@ int main(int argc, char *argv[]){
 	int timesteps;
 	int timestepsPerPlotting;
   int iProc, jProc, kProc;
-  int rank = 5;
-  int number_of_ranks;
+
 
   // send and read buffers for all possible directions :
   // [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
@@ -28,11 +33,10 @@ int main(int argc, char *argv[]){
 	double *readBuffer[6];
 	int sizeBuffer[6];
 
-  // Read the config file
-	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
-  // Start MPI
-  initializeMPI( &rank, &number_of_ranks, argc, argv );
+
+	  // Read the config file
+	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
 	// Each CPU is going to work in its own subdomain.
 	int cpuDomain[3];
@@ -50,11 +54,8 @@ int main(int argc, char *argv[]){
 	// Init the main three arrays.
 	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
 
-	printf("%d\n", iProc);
-
 	// allocate the buffers
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
-	printf("haha\n");
 	int t = 0;
 	//for(int t = 0; t <= timesteps; t++){
 	//	double *swap = NULL;
@@ -102,7 +103,6 @@ int main(int argc, char *argv[]){
 	//	printf("haha\n");
 
 	//	if ( t % timestepsPerPlotting == 0 ) {
-      printf("Writing the vtk file for timestep # %d \n", t);
 				printf("%d cpu x\n", cpuDomain[0]);
 				printf("%d cpu y\n", cpuDomain[1]);
 				printf("%d cpu z\n", cpuDomain[2]);
@@ -112,7 +112,8 @@ int main(int argc, char *argv[]){
 				printf("%d zlength\n", xlength[2]);
 				printf("%d iproc\n", iProc);
 				printf("%d jproc\n", jProc);
-				printf("%d kproc\n", kProc);
+				printf("%d kproc\n\n", kProc);
+				printf("Writing the vtk file for timestep # %d \n", t);
       writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
 
  //   }

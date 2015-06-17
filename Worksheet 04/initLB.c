@@ -11,6 +11,11 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 		read_int( szFileName, "xlength", xlength );
 		read_int( szFileName, "ylength", xlength+1 );
 		read_int( szFileName, "zlength", xlength+2 );
+		if(xlength[0] < 2 || xlength[1] < 2 || xlength[2] < 2){
+			printf("Dimensions must be > 1, please fix the geometry!\n");
+			return 1;
+		}
+
 		READ_DOUBLE( szFileName, *tau );
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );

@@ -23,4 +23,13 @@ void extraction(
       int boundary
 );
 
+// Do the injection
+void injection(
+      double *collideField, 
+      int *flagField, 
+      int *xlength, 
+      double *readBuffer[], 
+      int boundary
+);
+
 #endif

@@ -4,7 +4,6 @@
 #include "helper.h"
 #include <stdio.h>
 
-
 void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int *xlength, int rank, int *xlength_global,
 										int iProc, int jProc, int kProc) {
 

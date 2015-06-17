@@ -34,9 +34,6 @@ int main(int argc, char *argv[]){
   // Start MPI
   initializeMPI( &rank, &number_of_ranks, argc, argv );
 
-  // Read the config file
-	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
-
 	// Each CPU is going to work in its own subdomain.
 	int cpuDomain[3];
 	int cpuDomain_size;
@@ -106,7 +103,18 @@ int main(int argc, char *argv[]){
 
 	//	if ( t % timestepsPerPlotting == 0 ) {
       printf("Writing the vtk file for timestep # %d \n", t);
+				printf("%d cpu x\n", cpuDomain[0]);
+				printf("%d cpu y\n", cpuDomain[1]);
+				printf("%d cpu z\n", cpuDomain[2]);
+				printf("%d rank\n", rank);
+				printf("%d xlength\n", xlength[0]);
+				printf("%d ylength\n", xlength[1]);
+				printf("%d zlength\n", xlength[2]);
+				printf("%d iproc\n", iProc);
+				printf("%d jproc\n", jProc);
+				printf("%d kproc\n", kProc);
       writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
+
  //   }
  //   
 	//}

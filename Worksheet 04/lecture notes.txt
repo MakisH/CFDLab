@@ -1,0 +1,38 @@
+#include <mpi.h>
+
+MPI_COMM_WORLD
+MPI_COMM_SELF - communicators ?
+
+mpicc - compiler
+
+execute - mpiexec or mpiren (depends on the implementation)
+mpiexec -np 4 ./prog
+
+int size; // = getargv();
+MPI_Comm_size(MPI_COMM_WORLD,&size);
+
+int rank; // WTF
+
+MPI_Send(buf,count /* how many values we want to set, e.g. 5 */, MPI_DOUBLE /* what types of values we want to set , e.g. 5*8  bytes*/, nrank /* id of the receiver/sender in case of send/receive */ , tag/* id of thread */, MPI_COMM_WORLD/*communicator */, MPI_STATUS_IGNORE );
+
+// similar for the MPI_Recv
+
+MPI_ANY_RANK, MPI_ANY_TAG
+
+// MPI_Recv might be blocking ... it will block as long as the buf cannot be reused
+// there are also MPI_Ssend for synchronous and MPIBSend for buffered(slower)
+
+MPI_Sendrecv(/* makes sure that if both processes call sendrecv, it will work, so it will wait for the send but also wait for the data to be received */)
+
+MPI_Isend and Irecv(Asynchronous - return immediately, the have parameter MPI_Request(special struct) to query whther MPIrecv or wait is done)
+
+the different statements can
+
+MPI_Wait - waits until send recv is ready ... cna be used to overlap computation with sending data
+
+collective communication - include all processes , simplest one is MPI_Barrier(MPI_COMM_WORLD)
+
+PI_Bcast(buf,count, type, root, communicator);
+
+MPI_Gather = copy the data for one process to have all of it
+MPI_Reduce(blabal)

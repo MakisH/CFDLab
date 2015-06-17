@@ -19,19 +19,20 @@ int main(int argc, char *argv[]){
 	int timesteps;
 	int timestepsPerPlotting;
   int iProc, jProc, kProc;
-  int rank;
+  int rank = 5;
   int number_of_ranks;
 
   // send and read buffers for all possible directions :
   // [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
-   double *sendBuffer[6];
-   double *readBuffer[6];
+	double *sendBuffer[6];
+	double *readBuffer[6];
+	int sizeBuffer[6];
+
+  // Read the config file
+	readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
   // Start MPI
   initializeMPI( &rank, &number_of_ranks, argc, argv );
-
-  // Read the config file
-	readParameters( &xlength[0], &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ); // reading parameters from the file.
 
 	// Each CPU is going to work in its own subdomain.
 	int cpuDomain[3];
@@ -49,8 +50,10 @@ int main(int argc, char *argv[]){
 	// Init the main three arrays.
 	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
 
+	printf("%d\n", iProc);
+
 	// allocate the buffers
-	initialiseBuffers(sendBuffer, readBuffer, cpuDomain);
+	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
 	printf("haha\n");
 
 	for(int t = 0; t <= timesteps; t++){

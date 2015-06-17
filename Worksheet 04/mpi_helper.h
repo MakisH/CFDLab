@@ -24,7 +24,7 @@ void swap(
       int iProc, 
       int kProc, 
       int jProc, 
-      int *rank
+      int rank
 );
 
 // Do the extraction

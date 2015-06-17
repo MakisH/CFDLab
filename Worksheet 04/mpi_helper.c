@@ -32,9 +32,12 @@ void finalizeMPI() {
   MPI_Finalize();
 }
 
-void swap(double *sendBuffer, double *readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int *rank) {
+void swap(double *sendBuffer, double *readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
   
   int neighbor_distance = 0;
+  int neighborId_send = MPI_PROC_NULL;
+  int neighborId_recv = MPI_PROC_NULL;
+  MPI_Status status;
   
   switch (direction) {
     // x- direction (right-to-left)
@@ -152,7 +155,7 @@ void swap(double *sendBuffer, double *readBuffer, int *sizeBuffer, int direction
   }
   
   MPI_Send(&sendBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
-  MPI_Recv(&readBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD);
+  MPI_Recv(&readBuffer, sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
   
 }
 

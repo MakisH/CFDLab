@@ -26,7 +26,6 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 
 void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, int *sizeBuffer){
 
-
 	int x = xlength[0]+2;
 	int y = xlength[1]+2;
 	int z = xlength[2]+2;
@@ -58,7 +57,6 @@ void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, 
 	readBuffer[3] = (double *) malloc(x * y * domain * sizeof(double)); // bottom plane
 	readBuffer[4] = (double *) malloc(x * z * domain * sizeof(double)); // front plane
 	readBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
-
 
 }
 

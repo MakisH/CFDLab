@@ -86,19 +86,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	// 16 17 18 19
 	// 12 13 14 15
 
-
-	// Fluid init (inner part of flagField).
-	for (z = 1; z <= zlen2 - 2; ++z) {
-		for (y = 1; y <= ylen2 - 2; ++y) {
-			for (x = 1; x <= xlen2 - 2; ++x) {
-				flagField[x + y * xlen2 + z * xlen2 * ylen2] = FLUID;
-			}
-		}
-	}
-
-
-
-
 	// Boundary init.
 	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
 	if (rank % iProc == 0){
@@ -163,7 +150,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
-	if (rank % iProc*kProc >= iProc*(kProc - 1)) {
+	if (rank % (iProc*kProc) >= iProc*(kProc - 1)) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
@@ -179,7 +166,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
-	if (rank % iProc*kProc < iProc) {
+	if (rank % (iProc*kProc) < iProc) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2] = NO_SLIP;
@@ -206,6 +193,16 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			}
 		}
 	}
+
+	// Fluid init (inner part of flagField).
+	for (z = 1; z <= zlen2-2; ++z) {
+		for (y = 1; y <= ylen2-2; ++y) {
+			for (x= 1; x <= xlen2-2; ++x) {
+				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
+			}
+		}
+	}
+
 	// print flagfield initialization for debug
 	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
 	for(z = 0;z < zlen2; ++z)
@@ -213,4 +210,5 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			for(x = 0; x < xlen2; ++x)
 				printf("%d ",flagField[xlen2 + y * xlen2 + z * xlen2 * ylen2]);
 	printf("exit \n");
+
 }

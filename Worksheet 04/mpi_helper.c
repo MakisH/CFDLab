@@ -260,7 +260,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
       
   }
   
-  int cell = 0;
+  int cell = -1;
   
   for (int z = z_start; z <= z_end; ++z) {
     for (int y = y_start; y <= y_end; ++y) {

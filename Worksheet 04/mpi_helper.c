@@ -79,11 +79,11 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
     // z+ direction (down-to-top)
     case DIRECTION_DT :
       neighbor_distance = iProc;
-      if ( rank % iProc*kProc < iProc ) { 
+      if ( rank % (iProc*kProc) < iProc ) { 
         // bottom boundary
         neighborId_send = rank + neighbor_distance;
         neighborId_recv = MPI_PROC_NULL;
-      } else if ( rank % iProc*kProc >= iProc*(kProc - 1) ) { 
+      } else if ( rank % (iProc*kProc) >= iProc*(kProc - 1) ) { 
         // top boundary
         neighborId_send = MPI_PROC_NULL;
         neighborId_recv = rank - neighbor_distance;        
@@ -97,11 +97,11 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
     // z- direction (top-to-down)
     case DIRECTION_TD :
       neighbor_distance = -iProc;
-      if ( rank % iProc*kProc < iProc ) { 
+      if ( rank % (iProc*kProc) < iProc ) { 
         // bottom boundary
         neighborId_send = MPI_PROC_NULL;
         neighborId_recv = rank - neighbor_distance;
-      } else if ( rank % iProc*kProc >= iProc*(kProc - 1) ) { 
+      } else if ( rank % (iProc*kProc) >= iProc*(kProc - 1) ) { 
         // top boundary
         neighborId_send = rank + neighbor_distance;
         neighborId_recv = MPI_PROC_NULL;        
@@ -114,7 +114,7 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
       
     // y+ direction (back-to-front)
     case DIRECTION_BF :
-      neighbor_distance = iProc * kProc;
+      neighbor_distance = -iProc * kProc;
       if ( rank >= iProc*(jProc-1)*kProc ) { 
         // back boundary
         neighborId_send = rank + neighbor_distance;
@@ -258,7 +258,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
       
   }
   
-  int cell = 0;
+  int cell = -1;
   
   for (int z = z_start; z <= z_end; ++z) {
     for (int y = y_start; y <= y_end; ++y) {

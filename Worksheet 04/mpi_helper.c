@@ -151,6 +151,8 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
     default :
       neighborId_send = MPI_PROC_NULL;
       neighborId_recv = MPI_PROC_NULL;      
+			printf("should never be here! Error in switch condition\n");
+			return;
       break;
   }
   

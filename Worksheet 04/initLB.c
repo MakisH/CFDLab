@@ -9,19 +9,19 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 		const char *szFileName = NULL;
 		szFileName = argv[1];  
 		read_int( szFileName, "xlength", xlength );
-		read_int( szFileName, "ylength", xlength+1 );
-		read_int( szFileName, "zlength", xlength+2 );
+		read_int( szFileName, "ylength", xlength + 1 );
+		read_int( szFileName, "zlength", xlength + 2 );
 		if(xlength[0] < 2 || xlength[1] < 2 || xlength[2] < 2){
-			printf("Dimensions must be > 1, please fix the geometry!\n");
+			printf("Dimensions xyzlength must be > 1, please fix the geometry!\n");
 			return 1;
 		}
 
 		READ_DOUBLE( szFileName, *tau );
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );
-		read_double( szFileName, "velocityWall1", &velocityWall[0] );
-		read_double( szFileName, "velocityWall2", &velocityWall[1] );
-		read_double( szFileName, "velocityWall3", &velocityWall[2] );
+		read_double( szFileName, "velocityWall1", velocityWall );
+		read_double( szFileName, "velocityWall2", velocityWall + 1 );
+		read_double( szFileName, "velocityWall3", velocityWall + 2 );
 		READ_INT( szFileName, *iProc );
 		READ_INT( szFileName, *jProc );
 		READ_INT( szFileName, *kProc );
@@ -31,47 +31,47 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 
 void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, int *sizeBuffer){
 
-	int x = xlength[0]+2;
-	int y = xlength[1]+2;
-	int z = xlength[2]+2;
+	int x = xlength[0] + 2;
+	int y = xlength[1] + 2;
+	int z = xlength[2] + 2;
 
 	int domain = 5; // because we have 5 possible directions to be extracted to buffer
 
 	// We should substitute the sizes in malloc, but we don't have time now.
 	sizeBuffer[0] = y * z * domain;
-	sizeBuffer[1] = y * z * domain;
+	sizeBuffer[1] = y * z * domain; // =sizeBuffer[0]
 	sizeBuffer[2] = x * y * domain;
-	sizeBuffer[3] = x * y * domain;
+	sizeBuffer[3] = x * y * domain; // =sizeBuffer[2]
 	sizeBuffer[4] = x * z * domain;
-	sizeBuffer[5] = x * z * domain;
+	sizeBuffer[5] = x * z * domain; // =sizeBuffer[4]
 
 	// We initilise 6 different buffers.
 	// sendBuffer planes[0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 
-	sendBuffer[0] = (double *) malloc(y * z * domain * sizeof(double)); // left plane
-	sendBuffer[1] = (double *) malloc(y * z * domain * sizeof(double)); // right plane
-	sendBuffer[2] = (double *) malloc(x * y * domain * sizeof(double)); // top plane
-	sendBuffer[3] = (double *) malloc(x * y * domain * sizeof(double)); // bottom plane
-	sendBuffer[4] = (double *) malloc(x * z * domain * sizeof(double)); // front plane
-	sendBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
+	sendBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
+	sendBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
+	sendBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
+	sendBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
+	sendBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
+	sendBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
 
 	// readBuffer planes[0:right sendBuffer, 1:left sendBuffer, 2:bottom sendBuffer, 3:top sendBuffer, 4:back sendBuffer, 5:front sendBuffer]
-	readBuffer[0] = (double *) malloc(y * z * domain * sizeof(double)); // left plane
-	readBuffer[1] = (double *) malloc(y * z * domain * sizeof(double)); // right plane
-	readBuffer[2] = (double *) malloc(x * y * domain * sizeof(double)); // top plane
-	readBuffer[3] = (double *) malloc(x * y * domain * sizeof(double)); // bottom plane
-	readBuffer[4] = (double *) malloc(x * z * domain * sizeof(double)); // front plane
-	readBuffer[5] = (double *) malloc(x * z * domain * sizeof(double)); // back plane
+	readBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
+	readBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
+	readBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
+	readBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
+	readBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
+	readBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
 
 }
 
 void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank){
-
-
+	// xlength here is fluid CPUdomain ... meaning the local processor coordinates without boundary cells
+	// local domain is altogether Dlength + 2, where the first and last cells are either buffer(parallel boundary) or global domain(no slip)
 	int x, y, z, i;
-	int xlen2 = xlength[0]+2;
-	int ylen2 = xlength[1]+2;
-	int zlen2 = xlength[2]+2;
+	int xlen2 = xlength[0] + 2;
+	int ylen2 = xlength[1] + 2;
+	int zlen2 = xlength[2] + 2;
 
 	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 
@@ -86,26 +86,22 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	// 16 17 18 19
 	// 12 13 14 15
 
-
-
-
 	// Boundary init.
 	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
 	if (rank % iProc == 0){
 		for (z = 0; z < zlen2; z++) {
 			for (y = 0; y < ylen2; y++) {
-				flagField[y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
+				flagField[y * xlen2 + z * xlen2 * ylen2] = NO_SLIP;
 			}
 		}
 	} else {
 
 		for (z = 0; z < zlen2; z++) {
 			for (y = 0; y < ylen2; y++) {
-				flagField[y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
+				flagField[y * xlen2 + z * xlen2 * ylen2] = PARALLEL_BOUNDARY;
 			}
 		}
 	}
-
 
 	// Right boundary. If true, then we pick the right plane A=A(x=xlen, y, z) of this process and define it as no-slip.
 	if (rank % iProc == iProc - 1){
@@ -121,7 +117,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			}
 		}
 }
-
 
 	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
 	if (rank <= iProc*kProc - 1){
@@ -208,7 +203,12 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 	}
 
-
-
+	// print flagfield initialization for debug
+	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
+	for(z = 0;z < zlen2; ++z)
+		for(y = 0; y < ylen2; ++y)
+			for(x = 0; x < xlen2; ++x)
+				printf("%d ",flagField[xlen2 + y * xlen2 + z * xlen2 * ylen2]);
+	printf("exit \n");
 
 }

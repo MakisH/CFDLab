@@ -174,7 +174,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 
     // x- direction (left)
     case 0 :
-      x_start = 0;          x_end = 0;
+      x_start = 1;          x_end = 1;
       y_start = 0;          y_end = SizeY - 1;
       z_start = 0;          z_end = SizeZ - 1;
       
@@ -187,7 +187,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 
     // x+ direction (right)
     case 1 :
-      x_start = SizeX - 1;  x_end = SizeX - 1;
+      x_start = SizeX - 2;  x_end = SizeX - 2;
       y_start = 0;          y_end = SizeY - 1;
       z_start = 0;          z_end = SizeZ - 1;
       
@@ -202,7 +202,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
     case 2 :
       x_start = 0;          x_end = SizeX - 1;
       y_start = 0;          y_end = SizeY - 1;
-      z_start = SizeZ - 1;  z_end = SizeZ - 1;
+      z_start = SizeZ - 2;  z_end = SizeZ - 2;
       
       each[0] = 14;
       each[1] = 15;
@@ -215,7 +215,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
       // z- direction (down)
       x_start = 0;          x_end = SizeX - 1;
       y_start = 0;          y_end = SizeY - 1;
-      z_start = 0;          z_end = 0;
+      z_start = 1;          z_end = 1;
       
       each[0] = 0;
       each[1] = 1;
@@ -227,7 +227,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
     // y+ direction (front)
     case 4 :
       x_start = 0;          x_end = SizeX - 1;
-      y_start = SizeY - 1;  y_end = SizeY - 1;
+      y_start = SizeY - 2;  y_end = SizeY - 2;
       z_start = 0;          z_end = SizeZ - 1;
       
       each[0] = 4;
@@ -240,7 +240,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
     // y- direction (back)
     case 5 :
       x_start = 0;        x_end = SizeX - 1;
-      y_start = 0;        y_end = 0;
+      y_start = 1;        y_end = 1;
       z_start = 0;        z_end = SizeZ - 1;
       
       each[0] = 0;
@@ -376,7 +376,7 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
       
   }
   
-  int cell = 0;
+  int cell = -1;
   
   for (int z = z_start; z <= z_end; ++z) {
     for (int y = y_start; y <= y_end; ++y) {

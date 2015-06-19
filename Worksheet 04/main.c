@@ -79,7 +79,8 @@ int main(int argc, char *argv[]){
 		flagField = (int *) malloc(cpuDomain_size * sizeof(int));
 
 
-		printf("before INit fields\n");
+		printf("before Init fields\n");
+		printf("values:\n xlength: %d %d %d\n Proc ijk %d %d %d\n cpuDomain: %d %d %d\n ",xlength[0],xlength[1],xlength[2],iProc,jProc,kProc,cpuDomain[0],cpuDomain[1],cpuDomain[2]);
 	// Init the main three arrays.
 	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
 
@@ -102,37 +103,37 @@ int main(int argc, char *argv[]){
 		printf("before extr\n");
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
 		printf("before swap\n");
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, 1, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, iProc, kProc, jProc, rank);
 		printf("before injection\n");
 		injection( collideField, flagField, cpuDomain, readBuffer, 1 );
 
 		printf("before extr2\n");
 		// Do extraction, swap, injection for x- (right to left)
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 0 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, 0, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, iProc, kProc, jProc, rank);
 		injection( collideField, flagField, cpuDomain, readBuffer, 0 );
- 		printf("before extr3\n");
+		printf("before extr3\n");
 
  //   // Do extraction, swap, injection for y+ (back to forth)
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
 		printf("before sw3\n");
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, 4, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, iProc, kProc, jProc, rank);
 		printf("before inj3\n");
 		injection( collideField, flagField, cpuDomain, readBuffer, 4 );
 		printf("middle streaming transport\n");
 	 // Do extraction, swap, injection for y- (forth to back)
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, 5, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, iProc, kProc, jProc, rank);
 		injection( collideField, flagField, cpuDomain, readBuffer, 5 );
 
 	 // Do extraction, swap, injection for z+ (down to up)
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, 2, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, iProc, kProc, jProc, rank);
 		injection( collideField, flagField, cpuDomain, readBuffer, 2 );
 		
 		// Do extraction, swap, injection for z- (up to down)
 		extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, 3, iProc, kProc, jProc, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, iProc, kProc, jProc, rank);
 		injection( collideField, flagField, cpuDomain, readBuffer, 3 );
 		printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, cpuDomain );

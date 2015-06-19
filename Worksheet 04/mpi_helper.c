@@ -32,119 +32,46 @@ void finalizeMPI() {
   MPI_Finalize();
 }
 
-void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
+void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int iProc, int kProc, int jProc, int rank) {
   
-  int neighbor_distance = 0;
   int neighborId_send = MPI_PROC_NULL;
   int neighborId_recv = MPI_PROC_NULL;
   MPI_Status status;
   
   switch (direction) {
-    // x- direction (right-to-left)
-    case DIRECTION_RL :
-      neighbor_distance = -1;
-      if ( rank % iProc == 0 ) { 
-        // left boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;
-      } else if ( rank % iProc == iProc - 1 ) { 
-        // right boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
+    case DIRECTION_LR :// x+ direction (left-to-right)
+      if ( rank % iProc != iProc - 1 ) { // NOT right boundary => communicate with right
+        neighborId_send = neighborId_recv = rank + 1; // send & receive are the same = rank + 1
       }
       break;
-      
-    // x+ direction (left-to-right)
-    case DIRECTION_LR :
-      neighbor_distance = 1;
-      if ( rank % iProc == 0 ) { 
-        // left boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;
-      } else if ( rank % iProc == iProc - 1 ) { 
-        // right boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
+
+    case DIRECTION_RL :// x- direction (right-to-left)
+      if ( rank % iProc != 0 ) { // NOT left boundary => communicate with left
+        neighborId_send = neighborId_recv = rank -1;
+			}
+      break;
+
+    case DIRECTION_DT :// y+ direction (down-to-top)
+      if ( (rank % kProc) / iProc != jProc - 1 ) { // NOT top boundary => exch with top
+				neighborId_send = neighborId_recv = rank + iProc;
       }
       break;
-      
-    // z+ direction (down-to-top)
-    case DIRECTION_DT :
-      neighbor_distance = iProc;
-      if ( rank % (iProc*kProc) < iProc ) { 
-        // bottom boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;
-      } else if ( rank % (iProc*kProc) >= iProc*(kProc - 1) ) { 
-        // top boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
+
+    case DIRECTION_TD :// y- direction (top-to-down)
+      if ( (rank % kProc) / iProc != 0 ) { // NOT bottom boundary => exch with bottom
+				neighborId_send = neighborId_recv = rank - iProc;
       }
       break;
-      
-    // z- direction (top-to-down)
-    case DIRECTION_TD :
-      neighbor_distance = -iProc;
-      if ( rank % (iProc*kProc) < iProc ) { 
-        // bottom boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;
-      } else if ( rank % (iProc*kProc) >= iProc*(kProc - 1) ) { 
-        // top boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
-      }
+
+    case DIRECTION_BF :// z+ direction (back-to-front)
+      if ( rank /(iProc * jProc ) != 0) { // NOT front boundary => exch with front
+        neighborId_send = neighborId_recv = rank - iProc * jProc;
+			}
       break;
-      
-    // y+ direction (back-to-front)
-    case DIRECTION_BF :
-      neighbor_distance = -iProc * kProc;
-      if ( rank >= iProc*(jProc-1)*kProc ) { 
-        // back boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;
-      } else if ( rank <= iProc*kProc - 1 ) { 
-        // front boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
-      }
-      break;
-      
-    // y- direction (front-to-back)
-    case DIRECTION_FB :
-      neighbor_distance = iProc * kProc;
-      if ( rank >= iProc*(jProc-1)*kProc ) { 
-        // back boundary
-        neighborId_send = MPI_PROC_NULL;
-        neighborId_recv = rank - neighbor_distance;
-      } else if ( rank <= iProc*kProc - 1 ) { 
-        // front boundary
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = MPI_PROC_NULL;        
-      } else { 
-        // inner subdomain
-        neighborId_send = rank + neighbor_distance;
-        neighborId_recv = rank - neighbor_distance;        
+
+    case DIRECTION_FB :// z- direction (front-to-back)
+      if ( rank /(iProc * jProc ) != kProc - 1) { // NOT back boundary => exch with back
+        neighborId_send = neighborId_recv = rank + iProc * jProc;
       }
       break;
       
@@ -155,9 +82,9 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 			return;
       break;
   }
-  
-  MPI_Send(sendBuffer[boundary], sizeBuffer[boundary], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
-  MPI_Recv(readBuffer[boundary], sizeBuffer[boundary], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
+  printf("MPI send & recv neighbors: %d %d\n",neighborId_send,neighborId_recv);
+  MPI_Send(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId_send, 1, MPI_COMM_WORLD);
+  MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId_recv, 1, MPI_COMM_WORLD, &status);
   
 }
 

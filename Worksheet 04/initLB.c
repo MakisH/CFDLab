@@ -210,7 +210,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 			for(x = 0;x < xlen2; ++x){
 				printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
 			}
-			printf("\n");
+			printf(" _%d\n", rank);
 		}
 		printf("\n");
 	}

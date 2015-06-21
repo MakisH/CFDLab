@@ -2,31 +2,26 @@
 #include "stdio.h"
 #include "mpi_helper.h"
 #include "LBDefinitions.h"
+#include "mpi.h"
 
 void initializeMPI( int *rank, int *number_of_ranks, int argc, char *argv[] ) {
-		printf("hi from mpi\n!");
-
 	// Initialize n processes
 	MPI_Init( &argc, &argv );
-	printf("test init\n!");
 	// Ask for the size of the communicator (number_of_ranks)
 	MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
-	printf("mpi_comm_size\n!");
 	// Ask for the local process id (rank)
 	MPI_Comm_rank( MPI_COMM_WORLD, rank );
-	
-	printf("Hello! I am rank %d of %d.\n", *rank, *number_of_ranks);
+	printf("hi mpi! rank %d of %d.\n", *rank, *number_of_ranks);
 }
 
 void finalizeMPI() {
-	
+	printf("bye mpi!\n");
 	// Write all the output
 	fflush(stdout);
 	fflush(stderr);
 	
 	// Synchronize all processes
 	MPI_Barrier( MPI_COMM_WORLD );
-	
 	// Terminate the MPI session
 	MPI_Finalize();
 }
@@ -210,9 +205,9 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 			break;
 	}
 	printf("MPI send & recv neighbors in direction %d: %d\n", direction, neighborId);
-	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 1, MPI_COMM_WORLD, &send_request);
-	MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 1, MPI_COMM_WORLD, &status);
-	
+	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &send_request);
+	MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &status);
+	printf("Process %d received from direction %d from process %d\n", rank, direction, neighborId);
 }
 
 void extraction(double *collideField, int *flagField, int *xlength, double **sendBuffer, int boundary) {
@@ -239,6 +234,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 8;
 			each[3] = 11;
 			each[4] = 15;
+			printf("Left\n");
 			break;
 
 		// x+ direction (right)
@@ -252,6 +248,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 10;
 			each[3] = 13;
 			each[4] = 17;
+			printf("Right\n");
 			break;
 
 		// z+ direction (top)
@@ -265,6 +262,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 16;
 			each[3] = 17;
 			each[4] = 18;
+			printf("Top\n");
 			break;      
 			
 		case DIRECTION_TD:
@@ -278,6 +276,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 2;
 			each[3] = 3;
 			each[4] = 4;
+			printf("Down\n");
 			break;
 
 		// y+ direction (front)
@@ -291,6 +290,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 6;
 			each[3] = 7;
 			each[4] = 14;
+			printf("Front\n");
 			break;      
 			
 		// y- direction (back)
@@ -304,6 +304,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 12;
 			each[3] = 13;
 			each[4] = 18;
+			printf("Back\n");
 			break;
 		
 		default :
@@ -314,18 +315,19 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			break;
 			
 	}
-	
+	// buffer cell
 	int cell = -1;
-	
+	// loop over the whole 3D wall in corresponding direction
 	for (int z = z_start; z <= z_end; ++z) {
 		for (int y = y_start; y <= y_end; ++y) {
 			for (int x = x_start; x <= x_end; ++x) {
-				
+				// buffer index- destination
 				cell++;
+				// cpuDomain cell index- source
 				currentCell = x + y * SizeX + z * SizeXY;
-				
+				// loop over all velocities to be extracted
 				for (int dir = 0; dir < 5; ++dir) {
-					sendBuffer[boundary][5*cell + dir] = collideField[Q_NUMBER*currentCell + each[dir]];
+					sendBuffer[boundary][5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[dir]];
 				}
 			}
 		}

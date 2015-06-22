@@ -157,8 +157,8 @@ void finalizeMPI() {
 /// old swap
 void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int iProc, int kProc, int jProc, int rank) {
 	printf("rank %d\n",rank);
-	int neighborId = MPI_PROC_NULL;
-	MPI_Status status;
+	int neighborId = MPI_PROC_NULL;  // default action - do nothing if on the boundary
+	MPI_Status status;//, st1;
 	MPI_Request send_request;
 	
 	switch (direction) {
@@ -174,27 +174,27 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 			}
 			break;
 
-		case DIRECTION_DT :// y+ direction (down-to-top)
-			if ( (rank % kProc) / iProc != jProc - 1 ) { // NOT top boundary => exch with top
-				neighborId = rank + iProc;
+		case DIRECTION_DT :// z+ direction (down-to-top)
+			if ( rank / iProc / jProc != kProc - 1 ) { // NOT top boundary => exch with top
+				neighborId = rank + iProc * jProc;
 			}
 			break;
 
-		case DIRECTION_TD :// y- direction (top-to-down)
-			if ( (rank % kProc) / iProc != 0 ) { // NOT bottom boundary => exch with bottom
-				neighborId = rank - iProc;
-			}
-			break;
-
-		case DIRECTION_BF :// z+ direction (back-to-front)
-			if ( rank /(iProc * jProc ) != 0) { // NOT front boundary => exch with front
+		case DIRECTION_TD :// z- direction (top-to-down)
+			if ( rank / iProc / jProc != 0 ) { // NOT bottom boundary => exch with bottom
 				neighborId = rank - iProc * jProc;
 			}
 			break;
 
-		case DIRECTION_FB :// z- direction (front-to-back)
-			if ( rank /(iProc * jProc ) != kProc - 1) { // NOT back boundary => exch with back
-				neighborId = rank + iProc * jProc;
+		case DIRECTION_BF :// y- direction (back-to-front)
+			if ( rank / iProc % jProc != 0) { // NOT front boundary => exch with front
+				neighborId = rank - iProc;
+			}
+			break;
+
+		case DIRECTION_FB :// y+ direction (front-to-back)
+			if ( rank / iProc % jProc != jProc - 1) { // NOT back boundary => exch with back
+				neighborId = rank + iProc;
 			}
 			break;
 			
@@ -204,13 +204,21 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 			return;
 			break;
 	}
-	printf("MPI send & recv neighbors in direction %d: %d\n", direction, neighborId);
-	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &send_request);
-	MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &status);
-	printf("Process %d received from direction %d from process %d\n", rank, direction, neighborId);
+	//printf("MPI send & recv neighbors in direction %d: %d\n", direction, neighborId);
+		MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &send_request);
+		MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &status);
+	//MPI_Sendrecv(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, rank, readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, neighborId, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	
+	//for(int i = 0; i < sizeBuffer[direction]*5;++i){
+	//	printf("%f ",readBuffer[direction][i]);
+	//}
+
+	MPI_Wait(&send_request,MPI_STATUS_IGNORE);
+		printf("swap rank %d direction %d\n",rank, direction);
+
 }
 
-void extraction(double *collideField, int *flagField, int *xlength, double **sendBuffer, int boundary) {
+void extraction(double *collideField, int *flagField, int *xlength, double **sendBuffer, int boundary, int rank) {
 	
 	int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
 	int x_start, x_end, y_start, y_end, z_start, z_end;
@@ -234,7 +242,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 8;
 			each[3] = 11;
 			each[4] = 15;
-			printf("Left\n");
+			printf("RL Left\n");
 			break;
 
 		// x+ direction (right)
@@ -248,7 +256,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 10;
 			each[3] = 13;
 			each[4] = 17;
-			printf("Right\n");
+			printf("LR Right\n");
 			break;
 
 		// z+ direction (top)
@@ -308,26 +316,29 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			break;
 		
 		default :
-			printf("You shuld not be here! Are you in 4D ???\n");
+			printf("You should not be here! Are you in 4D ???\n");
 			x_start = 0;        x_end = -1;
 			y_start = 0;        y_end = -1;
 			z_start = 0;        z_end = -1;
 			break;
 			
 	}
+		printf("extr rank %d direction %d\n",rank,boundary);
+
 	// buffer cell
 	int cell = -1;
 	// loop over the whole 3D wall in corresponding direction
 	for (int z = z_start; z <= z_end; ++z) {
 		for (int y = y_start; y <= y_end; ++y) {
 			for (int x = x_start; x <= x_end; ++x) {
-				// buffer index- destination
+				// buffer index - destination
 				cell++;
-				// cpuDomain cell index- source
+				// cpuDomain cell index - source
 				currentCell = x + y * SizeX + z * SizeXY;
 				// loop over all velocities to be extracted
 				for (int dir = 0; dir < 5; ++dir) {
 					sendBuffer[boundary][5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[dir]];
+					//printf("direction %d - extract %f from coll %d into buff %d\n", boundary, collideField[Q_NUMBER * currentCell + each[dir]], Q_NUMBER * currentCell + each[dir], 5 * cell + dir );
 				}
 			}
 		}
@@ -335,7 +346,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 	
 }
 
-void injection(double *collideField, int *flagField, int *xlength, double **readBuffer, int boundary) {
+void injection(double *collideField, int *flagField, int *xlength, double **readBuffer, int boundary, int rank) {
 	
 	int each[5]; // trick to implement a "foreach" loop, for every i direction to be transfered
 	int x_start, x_end, y_start, y_end, z_start, z_end;
@@ -350,19 +361,6 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 
 		// x- direction (left)
 		case DIRECTION_RL :
-			x_start = SizeX - 1;  x_end = SizeX - 1;
-			y_start = 0;          y_end = SizeY - 1;
-			z_start = 0;          z_end = SizeZ - 1;
-			
-			each[0] = 1;
-			each[1] = 5;
-			each[2] = 8;
-			each[3] = 11;
-			each[4] = 15;
-			break;
-
-		// x+ direction (right)
-		case DIRECTION_LR :
 			x_start = 0;          x_end = 0;
 			y_start = 0;          y_end = SizeY - 1;
 			z_start = 0;          z_end = SizeZ - 1;
@@ -374,21 +372,21 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			each[4] = 17;
 			break;
 
+		// x+ direction (right)
+		case DIRECTION_LR :
+			x_start = SizeX - 1;  x_end = SizeX - 1;
+			y_start = 0;          y_end = SizeY - 1;
+			z_start = 0;          z_end = SizeZ - 1;
+			each[0] = 1;
+			each[1] = 5;
+			each[2] = 8;
+			each[3] = 11;
+			each[4] = 15;
+
+			break;
+
 		// z+ direction (up)
 		case DIRECTION_DT :
-			x_start = 0;          x_end = SizeX - 1;
-			y_start = 0;          y_end = SizeY - 1;
-			z_start = 0;          z_end = 0;
-			
-			each[0] = 14;
-			each[1] = 15;
-			each[2] = 16;
-			each[3] = 17;
-			each[4] = 18;
-			break;      
-			
-		case DIRECTION_TD:
-			// z- direction (down) (in the case of injection the limits are opposite)
 			x_start = 0;          x_end = SizeX - 1;
 			y_start = 0;          y_end = SizeY - 1;
 			z_start = SizeZ - 1;  z_end = SizeZ - 1;
@@ -398,6 +396,19 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			each[2] = 2;
 			each[3] = 3;
 			each[4] = 4;
+			break;      
+			
+		case DIRECTION_TD:
+			// z- direction (down) (in the case of injection the limits are opposite)
+			x_start = 0;          x_end = SizeX - 1;
+			y_start = 0;          y_end = SizeY - 1;
+			z_start = 0;          z_end = 0;
+
+			each[0] = 14;
+			each[1] = 15;
+			each[2] = 16;
+			each[3] = 17;
+			each[4] = 18;
 			break;
 
 		// y+ direction (front)
@@ -406,11 +417,11 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			y_start = 0;          y_end = 0;
 			z_start = 0;          z_end = SizeZ - 1;
 			
-			each[0] = 0;
-			each[1] = 5;
-			each[2] = 6;
-			each[3] = 7;
-			each[4] = 14;
+			each[0] = 4;
+			each[1] = 11;
+			each[2] = 12;
+			each[3] = 13;
+			each[4] = 18;
 			break;
 
 		// y- direction (back)
@@ -419,11 +430,11 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			y_start = SizeY - 1; y_end = SizeY - 1;
 			z_start = 0;         z_end = SizeZ - 1;
 			
-			each[0] = 4;
-			each[1] = 11;
-			each[2] = 12;
-			each[3] = 13;
-			each[4] = 18;
+			each[0] = 0;
+			each[1] = 5;
+			each[2] = 6;
+			each[3] = 7;
+			each[4] = 14;
 			break;
 
 		default :
@@ -432,9 +443,8 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			y_start = 0;        y_end = -1;
 			z_start = 0;        z_end = -1;
 			break;
-			
 	}
-	
+	printf("inje rank %d direction %d\n",rank,boundary);
 	int cell = -1;
 	
 	for (int z = z_start; z <= z_end; ++z) {
@@ -442,10 +452,11 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			for (int x = x_start; x <= x_end; ++x) {
 				
 				cell++;
-				currentCell = x + y*SizeX + z*SizeXY;
+				currentCell = x + y * SizeX + z * SizeXY;
 				
 				for (int dir = 0; dir < 5; ++dir) {
-					collideField[Q_NUMBER*currentCell + each[dir]] = readBuffer[boundary][5*cell + dir];
+					collideField[Q_NUMBER * currentCell + each[dir]] = readBuffer[boundary][5 * cell + dir];
+					//printf("direction %d - inject %f from buff %d into coll %d\n", boundary, readBuffer[boundary][5 * cell + dir], 5 * cell + dir, Q_NUMBER * currentCell + each[dir]);
 				}
 				
 			}

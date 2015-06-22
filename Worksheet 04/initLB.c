@@ -214,6 +214,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 		printf("\n");
 	}
-	printf("exit \n");
+	//printf("exit initLB \n");
 
 }

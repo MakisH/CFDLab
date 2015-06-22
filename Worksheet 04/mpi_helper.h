@@ -32,7 +32,8 @@ void extraction(
       int *flagField, 
       int *xlength, 
       double **sendBuffer, 
-      int boundary
+      int boundary,
+			int rank
 );
 
 // Do the injection
@@ -41,7 +42,8 @@ void injection(
       int *flagField, 
       int *xlength, 
       double **readBuffer, 
-      int boundary
+      int boundary,
+			int rank
 );
 
 #endif

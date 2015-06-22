@@ -7,6 +7,8 @@
 #include "initLB.h"
 #include "visualLB.h"
 #include "boundary.h"
+//sleep()
+#include <unistd.h>
 
 int main(int argc, char *argv[]){
 	int rank = 5;
@@ -54,32 +56,38 @@ int main(int argc, char *argv[]){
 		// Allocating the main three arrays.
 		cpuDomain_size = (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2);
 	}
-	printf("before bcas\n");
 	MPI_Bcast( xlength, 3, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &tau, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &timesteps, 1, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &timestepsPerPlotting, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( velocityWall, 3, MPI_DOUBLE, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &iProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &jProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &kProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( cpuDomain, 3, MPI_INT, 0, MPI_COMM_WORLD );
-	printf("before bcas\n");
 	MPI_Bcast( &cpuDomain_size, 1, MPI_INT, 0, MPI_COMM_WORLD );
+	/*
+//// test for correct data reading
+//	printf("\
+//xlength x y z		= %d %d %d\n \
+//tau			= %f\n \
+//timesteps		= %d\n \
+//timestepsPerPlotting	= %d\n \
+//velocityWall x y z	= %f %f %f\n \
+//iProc			= %d\n \
+//jProc			= %d\n \
+//kProc			= %d\n \
+//cpuDomain x y z	= %d %d %d\n \
+//cpuDomain_size	= %d\n\n\n.", xlength[0], xlength[1], xlength[2], tau, timesteps, timestepsPerPlotting, velocityWall[0], velocityWall[1], velocityWall[2], iProc, jProc, kProc, cpuDomain[0], cpuDomain[1], cpuDomain[2], cpuDomain_size);
+//	sleep(1000);
+*/
 
-		collideField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
-		streamField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
-		flagField = (int *) malloc(cpuDomain_size * sizeof(int));
+	collideField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
+	streamField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
+	flagField = (int *) malloc(cpuDomain_size * sizeof(int));
 
 
-		printf("before INit fields\n");
+	printf("values:\n xlength: %d %d %d\n Proc ijk %d %d %d\n cpuDomain: %d %d %d\n ",xlength[0],xlength[1],xlength[2],iProc,jProc,kProc,cpuDomain[0],cpuDomain[1],cpuDomain[2]);
 	// Init the main three arrays.
 	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
 
@@ -94,69 +102,70 @@ int main(int argc, char *argv[]){
 	// allocate the buffers
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
 	printf("before t loop\n");
+	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
-		double *tmp = NULL;
 
 		// TODO: maybe move all these to a separate function?
 		// Do extraction, swap, injection for x+ (left to right)
-		printf("before extr\n");
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 1 );
-		printf("before swap\n");
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, 1, iProc, kProc, jProc, rank);
-		printf("before injection\n");
-		injection( collideField, flagField, cpuDomain, readBuffer, 1 );
+		//printf("before extr\n");
+		if ( rank % iProc != iProc - 1 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_LR );
+		//printf("before swap\n");
+		if ( rank % iProc != iProc - 1 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, iProc, kProc, jProc, rank);
+		//printf("before injection\n");
+		if ( rank % iProc != iProc - 1 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_LR );
 
-		printf("before extr2\n");
+		//printf("before extr2\n");
 		// Do extraction, swap, injection for x- (right to left)
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 0 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, 0, iProc, kProc, jProc, rank);
-		injection( collideField, flagField, cpuDomain, readBuffer, 0 );
- 		printf("before extr3\n");
+		if ( rank % iProc != 0 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_RL );
+		if ( rank % iProc != 0 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, iProc, kProc, jProc, rank);
+		if ( rank % iProc != 0 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_RL );
+		//printf("before extr3\n");
 
  //   // Do extraction, swap, injection for y+ (back to forth)
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 4 );
-		printf("before sw3\n");
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, 4, iProc, kProc, jProc, rank);
-		printf("before inj3\n");
-		injection( collideField, flagField, cpuDomain, readBuffer, 4 );
-		printf("middle streaming transport\n");
+		if ( rank /(iProc * jProc ) != 0) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_BF);
+		//printf("before sw3\n");
+		if ( rank /(iProc * jProc ) != 0) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, iProc, kProc, jProc, rank);
+		//printf("before inj3\n");
+		if ( rank /(iProc * jProc ) != 0) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_BF );
+		//printf("middle streaming transport\n");
 	 // Do extraction, swap, injection for y- (forth to back)
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 5 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, 5, iProc, kProc, jProc, rank);
-		injection( collideField, flagField, cpuDomain, readBuffer, 5 );
+		if ( rank /(iProc * jProc ) != kProc - 1) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_FB );
+		if ( rank /(iProc * jProc ) != kProc - 1) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, iProc, kProc, jProc, rank);
+		if ( rank /(iProc * jProc ) != kProc - 1) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_FB );
 
 	 // Do extraction, swap, injection for z+ (down to up)
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 2 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, 2, iProc, kProc, jProc, rank);
-		injection( collideField, flagField, cpuDomain, readBuffer, 2 );
-		
+		if ( (rank / iProc) % jProc != jProc - 1 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_DT );
+		if ( (rank / iProc) % jProc != jProc - 1 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, iProc, kProc, jProc, rank);
+		if ( (rank / iProc) % jProc != jProc - 1 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_DT );
+		 
 		// Do extraction, swap, injection for z- (up to down)
-		extraction( collideField, flagField, cpuDomain, sendBuffer, 3 );
-		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, 3, iProc, kProc, jProc, rank);
-		injection( collideField, flagField, cpuDomain, readBuffer, 3 );
-		printf("before streaming\n");
+		if ( (rank / iProc) % jProc != 0 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_TD );
+		if ( (rank / iProc) % jProc != 0 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, iProc, kProc, jProc, rank);
+		if ( (rank / iProc) % jProc != 0 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_TD );
+
+		//printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, cpuDomain );
 
 		tmp = collideField;
 		collideField = streamField;
 		streamField = tmp;
-		printf("before collision\n");
+		//printf("before collision\n");
 		doCollision( collideField, flagField, &tau, cpuDomain );
-		printf("before boundary\n");
+		//printf("before boundary\n");
 		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
-		printf("%d time\n",t);
+		//printf("%d time\n",t);
 		if ( t % timestepsPerPlotting == 0 ) {
-				printf("%d cpu x\n", cpuDomain[0]);
-				printf("%d cpu y\n", cpuDomain[1]);
-				printf("%d cpu z\n", cpuDomain[2]);
-				printf("%d rank\n", rank);
-				printf("%d xlength\n", xlength[0]);
-				printf("%d ylength\n", xlength[1]);
-				printf("%d zlength\n", xlength[2]);
-				printf("%d iproc\n", iProc);
-				printf("%d jproc\n", jProc);
-				printf("%d kproc\n\n", kProc);
-				printf("Writing the vtk file for timestep # %d \n", t);
+				//printf("%d cpu x\n", cpuDomain[0]);
+				//printf("%d cpu y\n", cpuDomain[1]);
+				//printf("%d cpu z\n", cpuDomain[2]);
+				//printf("%d rank\n", rank);
+				//printf("%d xlength\n", xlength[0]);
+				//printf("%d ylength\n", xlength[1]);
+				//printf("%d zlength\n", xlength[2]);
+				//printf("%d iproc\n", iProc);
+				//printf("%d jproc\n", jProc);
+				//printf("%d kproc\n\n", kProc);
+				printf("Write vtk for time # %d \n", t);
 			writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
 		}
 	}

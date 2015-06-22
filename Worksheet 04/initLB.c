@@ -198,17 +198,22 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	for (z = 1; z <= zlen2-2; ++z) {
 		for (y = 1; y <= ylen2-2; ++y) {
 			for (x= 1; x <= xlen2-2; ++x) {
-				flagField[x + y * xlen2 + z * xlen2*ylen2] = FLUID;
+				flagField[x + y * xlen2 + z * xlen2 * ylen2] = FLUID;
 			}
 		}
 	}
 
 	// print flagfield initialization for debug
 	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
-	for(z = 0;z < zlen2; ++z)
-		for(y = 0; y < ylen2; ++y)
-			for(x = 0; x < xlen2; ++x)
-				printf("%d ",flagField[xlen2 + y * xlen2 + z * xlen2 * ylen2]);
+	for(z = 0;z < zlen2; ++z){
+		for(y = ylen2-1;y >=0; --y){
+			for(x = 0;x < xlen2; ++x){
+				printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
+			}
+			printf(" _%d\n", rank);
+		}
+		printf("\n");
+	}
 	printf("exit \n");
 
 }

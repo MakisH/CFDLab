@@ -20,7 +20,6 @@ void swap(
       double **readBuffer, 
       int *sizeBuffer, 
       int direction,
-      int boundary,
       int iProc, 
       int kProc, 
       int jProc, 

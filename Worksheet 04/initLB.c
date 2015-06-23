@@ -119,7 +119,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 }
 
 	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
-	if (rank <= iProc*kProc - 1){
+	if (rank / iProc %jProc == 0){
 		for (z = 0; z < zlen2; z++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + z * xlen2*ylen2] = NO_SLIP;
@@ -134,7 +134,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
-	if (rank >= iProc*(jProc-1)*kProc){
+	if (rank / iProc % jProc == jProc -1){
 		for (z = 0; z < zlen2; z++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = NO_SLIP;
@@ -150,7 +150,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	}
 
 	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
-	if (rank % (iProc*kProc) >= iProc*(kProc - 1)) {
+	if (rank / iProc / jProc == kProc - 1) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
@@ -166,7 +166,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 		}
 
 	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
-	if (rank % (iProc*kProc) < iProc) {
+	if (rank / iProc / jProc == 0) {
 		for (y = 0; y < ylen2; y++) {
 			for (x = 0; x < xlen2; x++) {
 				flagField[x + y*xlen2] = NO_SLIP;
@@ -205,15 +205,15 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
 	// print flagfield initialization for debug
 	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
-	for(z = 0;z < zlen2; ++z){
+	for(z = zlen2-1;z >= 02; --z){
 		for(y = ylen2-1;y >=0; --y){
 			for(x = 0;x < xlen2; ++x){
 				printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
 			}
-			printf(" _%d\n", rank);
+		printf("plane %d rank _%d\n",z, rank);
 		}
 		printf("\n");
 	}
-	printf("exit \n");
+	//printf("exit initLB \n");
 
 }

@@ -11,7 +11,7 @@ void initializeMPI( int *rank, int *number_of_ranks, int argc, char *argv[] ) {
 	MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
 	// Ask for the local process id (rank)
 	MPI_Comm_rank( MPI_COMM_WORLD, rank );
-	printf("hi mpi! rank %d of %d.\n", *rank, *number_of_ranks);
+	//printf("hi mpi! rank %d of %d.\n", *rank, *number_of_ranks);
 }
 
 void finalizeMPI() {
@@ -156,7 +156,7 @@ void finalizeMPI() {
 //}
 /// old swap
 void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int iProc, int kProc, int jProc, int rank) {
-	printf("rank %d\n",rank);
+	//printf("rank %d\n",rank);
 	int neighborId = MPI_PROC_NULL;  // default action - do nothing if on the boundary
 	MPI_Status status;//, st1;
 	MPI_Request send_request;
@@ -214,7 +214,7 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 	//}
 
 	MPI_Wait(&send_request,MPI_STATUS_IGNORE);
-		printf("swap rank %d direction %d\n",rank, direction);
+		//printf("swap rank %d direction %d\n",rank, direction);
 
 }
 
@@ -242,7 +242,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 8;
 			each[3] = 11;
 			each[4] = 15;
-			printf("RL Left\n");
+			//printf("RL Left\n");
 			break;
 
 		// x+ direction (right)
@@ -256,7 +256,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 10;
 			each[3] = 13;
 			each[4] = 17;
-			printf("LR Right\n");
+			//printf("LR Right\n");
 			break;
 
 		// z+ direction (top)
@@ -270,7 +270,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 16;
 			each[3] = 17;
 			each[4] = 18;
-			printf("Top\n");
+			//printf("Top\n");
 			break;      
 			
 		case DIRECTION_TD:
@@ -284,7 +284,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 2;
 			each[3] = 3;
 			each[4] = 4;
-			printf("Down\n");
+			//printf("Down\n");
 			break;
 
 		// y+ direction (front)
@@ -298,7 +298,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 6;
 			each[3] = 7;
 			each[4] = 14;
-			printf("Front\n");
+			//printf("Front\n");
 			break;      
 			
 		// y- direction (back)
@@ -312,7 +312,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			each[2] = 12;
 			each[3] = 13;
 			each[4] = 18;
-			printf("Back\n");
+			//printf("Back\n");
 			break;
 		
 		default :
@@ -323,7 +323,7 @@ void extraction(double *collideField, int *flagField, int *xlength, double **sen
 			break;
 			
 	}
-		printf("extr rank %d direction %d\n",rank,boundary);
+		//printf("extr rank %d direction %d\n",rank,boundary);
 
 	// buffer cell
 	int cell = -1;
@@ -444,7 +444,7 @@ void injection(double *collideField, int *flagField, int *xlength, double **read
 			z_start = 0;        z_end = -1;
 			break;
 	}
-	printf("inje rank %d direction %d\n",rank,boundary);
+	//printf("inje rank %d direction %d\n",rank,boundary);
 	int cell = -1;
 	
 	for (int z = z_start; z <= z_end; ++z) {

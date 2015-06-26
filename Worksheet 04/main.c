@@ -12,10 +12,10 @@
 
 int main(int argc, char *argv[]){
 	int rank = 5;
-	int number_of_ranks;
+	int np;
 
 		// Start MPI
-	initializeMPI( &rank, &number_of_ranks, argc, argv );
+	initializeMPI( &rank, &np, argc, argv );
 
 	double *collideField = NULL;
 	double *streamField = NULL;
@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 	int timesteps;
 	int timestepsPerPlotting;
 	int iProc, jProc, kProc;
-
+	int error_code;
 	// send and read buffers for all possible directions :
 	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 	double *sendBuffer[6];
@@ -36,24 +36,26 @@ int main(int argc, char *argv[]){
 	int cpuDomain[3];
 	int cpuDomain_size;
 
+// Read the config file using only one thread
 	if(0 == rank){
-		// Read the config file using only one thread
-		if(readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv ) == 1) return 1; // reading parameters from the file.
-
-		// check if iProc and xlength are legitimate
-		if(0 == iProc || 0 == jProc || 0 == kProc){
-			printf("Invalid number of processors in some dimension(0)!\n");
-			return 1;
+		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv );
+// Error checking
+		if(error_code) return error_code;
+		else if(0 == iProc || 0 == jProc || 0 == kProc){
+			printf("Invalid number of processors in some dimension(cannot be 0)!\n");
+			return 3;
+		}
+		else if(np < iProc * jProc * kProc) {
+			printf("not enough processors - %d needed, but only %d are present! (adjust -np or ijkProc parameters)", iProc * jProc * kProc, np);
+			return 4;
 		}
 		else if(xlength[0] % iProc || xlength[1] % jProc || xlength[2] % kProc){
 			printf("Non-integer ratio xlength/ijkProc - Invalid !\n");
-			return 1;
+			return 5;
 		}
 		cpuDomain[0] = xlength[0] / iProc;
 		cpuDomain[1] = xlength[1] / jProc;
 		cpuDomain[2] = xlength[2] / kProc;
-
-		// Allocating the main three arrays.
 		cpuDomain_size = (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2);
 	}
 	MPI_Bcast( xlength, 3, MPI_INT, 0, MPI_COMM_WORLD );
@@ -84,66 +86,73 @@ int main(int argc, char *argv[]){
 
 	collideField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
 	streamField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
-	flagField = (int *) malloc(cpuDomain_size * sizeof(int));
-
+	flagField =	(int *) malloc(cpuDomain_size * sizeof(int));
 
 	printf("values:\n xlength: %d %d %d\n Proc ijk %d %d %d\n cpuDomain: %d %d %d\n ",xlength[0],xlength[1],xlength[2],iProc,jProc,kProc,cpuDomain[0],cpuDomain[1],cpuDomain[2]);
 	// Init the main three arrays.
-	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank);
-
-	//// check for insufficient number of processors
-	//if(number_of_ranks < iProc * jProc * kProc) {
-	//	printf("There are not enough processors for this simulation, at least %d needed!", iProc * jProc * kProc);
-	//	return 1;
-	//}
+	int neighbor[6];	// default action - do nothing if on the boundary
+	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank, neighbor);
 
 	// Each processor responsible for its own domain.
-
 	// allocate the buffers
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
-	printf("before t loop\n");
+	//printf("before t loop\n");
 	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
 
 		// TODO: maybe move all these to a separate function?
-		// Do extraction, swap, injection for x+ (left to right)
+		// Do extraction, swap, injection for
+		// x+ (left to right)
 		//printf("before extr\n");
 		printf("t = %d, rank = %d\n",t,rank);
-		if ( rank % iProc != iProc - 1 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_LR, rank);
-		//printf("before swap\n");
-		if ( rank % iProc != iProc - 1 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, iProc, kProc, jProc, rank);
-		//printf("before injection\n");
-		if ( rank % iProc != iProc - 1 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_LR, rank );
 
 		//printf("before extr2\n");
-		// Do extraction, swap, injection for x- (right to left)
-		if ( rank % iProc != 0 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_RL, rank );
-		if ( rank % iProc != 0 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, iProc, kProc, jProc, rank);
-		if ( rank % iProc != 0 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_RL, rank );
+		// x- (right to left)
+		if (rank % iProc != 0)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_RL, rank );
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_RL, iProc, kProc, jProc, rank, neighbor);
+		if (rank % iProc != iProc - 1)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_LR, rank );
 		//printf("before extr3\n");
+		
+		if (rank % iProc != iProc - 1)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_LR, rank);
+		//printf("before swap\n");
+			swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_LR, iProc, kProc, jProc, rank, neighbor);
+		//printf("before injection\n");
+		if (rank % iProc != 0)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_RL, rank );
 
- //   // Do extraction, swap, injection for y+ (back to forth)
-		if ( rank / iProc % jProc  != 0) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_BF, rank);
-		//printf("before sw3\n");
-		if ( rank / iProc % jProc  != 0) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, iProc, kProc, jProc, rank);
-		//printf("before inj3\n");
-		if ( rank / iProc % jProc  != 0) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_BF, rank );
-		//printf("middle streaming transport\n");
-	 // Do extraction, swap, injection for y- (forth to back)
-		if ( rank / iProc % jProc != jProc - 1) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_FB, rank );
-		if ( rank / iProc % jProc != jProc - 1) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, iProc, kProc, jProc, rank);
-		if ( rank / iProc % jProc != jProc - 1) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_FB, rank );
-
-	 // Do extraction, swap, injection for z+ (down to up)
-		if ( rank / iProc / jProc != kProc - 1 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_DT, rank );
-		if ( rank / iProc / jProc != kProc - 1 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, iProc, kProc, jProc, rank);
-		if ( rank / iProc / jProc != kProc - 1 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_DT, rank );
+		// y+ (back to forth)
+		if (rank / iProc % jProc != 0)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_BF, rank);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_BF, iProc, kProc, jProc, rank, neighbor);
+		if (rank / iProc % jProc != jProc - 1)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_FB, rank );
+		
+	 // y- (forth to back)
+		if (rank / iProc % jProc != jProc - 1)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_FB, rank );
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_FB, iProc, kProc, jProc, rank, neighbor);
+		if (rank / iProc % jProc != 0)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_BF, rank );
+		
+	 // z+ (down to up)
+		if (rank / iProc / jProc != kProc - 1)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_DT, rank );
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_DT, iProc, kProc, jProc, rank, neighbor);
+		if (rank / iProc / jProc != 0)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_TD, rank );
 		 
-		// Do extraction, swap, injection for z- (up to down)
-		if ( rank / iProc / jProc != 0 ) extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_TD, rank );
-		if ( rank / iProc / jProc != 0 ) swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, iProc, kProc, jProc, rank);
-		if ( rank / iProc / jProc != 0 ) injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_TD, rank );
-
+		// z- (up to down)
+		if (rank / iProc / jProc != 0)
+			extraction( collideField, flagField, cpuDomain, sendBuffer, DIRECTION_TD, rank );
+		swap( sendBuffer, readBuffer, sizeBuffer, DIRECTION_TD, iProc, kProc, jProc, rank, neighbor);
+		if (rank / iProc / jProc != kProc - 1)
+			injection( collideField, flagField, cpuDomain, readBuffer, DIRECTION_DT, rank );
+		
+		MPI_Barrier(MPI_COMM_WORLD);
+		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
 		//printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, cpuDomain );
 
@@ -153,7 +162,7 @@ int main(int argc, char *argv[]){
 		//printf("before collision\n");
 		doCollision( collideField, flagField, &tau, cpuDomain );
 		//printf("before boundary\n");
-		treatBoundary( collideField, flagField, velocityWall, cpuDomain );
+		
 		//printf("%d time\n",t);
 		if ( t % timestepsPerPlotting == 0 ) {
 				//printf("%d cpu x\n", cpuDomain[0]);
@@ -170,6 +179,7 @@ int main(int argc, char *argv[]){
 			writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
 		}
 	}
+
 	free(collideField);
 	free(streamField);
 	free(flagField);
@@ -187,10 +197,9 @@ int main(int argc, char *argv[]){
 	free(sendBuffer[3]);
 	free(sendBuffer[4]);
 	free(sendBuffer[5]);
-	// Terminate MPI
+
 	finalizeMPI();
 	
 	return 0;
 }
 #endif
-

@@ -23,7 +23,8 @@ void swap(
       int iProc, 
       int kProc, 
       int jProc, 
-      int rank
+      int rank,
+			int *neighbor
 );
 
 // Do the extraction

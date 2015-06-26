@@ -1,5 +1,5 @@
 #include "initLB.h"
-
+#include "mpi.h"
 int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int *iProc, int *jProc, int *kProc, int argc, char *argv[]){
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
@@ -13,7 +13,7 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 		read_int( szFileName, "zlength", xlength + 2 );
 		if(xlength[0] < 2 || xlength[1] < 2 || xlength[2] < 2){
 			printf("Dimensions xyzlength must be > 1, please fix the geometry!\n");
-			return 1;
+			return 2;
 		}
 
 		READ_DOUBLE( szFileName, *tau );
@@ -65,7 +65,7 @@ void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, 
 
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank){
+void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank, int *neighbor){
 	// xlength here is fluid CPUdomain ... meaning the local processor coordinates without boundary cells
 	// local domain is altogether Dlength + 2, where the first and last cells are either buffer(parallel boundary) or global domain(no slip)
 	int x, y, z, i;
@@ -94,6 +94,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[y * xlen2 + z * xlen2 * ylen2] = NO_SLIP;
 			}
 		}
+		neighbor[DIRECTION_RL] = MPI_PROC_NULL;
 	} else {
 
 		for (z = 0; z < zlen2; z++) {
@@ -101,6 +102,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[y * xlen2 + z * xlen2 * ylen2] = PARALLEL_BOUNDARY;
 			}
 		}
+		neighbor[DIRECTION_RL] = rank - 1;
 	}
 
 	// Right boundary. If true, then we pick the right plane A=A(x=xlen, y, z) of this process and define it as no-slip.
@@ -110,12 +112,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
+		neighbor[DIRECTION_LR] = MPI_PROC_NULL;
 	} else {
 			for (z = 0; z < zlen2; z++) {
 				for (y = 0; y < ylen2; y++) {
 				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 			}
 		}
+		neighbor[DIRECTION_LR] = rank + 1;
 }
 
 	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
@@ -125,12 +129,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
+		neighbor[DIRECTION_BF] = MPI_PROC_NULL;
 	} else {
 			for (z = 0; z < zlen2; z++) {
 				for (x = 0; x < xlen2; x++) {
 					flagField[x + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
+			neighbor[DIRECTION_BF] = rank - iProc;
 		}
 
 	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
@@ -140,13 +146,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
+		neighbor[DIRECTION_FB] = MPI_PROC_NULL;
 	} else {
-
 			for (z = 0; z < zlen2; z++) {
 				for (x = 0; x < xlen2; x++) {
 					flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
+			neighbor[DIRECTION_FB] = rank + iProc;
 	}
 
 	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
@@ -156,6 +163,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
 			}
 		}
+		neighbor[DIRECTION_DT] = MPI_PROC_NULL;
 	} else {
 
 			for (y = 0; y < ylen2; y++) {
@@ -163,6 +171,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
+			neighbor[DIRECTION_DT] = rank + iProc * jProc;
 		}
 
 	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
@@ -172,6 +181,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2] = NO_SLIP;
 			}
 		}
+		neighbor[DIRECTION_TD] = MPI_PROC_NULL;
 	} else {
 
 		for (y = 0; y < ylen2; y++) {
@@ -179,6 +189,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2] = PARALLEL_BOUNDARY;
 			}
 		}
+		neighbor[DIRECTION_TD] = rank - iProc * jProc;
 	}
 
 
@@ -205,8 +216,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
 	// print flagfield initialization for debug
 	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
-	for(z = zlen2-1;z >= 02; --z){
-		for(y = ylen2-1;y >=0; --y){
+	for(z = zlen2 - 1;z >= 0; --z){
+		for(y = ylen2 - 1;y >= 0; --y){
 			for(x = 0;x < xlen2; ++x){
 				printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
 			}

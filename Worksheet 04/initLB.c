@@ -94,7 +94,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[y * xlen2 + z * xlen2 * ylen2] = NO_SLIP;
 			}
 		}
-		neighbor[DIRECTION_RL] = MPI_PROC_NULL;
+		neighbor[DIR_L] = MPI_PROC_NULL;
 	} else {
 
 		for (z = 0; z < zlen2; z++) {
@@ -102,7 +102,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[y * xlen2 + z * xlen2 * ylen2] = PARALLEL_BOUNDARY;
 			}
 		}
-		neighbor[DIRECTION_RL] = rank - 1;
+		neighbor[DIR_L] = rank - 1;
 	}
 
 	// Right boundary. If true, then we pick the right plane A=A(x=xlen, y, z) of this process and define it as no-slip.
@@ -112,14 +112,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
-		neighbor[DIRECTION_LR] = MPI_PROC_NULL;
+		neighbor[DIR_R] = MPI_PROC_NULL;
 	} else {
 			for (z = 0; z < zlen2; z++) {
 				for (y = 0; y < ylen2; y++) {
 				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 			}
 		}
-		neighbor[DIRECTION_LR] = rank + 1;
+		neighbor[DIR_R] = rank + 1;
 }
 
 	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
@@ -129,14 +129,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
-		neighbor[DIRECTION_BF] = MPI_PROC_NULL;
+		neighbor[DIR_F] = MPI_PROC_NULL;
 	} else {
 			for (z = 0; z < zlen2; z++) {
 				for (x = 0; x < xlen2; x++) {
 					flagField[x + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
-			neighbor[DIRECTION_BF] = rank - iProc;
+			neighbor[DIR_F] = rank - iProc;
 		}
 
 	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
@@ -146,14 +146,14 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = NO_SLIP;
 			}
 		}
-		neighbor[DIRECTION_FB] = MPI_PROC_NULL;
+		neighbor[DIR_B] = MPI_PROC_NULL;
 	} else {
 			for (z = 0; z < zlen2; z++) {
 				for (x = 0; x < xlen2; x++) {
 					flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
-			neighbor[DIRECTION_FB] = rank + iProc;
+			neighbor[DIR_B] = rank + iProc;
 	}
 
 	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
@@ -163,7 +163,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
 			}
 		}
-		neighbor[DIRECTION_DT] = MPI_PROC_NULL;
+		neighbor[DIR_T] = MPI_PROC_NULL;
 	} else {
 
 			for (y = 0; y < ylen2; y++) {
@@ -171,7 +171,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = PARALLEL_BOUNDARY;
 				}
 			}
-			neighbor[DIRECTION_DT] = rank + iProc * jProc;
+			neighbor[DIR_T] = rank + iProc * jProc;
 		}
 
 	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
@@ -181,7 +181,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2] = NO_SLIP;
 			}
 		}
-		neighbor[DIRECTION_TD] = MPI_PROC_NULL;
+		neighbor[DIR_D] = MPI_PROC_NULL;
 	} else {
 
 		for (y = 0; y < ylen2; y++) {
@@ -189,7 +189,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 				flagField[x + y*xlen2] = PARALLEL_BOUNDARY;
 			}
 		}
-		neighbor[DIRECTION_TD] = rank - iProc * jProc;
+		neighbor[DIR_D] = rank - iProc * jProc;
 	}
 
 

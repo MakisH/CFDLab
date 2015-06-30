@@ -2,13 +2,14 @@
 #define _MPIHELPER_H_
 
 #include "mpi.h"
+#include "LBDefinitions.h"
 
 // Initializes the MPI session
 void initializeMPI( 
-      int *rank,              /* Current process id */
-      int *number_of_ranks,   /* Total number of processes */
-      int argc,               /* Number of arguments */
-      char *argv[]            /* Array of arguments */
+	int *rank,              /* Current process id */
+	int *number_of_ranks,   /* Total number of processes */
+	int argc,               /* Number of arguments */
+	char *argv[]            /* Array of arguments */
 );
 
 // Terminates the MPI session
@@ -16,35 +17,33 @@ void finalizeMPI();
 
 // Transfer the overlapping cells
 void swap(
-      double **sendBuffer, 
-      double **readBuffer, 
-      int *sizeBuffer, 
-      int direction,
-      int iProc, 
-      int kProc, 
-      int jProc, 
-      int rank,
-			int *neighbor
+	double **sendBuffer,
+	double **readBuffer,
+	int *sizeBuffer,
+	int direction,
+	int iProc,
+	int kProc,
+	int jProc,
+	int rank,
+	int *neighbor
 );
 
 // Do the extraction
 void extraction(
-      double *collideField, 
-      int *flagField, 
-      int *xlength, 
-      double **sendBuffer, 
-      int boundary,
-			int rank
+	double *collideField,
+	int *xlength,
+	double **sendBuffer,
+	int boundary,
+	const side *Bsides
 );
 
 // Do the injection
 void injection(
-      double *collideField, 
-      int *flagField, 
-      int *xlength, 
-      double **readBuffer, 
-      int boundary,
-			int rank
+	double *collideField,
+	int *xlength,
+	double **readBuffer,
+	int boundary,
+	const side *Bsides
 );
 
 #endif

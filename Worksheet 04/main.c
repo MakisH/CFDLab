@@ -10,17 +10,16 @@
 //sleep()
 #include <unistd.h>
 
+// free complains without this library ???
+#include "stdlib.h"
 int main(int argc, char *argv[]){
-	int rank = 5;
+	printf("hi!\n");
+	int rank;
 	int np;
 
-		// Start MPI
-	initializeMPI( &rank, &np, argc, argv );
-
-	double *collideField = NULL;
-	double *streamField = NULL;
-	int *flagField = NULL;
-
+	// Start MPI
+	// slow for more processors ???
+	initializeMPI( &rank, &np, argc, argv);
 	int xlength[3];
 	double tau;
 	double velocityWall[3];
@@ -28,17 +27,11 @@ int main(int argc, char *argv[]){
 	int timestepsPerPlotting;
 	int iProc, jProc, kProc;
 	int error_code;
-	// send and read buffers for all possible directions :
-	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
-	double *sendBuffer[6];
-	double *readBuffer[6];
-	int sizeBuffer[6];
-	int cpuDomain[3];
-	int cpuDomain_size;
 
-// Read the config file using only one thread
+	int cpuDomain[3];
+	// Read the config file using only one thread
 	if(0 == rank){
-		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv );
+		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv);
 // Error checking
 		if(error_code) return error_code;
 		else if(0 == iProc || 0 == jProc || 0 == kProc){
@@ -56,7 +49,6 @@ int main(int argc, char *argv[]){
 		cpuDomain[0] = xlength[0] / iProc;
 		cpuDomain[1] = xlength[1] / jProc;
 		cpuDomain[2] = xlength[2] / kProc;
-		cpuDomain_size = (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2);
 	}
 	MPI_Bcast( xlength, 3, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( &tau, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
@@ -67,7 +59,6 @@ int main(int argc, char *argv[]){
 	MPI_Bcast( &jProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( &kProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( cpuDomain, 3, MPI_INT, 0, MPI_COMM_WORLD );
-	MPI_Bcast( &cpuDomain_size, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	/*
 //// test for correct data reading
 //	printf("\
@@ -79,80 +70,80 @@ int main(int argc, char *argv[]){
 //iProc			= %d\n \
 //jProc			= %d\n \
 //kProc			= %d\n \
-//cpuDomain x y z	= %d %d %d\n \
-//cpuDomain_size	= %d\n\n\n.", xlength[0], xlength[1], xlength[2], tau, timesteps, timestepsPerPlotting, velocityWall[0], velocityWall[1], velocityWall[2], iProc, jProc, kProc, cpuDomain[0], cpuDomain[1], cpuDomain[2], cpuDomain_size);
+//cpuDomain x y z	= %d %d %d\n", xlength[0], xlength[1], xlength[2], tau, timesteps, timestepsPerPlotting, velocityWall[0], velocityWall[1], velocityWall[2], iProc, jProc, kProc, cpuDomain[0], cpuDomain[1], cpuDomain[2]);
 //	sleep(1000);
 */
 
-	collideField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
-	streamField = (double *) malloc(Q_NUMBER * cpuDomain_size * sizeof(double));
-	flagField =	(int *) malloc(cpuDomain_size * sizeof(int));
-
-	printf("values:\n xlength: %d %d %d\n Proc ijk %d %d %d\n cpuDomain: %d %d %d\n ",xlength[0],xlength[1],xlength[2],iProc,jProc,kProc,cpuDomain[0],cpuDomain[1],cpuDomain[2]);
+	//printf("values:\n xlength: %d %d %d\n Proc ijk %d %d %d\n cpuDomain: %d %d %d\n ",xlength[0],xlength[1],xlength[2],iProc,jProc,kProc,cpuDomain[0],cpuDomain[1],cpuDomain[2]);
 	// Init the main three arrays.
+
+	double *collideField = (double *) malloc(Q_NUMBER * (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2) * sizeof(double));
+	double *streamField = (double *) malloc(Q_NUMBER * (cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2) * sizeof(double));
+	int *flagField = (int *) malloc((cpuDomain[0] + 2) * (cpuDomain[1] + 2) * (cpuDomain[2] + 2) * sizeof(int));
+
 	int neighbor[6];	// default action - do nothing if on the boundary
 	initialiseFields( collideField, streamField, flagField, cpuDomain, iProc, jProc, kProc, rank, neighbor);
-const side Bsides_ext[6] = {{cpuDomain[0], cpuDomain[0], 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
-														{1, 1,											 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
-														{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, cpuDomain[2], cpuDomain[2]},
-														{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 1, 1},
-														{0, cpuDomain[0] + 1, cpuDomain[1], cpuDomain[1], 0, cpuDomain[2] + 1},
-														{0, cpuDomain[0] + 1, 1, 1,												0, cpuDomain[2] + 1}};
-const side Bsides_inj[6] = {{0, 0, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
-														{cpuDomain[0] + 1, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
-														{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 0, 0},
-														{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, cpuDomain[2] + 1, cpuDomain[2] + 1},
-														{0, cpuDomain[0] + 1, 0, 0, 0, cpuDomain[2] + 1},
-														{0, cpuDomain[0] + 1, cpuDomain[1] + 1, cpuDomain[1] + 1, 0, cpuDomain[2] + 1}};
-	// Each processor responsible for its own domain.
-	// allocate the buffers
-	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
-	//printf("before t loop\n");
+	//printf("neighbors:\n%d %d %d %d %d %d\n",neighbor[0], neighbor[1], neighbor[2], neighbor[3], neighbor[4], neighbor[5]);
+	// precomputed values for extraction and injection bounds depending on the direction
+	const side Bsides_ext[6] = {{cpuDomain[0], cpuDomain[0], 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
+															{1, 1,											 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
+															{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, cpuDomain[2], cpuDomain[2]},
+															{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 1, 1},
+															{0, cpuDomain[0] + 1, cpuDomain[1], cpuDomain[1], 0, cpuDomain[2] + 1},
+															{0, cpuDomain[0] + 1, 1, 1,												0, cpuDomain[2] + 1}};
+	const side Bsides_inj[6] = {{0, 0, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
+															{cpuDomain[0] + 1, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
+															{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, 0, 0},
+															{0, cpuDomain[0] + 1, 0, cpuDomain[1] + 1, cpuDomain[2] + 1, cpuDomain[2] + 1},
+															{0, cpuDomain[0] + 1, 0, 0, 0, cpuDomain[2] + 1},
+															{0, cpuDomain[0] + 1, cpuDomain[1] + 1, cpuDomain[1] + 1, 0, cpuDomain[2] + 1}};
+
+// send and read buffers for all possible directions :
+	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
+	double *sendBuffer[6] = {NULL,NULL,NULL,NULL,NULL,NULL};
+	double *readBuffer[6] = {NULL,NULL,NULL,NULL,NULL,NULL};
+	int sizeBuffer[6];
+	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer, neighbor);
 	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
-
 		// TODO: maybe move all these to a separate function?
+		//if(!rank)
+		//	printf("t = %d, rank = %d\n",t,rank);
 		// Do extraction, swap, injection for
-		// x+ (left to right)
-		//printf("before extr\n");
-		if(!rank)
-			printf("t = %d, rank = %d\n",t,rank);
 
-		//printf("before extr2\n");
+				// x+ (left to right)
+		if (neighbor[DIR_R] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_R, Bsides_ext);
+		//printf("after extr\n");
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_R, neighbor);
+		//printf("after swap\n");
+		if (neighbor[DIR_L] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer, DIR_R, Bsides_inj);
+		//printf("after inj\n");
 		// x- (right to left)
-
-		
-		if (rank % iProc != iProc - 1)	extraction( collideField, cpuDomain, sendBuffer, DIR_R, Bsides_ext);
-		//printf("before swap\n");
-			swap( sendBuffer, readBuffer, sizeBuffer, DIR_R, iProc, kProc, jProc, rank, neighbor);
-		//printf("before injection\n");
-		if (rank % iProc != 0)	injection( collideField, cpuDomain, readBuffer, DIR_R, Bsides_inj);
-
-		if (rank % iProc != 0)	extraction( collideField, cpuDomain, sendBuffer, DIR_L, Bsides_ext);
-		swap( sendBuffer, readBuffer, sizeBuffer, DIR_L, iProc, kProc, jProc, rank, neighbor);
-		if (rank % iProc != iProc - 1)	injection( collideField, cpuDomain, readBuffer, DIR_L, Bsides_inj);
-		//printf("before extr3\n");
-
-	 // z+ (down to up)
-		if (rank / iProc / jProc != kProc - 1)	extraction( collideField, cpuDomain, sendBuffer, DIR_T, Bsides_ext);
-		swap( sendBuffer, readBuffer, sizeBuffer, DIR_T, iProc, kProc, jProc, rank, neighbor);
-		if (rank / iProc / jProc != 0)	injection( collideField, cpuDomain, readBuffer, DIR_T, Bsides_inj);
-		 
+		if (neighbor[DIR_L] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_L, Bsides_ext);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_L, neighbor);
+		if (neighbor[DIR_R] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer, DIR_L, Bsides_inj);
+		//printf("after 2\n");
+		// z+ (down to up)
+		if (neighbor[DIR_T] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_T, Bsides_ext);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_T, neighbor);
+		if (neighbor[DIR_D] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer, DIR_T, Bsides_inj);
+		//printf("after 3\n");
 		// z- (up to down)
-		if (rank / iProc / jProc != 0)	extraction( collideField, cpuDomain, sendBuffer, DIR_D, Bsides_ext);
-		swap( sendBuffer, readBuffer, sizeBuffer, DIR_D, iProc, kProc, jProc, rank, neighbor);
-		if (rank / iProc / jProc != kProc - 1)	injection( collideField, cpuDomain, readBuffer, DIR_D, Bsides_inj);
-		
-	 // y- (forth to back)
-		if (rank / iProc % jProc != jProc - 1)	extraction( collideField, cpuDomain, sendBuffer, DIR_B, Bsides_ext);
-		swap( sendBuffer, readBuffer, sizeBuffer, DIR_B, iProc, kProc, jProc, rank, neighbor);
-		if (rank / iProc % jProc != 0)	injection( collideField, cpuDomain, readBuffer, DIR_B, Bsides_inj);
-
+		if (neighbor[DIR_D] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_D, Bsides_ext);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_D, neighbor);
+		if (neighbor[DIR_T] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer, DIR_D, Bsides_inj);
+		//printf("after 4\n");
+		// y- (forth to back)
+		if (neighbor[DIR_B] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_B, Bsides_ext);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_B, neighbor);
+		if (neighbor[DIR_F] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer, DIR_B, Bsides_inj);
+		//printf("after 5\n");
 		// y+ (back to forth)
-		if (rank / iProc % jProc != 0)	extraction( collideField, cpuDomain, sendBuffer, DIR_F, Bsides_ext);
-		swap( sendBuffer, readBuffer, sizeBuffer, DIR_F, iProc, kProc, jProc, rank, neighbor);
-		if (rank / iProc % jProc != jProc - 1)	injection( collideField, cpuDomain, readBuffer,DIR_F, Bsides_inj);
-		
+		if (neighbor[DIR_F] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_F, Bsides_ext);
+		swap( sendBuffer, readBuffer, sizeBuffer, DIR_F, neighbor);
+		if (neighbor[DIR_B] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer,DIR_F, Bsides_inj);
+
+		//printf("before boundary\n");
 		treatBoundary( collideField, flagField, velocityWall, cpuDomain);
 		//printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, cpuDomain);
@@ -162,7 +153,7 @@ const side Bsides_inj[6] = {{0, 0, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
 		streamField = tmp;
 		//printf("before collision\n");
 		doCollision( collideField, flagField, &tau, cpuDomain );
-		//printf("before boundary\n");
+		//printf("after collision\n");
 		
 		//printf("%d time\n",t);
 		if ( t % timestepsPerPlotting == 0 ) {
@@ -182,23 +173,23 @@ const side Bsides_inj[6] = {{0, 0, 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
 		}
 	}
 
-	free(collideField);
-	free(streamField);
-	free(flagField);
+	free((void *)collideField);
+	free((void *)streamField);
+	free((void *)flagField);
 
-	free(readBuffer[0]);
-	free(readBuffer[1]);
-	free(readBuffer[2]);
-	free(readBuffer[3]);
-	free(readBuffer[4]);
-	free(readBuffer[5]);
+	free((void *)readBuffer[0]);
+	free((void *)readBuffer[1]);
+	free((void *)readBuffer[2]);
+	free((void *)readBuffer[3]);
+	free((void *)readBuffer[4]);
+	free((void *)readBuffer[5]);
 	
-	free(sendBuffer[0]);
-	free(sendBuffer[1]);
-	free(sendBuffer[2]);
-	free(sendBuffer[3]);
-	free(sendBuffer[4]);
-	free(sendBuffer[5]);
+	free((void *)sendBuffer[0]);
+	free((void *)sendBuffer[1]);
+	free((void *)sendBuffer[2]);
+	free((void *)sendBuffer[3]);
+	free((void *)sendBuffer[4]);
+	free((void *)sendBuffer[5]);
 
 	finalizeMPI();
 	

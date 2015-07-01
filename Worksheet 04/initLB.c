@@ -1,6 +1,9 @@
 #include "initLB.h"
 #include "mpi.h"
-int readParameters(int *xlength, double *tau, double *velocityWall, int *timesteps, int *timestepsPerPlotting, int *iProc, int *jProc, int *kProc, int argc, char *argv[]){
+#include "helper.h"
+#include "LBDefinitions.h"
+
+int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
 		return 1;
@@ -29,49 +32,52 @@ int readParameters(int *xlength, double *tau, double *velocityWall, int *timeste
 	return 0;
 }
 
-void initialiseBuffers(double **sendBuffer, double **readBuffer,  int *xlength, int *sizeBuffer){
+void initialiseBuffers(double **sendBuffer, double **readBuffer, const int * const cpuDomain, int * sizeBuffer, const int * const neighbor){
 
-	int x = xlength[0] + 2;
-	int y = xlength[1] + 2;
-	int z = xlength[2] + 2;
+	int xlen2 = cpuDomain[0] + 2;
+	int ylen2 = cpuDomain[1] + 2;
+	int zlen2 = cpuDomain[2] + 2;
 
 	int domain = 5; // because we have 5 possible directions to be extracted to buffer
 
 	// We should substitute the sizes in malloc, but we don't have time now.
-	sizeBuffer[0] = y * z * domain;
-	sizeBuffer[1] = y * z * domain; // =sizeBuffer[0]
-	sizeBuffer[2] = x * y * domain;
-	sizeBuffer[3] = x * y * domain; // =sizeBuffer[2]
-	sizeBuffer[4] = x * z * domain;
-	sizeBuffer[5] = x * z * domain; // =sizeBuffer[4]
+	sizeBuffer[0] = ylen2 * zlen2 * domain;
+	sizeBuffer[1] = ylen2 * zlen2 * domain; // =sizeBuffer[0]
+	sizeBuffer[2] = xlen2 * ylen2 * domain;
+	sizeBuffer[3] = xlen2 * ylen2 * domain; // =sizeBuffer[2]
+	sizeBuffer[4] = xlen2 * zlen2 * domain;
+	sizeBuffer[5] = xlen2 * zlen2 * domain; // =sizeBuffer[4]
 
 	// We initilise 6 different buffers.
 	// sendBuffer planes[0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 
-	sendBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
-	sendBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
-	sendBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
-	sendBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
-	sendBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
-	sendBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
+	if(neighbor[0] != MPI_PROC_NULL) sendBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
+	if(neighbor[1] != MPI_PROC_NULL) sendBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
+	if(neighbor[2] != MPI_PROC_NULL) sendBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
+	if(neighbor[3] != MPI_PROC_NULL) sendBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
+	if(neighbor[4] != MPI_PROC_NULL) sendBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
+	if(neighbor[5] != MPI_PROC_NULL) sendBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
 
 	// readBuffer planes[0:right sendBuffer, 1:left sendBuffer, 2:bottom sendBuffer, 3:top sendBuffer, 4:back sendBuffer, 5:front sendBuffer]
-	readBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
-	readBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
-	readBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
-	readBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
-	readBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
-	readBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
+	if(neighbor[0] != MPI_PROC_NULL) readBuffer[0] = (double *) malloc(sizeBuffer[0] * sizeof(double)); // left plane
+	if(neighbor[1] != MPI_PROC_NULL) readBuffer[1] = (double *) malloc(sizeBuffer[1] * sizeof(double)); // right plane
+	if(neighbor[2] != MPI_PROC_NULL) readBuffer[2] = (double *) malloc(sizeBuffer[2] * sizeof(double)); // top plane
+	if(neighbor[3] != MPI_PROC_NULL) readBuffer[3] = (double *) malloc(sizeBuffer[3] * sizeof(double)); // bottom plane
+	if(neighbor[4] != MPI_PROC_NULL) readBuffer[4] = (double *) malloc(sizeBuffer[4] * sizeof(double)); // front plane
+	if(neighbor[5] != MPI_PROC_NULL) readBuffer[5] = (double *) malloc(sizeBuffer[5] * sizeof(double)); // back plane
 
 }
 
-void initialiseFields(double *collideField, double *streamField, int *flagField, int *xlength, int iProc, int jProc, int kProc, int rank, int *neighbor){
-	// xlength here is fluid CPUdomain ... meaning the local processor coordinates without boundary cells
+void initialiseFields(double *collideField, double *streamField, int *flagField, const int * const cpuDomain, const int iProc, const int jProc, const int kProc, const int rank, int * const neighbor){
 	// local domain is altogether Dlength + 2, where the first and last cells are either buffer(parallel boundary) or global domain(no slip)
+
 	int x, y, z, i;
-	int xlen2 = xlength[0] + 2;
-	int ylen2 = xlength[1] + 2;
-	int zlen2 = xlength[2] + 2;
+	int xlen2 = cpuDomain[0] + 2;
+	int ylen2 = cpuDomain[1] + 2;
+	int zlen2 = cpuDomain[2] + 2;
+	//int xyzlen2 = xlen2 * ylen2 * zlen2;
+
+	
 
 	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 

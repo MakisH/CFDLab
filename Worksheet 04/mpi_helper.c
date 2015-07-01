@@ -1,10 +1,17 @@
-#include "stdlib.h"
-#include "stdio.h"
+
+//#include "stdlib.h" // not needed?
+
 #include "mpi_helper.h"
+
+// stdout
+// stderr
+#include <stdio.h>
+
+// Q_NUMBER
 #include "LBDefinitions.h"
 #include "mpi.h"
 
-void initializeMPI( int *rank, int *number_of_ranks, int argc, char *argv[] ) {
+void initializeMPI( int *rank, int *number_of_ranks, int argc, char ** argv ) {
 	MPI_Init( &argc, &argv );
 	MPI_Comm_size( MPI_COMM_WORLD, number_of_ranks );
 	MPI_Comm_rank( MPI_COMM_WORLD, rank );
@@ -18,6 +25,7 @@ void finalizeMPI() {
 	MPI_Barrier( MPI_COMM_WORLD );
 	MPI_Finalize();
 }
+
 //void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int boundary, int iProc, int kProc, int jProc, int rank) {
 //	
 //	int neighbor_distance = 0;
@@ -148,17 +156,20 @@ void finalizeMPI() {
 //	
 //}
 /// old swap
-void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int direction, int iProc, int kProc, int jProc, int rank, int *neighbor) {
-	//printf("rank %d\n",rank);
-	MPI_Status status;
+void swap(double * const * const sendBuffer, double * const * const readBuffer, const int * const sizeBuffer, const int direction, const int * const neighbor) {
+	// MPI_Status status; // waiting for status makes it slower ?
+	MPI_Request send_request;
 	// // version 4
-		MPI_Sendrecv(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction + 1  - direction % 2 * 2], MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+	//MPI_Sendrecv(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[inv_dir], MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		/// old
 	//// version 3
-		//MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborSendId, 0, MPI_COMM_WORLD, &send_request);
-		//// opposite direction is : direction + 1  - direction % 2 * 2
-		//MPI_Recv(readBuffer[direction + 1  - direction % 2 * 2], sizeBuffer[direction + 1  - direction % 2 * 2], MPI_DOUBLE, neighborRecvId, 0, MPI_COMM_WORLD, &status);
-		//MPI_Wait(&send_request,MPI_STATUS_IGNORE);
+	if(neighbor[direction] != MPI_PROC_NULL)	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, MPI_COMM_WORLD, &send_request);
+		// opposite direction is : direction + 1  - direction % 2 * 2
+	int inv_dir = direction + 1  - direction % 2 * 2;
+	if(neighbor[inv_dir] != MPI_PROC_NULL){
+		MPI_Recv(readBuffer[inv_dir], sizeBuffer[inv_dir], MPI_DOUBLE, neighbor[inv_dir], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	}
+	if(neighbor[direction] != MPI_PROC_NULL)	MPI_Wait(&send_request,MPI_STATUS_IGNORE);
 	// // version 2
 		//MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &send_request);
 		//MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &status);
@@ -172,16 +183,17 @@ void swap(double **sendBuffer, double **readBuffer, int *sizeBuffer, int directi
 }
 
 // before calling - check for NULL neighbor!
-void extraction(double *collideField, int *xlength/* == cpuDomain */, double **sendBuffer, int boundary, const side *Bsides) {
+// DIR_R means that Right side of domain is streamed to the Right(3,7,10,13,17)
+void extraction(double * const collideField, const int * const cpuDomain, double * const * const sendBuffer, const int direction, const side * const Bsides) {
 	int currentCell;
 	int cell = -1; // buffer cell
-	for (int z = Bsides[boundary].z_start; z <= Bsides[boundary].z_end; ++z) {
-		for (int y = Bsides[boundary].y_start; y <= Bsides[boundary].y_end; ++y) {
-			for (int x = Bsides[boundary].x_start; x <= Bsides[boundary].x_end; ++x) {
+	for (int z = Bsides[direction].z_start; z <= Bsides[direction].z_end; ++z) {
+		for (int y = Bsides[direction].y_start; y <= Bsides[direction].y_end; ++y) {
+			for (int x = Bsides[direction].x_start; x <= Bsides[direction].x_end; ++x) {
 				++cell; // buffer index - destination
-				currentCell = x + y * (xlength[0] + 2) + z * (xlength[0] + 2) * (xlength[1] + 2); // cpuDomain cell index - source
+				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2); // cpuDomain cell index - source
 				for (int dir = 0; dir < 5; ++dir) { // loop over all velocities to be extracted
-					sendBuffer[boundary][5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[boundary][dir]];
+					sendBuffer[direction][5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[direction][dir]];
 				}
 			}
 		}
@@ -189,16 +201,18 @@ void extraction(double *collideField, int *xlength/* == cpuDomain */, double **s
 }
 
 // before calling - check for NULL neighbor!
-void injection(double *collideField, int *xlength, double **readBuffer, int boundary, const side *Bsides) {
+// DIR_R means that we inject from Left to Right  on the Left side(x-)(3,7,10,13,17) 
+void injection(double * const collideField, const int * const cpuDomain, double * const * const readBuffer, const int direction, const side * const Bsides) {
 	int currentCell;
 	int cell = -1;
-	for (int z = Bsides[boundary].z_start; z <= Bsides[boundary].z_end; ++z) {
-		for (int y = Bsides[boundary].y_start; y <= Bsides[boundary].y_end; ++y) {
-			for (int x = Bsides[boundary].x_start; x <= Bsides[boundary].x_end; ++x) {
+	int inv_dir = direction + 1  - direction % 2 * 2;
+	for (int z = Bsides[direction].z_start; z <= Bsides[direction].z_end; ++z) {
+		for (int y = Bsides[direction].y_start; y <= Bsides[direction].y_end; ++y) {
+			for (int x = Bsides[direction].x_start; x <= Bsides[direction].x_end; ++x) {
 				++cell;
-				currentCell = x + y * (xlength[0] + 2) + z * (xlength[0] + 2) * (xlength[1] + 2);
-				for (int dir = 0; dir < 5; ++dir) {
-					collideField[Q_NUMBER * currentCell + each[boundary][dir]] = readBuffer[boundary][5 * cell + dir];
+				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2);
+				for (int vel_dir = 0; vel_dir < 5; ++vel_dir) {
+					collideField[Q_NUMBER * currentCell + each[direction][vel_dir]] = readBuffer[inv_dir][5 * cell + vel_dir];
 				}
 			}
 		}

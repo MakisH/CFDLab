@@ -35,13 +35,4 @@ const static int each[6][5] = {	{3, 7, 10,13,17},	// x+ R
 																{4, 11,12,13,18},	// y+ B
 																{0, 5, 6, 7, 14}};// y- F
 
-typedef struct  {
-	int x_start;
-	int x_end;
-	int y_start;
-	int y_end;
-	int z_start;
-	int z_end;
-}side ;
-
 #endif

@@ -1,0 +1,7 @@
+\beamer@endinputifotherversion {3.24pt}
+\select@language {english}
+\beamer@sectionintoc {2}{The idea}{3}{0}{1}
+\beamer@subsectionintoc {2}{1}{What we want to do}{4}{0}{1}
+\beamer@subsectionintoc {2}{2}{What we need}{5}{0}{1}
+\beamer@sectionintoc {3}{Geometry approach}{9}{0}{2}
+\beamer@sectionintoc {4}{Challenges}{13}{0}{3}

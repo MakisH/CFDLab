@@ -109,6 +109,7 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int
 	double xEnd = ((xFactor + 1) * xlength[0] - 1) * dx;
 	double yEnd = ((yFactor + 1) * xlength[1] - 1) * dy;
 	double zEnd = ((zFactor + 1) * xlength[2] - 1) * dz;
+
 	//printf("rank %d\n",rank);
 	//printf("dx %f\n", dx);
 	//printf("dy %f\n", dy);

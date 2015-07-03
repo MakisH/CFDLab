@@ -101,8 +101,8 @@ int main(int argc, char *argv[]){
 
 // send and read buffers for all possible directions :
 	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
-	double *sendBuffer[6];
-	double *readBuffer[6];
+	double *sendBuffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL}; // needed for free, otherwise gives a stupid error.
+	double *readBuffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL};;
 	int sizeBuffer[6];
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer, neighbor);
 	double *tmp = NULL;
@@ -175,7 +175,6 @@ int main(int argc, char *argv[]){
 			writeVtkOutput( collideField, flagField, "pics/simLB", t, cpuDomain, rank, xlength, iProc, jProc, kProc );
 		}
 	}
-
 	free((void *)collideField);
 	free((void *)streamField);
 	free((void *)flagField);
@@ -193,7 +192,6 @@ int main(int argc, char *argv[]){
 	free((void *)sendBuffer[3]);
 	free((void *)sendBuffer[4]);
 	free((void *)sendBuffer[5]);
-
 	finalizeMPI();
 	
 	return 0;

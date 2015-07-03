@@ -11,6 +11,9 @@ int readParameters(int * const xlength, double * const tau, double * const veloc
 	else {
 		const char *szFileName = NULL;
 		szFileName = argv[1];  
+
+		
+
 		read_int( szFileName, "xlength", xlength );
 		read_int( szFileName, "ylength", xlength + 1 );
 		read_int( szFileName, "zlength", xlength + 2 );

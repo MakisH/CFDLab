@@ -17,6 +17,7 @@ int main(int argc, char *argv[]){
 	int rank;
 	int np;
 
+	
 	// Start MPI
 	// slow for more processors ???
 	initializeMPI( &rank, &np, argc, argv);
@@ -100,8 +101,8 @@ int main(int argc, char *argv[]){
 
 // send and read buffers for all possible directions :
 	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
-	double *sendBuffer[6] = {NULL,NULL,NULL,NULL,NULL,NULL};
-	double *readBuffer[6] = {NULL,NULL,NULL,NULL,NULL,NULL};
+	double *sendBuffer[6];
+	double *readBuffer[6];
 	int sizeBuffer[6];
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer, neighbor);
 	double *tmp = NULL;
@@ -110,6 +111,8 @@ int main(int argc, char *argv[]){
 		//if(!rank)
 		//	printf("t = %d, rank = %d\n",t,rank);
 		// Do extraction, swap, injection for
+
+		// swap needs two checks so they're in the function
 
 				// x+ (left to right)
 		if (neighbor[DIR_R] != MPI_PROC_NULL)	extraction( collideField, cpuDomain, sendBuffer, DIR_R, Bsides_ext);

@@ -88,12 +88,13 @@ void write_vtkPointCoordinates( FILE *fp, int *xlength, int *xlength_global, int
 	// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1) // -1 because spaces between points are 1 less than the number of points
 	double dx, dy, dz;
 
+	double vtk_distance[3] = {2,16,1};
 	// start at 0 and finish at 1.0 => len-1
 	// e.g. for 15 points there are 14 "cells"
 	// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
-	dx = 1.0 / (xlength_global[0]-1);
-	dy = 1.0 / (xlength_global[1]-1);
-	dz = 1.0 / (xlength_global[2]-1);
+	dx = vtk_distance[0] / (xlength_global[0]-1);
+	dy = vtk_distance[1] / (xlength_global[1]-1);
+	dz = vtk_distance[2] / (xlength_global[2]-1);
 
 	// A factor of mapping from local CPU cube to the global one.
 	int xFactor = rank % iProc;

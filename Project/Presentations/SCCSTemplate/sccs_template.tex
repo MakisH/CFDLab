@@ -1,0 +1,87 @@
+\documentclass[9pt,pdftex]{beamer}
+
+% use git: import repository as new project in eclipse: http://www.eclipse.org/forums/index.php/t/226301/
+
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{amsfonts, amsmath, amssymb}
+\usepackage{color}
+\usepackage{fancybox}
+\usepackage{graphicx}
+\usepackage{multirow}
+% \usepackage{paralist}
+\usepackage{todonotes}
+%\usepackage{biblatex}
+\usepackage{subfig}
+\newenvironment{figure*}%
+{\begin{figure}}
+{\end{figure}}
+
+%\usepackage[style=mla,babel=hyphen,backend=biber]{biblatex}
+
+% CSE-Beamer-Styles:
+%\usepackage[conference]{beamertheme_sccstalk}
+\usepackage[lecture]{beamertheme_sccstalk}
+\usepackage{beamercolorscheme_sccs}
+\usepackage{beamerfontthemestructurebold}
+
+\setcounter{tocdepth}{3} 
+
+\title{Title}
+\subtitle{SubTitle}
+\author[FooterAuthor]{Author, Coauthors} %[displayed in footer]{displayed on title page}
+\date{\today}
+\institute{Technische Universität München}
+
+\begin{document}
+	\frame{\titlepage}
+
+	%===========================================================================
+\section{Content}
+\begin{frame}{Content}
+\tableofcontents
+\end{frame}
+	
+%===========================================================================
+
+\section{Motivation}
+
+\begin{frame}{Motivation}
+
+
+\end{frame}
+
+\begin{frame}{Multiple figures}
+\begin{figure*}[ht]
+\centering
+\subfloat[Subfigure 1 list of figures text][]{
+\includegraphics[scale=0.18]{img/sccs_os.pdf}
+}
+\subfloat[Subfigure 2 list of figures text][]{
+\includegraphics[scale=0.18]{img/sccs_os.pdf}
+}
+\subfloat[Subfigure 3 list of figures text][]{
+\includegraphics[scale=0.18]{img/sccs_os.pdf}
+}
+\subfloat[Subfigure 4 list of figures text][]{
+\includegraphics[scale=0.18]{img/sccs_os.pdf}
+}
+\end{figure*}
+\begin{figure*}
+%\subfloat[Subfigure 1 list of figures text][]{
+\includegraphics[scale=0.20]{img/sccs_os.pdf}
+%}
+%\subfloat[Subfigure 2 list of figures text][]{
+\includegraphics[scale=0.20]{img/sccs_os.pdf}
+%}
+%\subfloat[Subfigure 3 list of figures text][]{
+\includegraphics[scale=0.20]{img/sccs_os.pdf}
+%}
+%\subfloat[Subfigure 4 list of figures text][]{
+\includegraphics[scale=0.20]{img/sccs_os.pdf}
+%}
+\label{fig: example}
+\end{figure*}
+\end{frame}
+
+\end{document}

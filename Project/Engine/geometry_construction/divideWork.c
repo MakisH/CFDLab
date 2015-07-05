@@ -2,97 +2,26 @@
 #include <stdlib.h>
 #include <string.h>
 
-void ERROR(char bla[]){
-	printf("\n");
-	for (int i=0; bla[i]!='\0'; i++) printf("%c", bla[i]);
-}
-
-void readPGM_cpu(int *flagField, int *cpuDomain, int *flagField_cpu, int *xlength, int *scale);
-void cpuBoundary_connect(int *flagField_cpu, int cpu_connection, int *cpuDomain, int spaceFinger, int *xlength, char *buildingSide);
-void cpuBoundary(int *flagField_cpu, int typeofBoundary, char *plane, int *cpuDomain);
-
-
-int main(void){
-
-	int *xlength = malloc(3 * sizeof(int));
-	xlength[0] = 16; // Without boundaries xlen = xlen - 2
-	xlength[1] = 2;
-	xlength[2] = 4;
-
-	int xlen2 = xlength[0];
-	int xylen2 = (xlength[0]) * (xlength[1]);
-
-	int *cpuDomain = malloc(3 * sizeof(int));
-	cpuDomain[0] = 16;
-	cpuDomain[1] = 1;
-	cpuDomain[2] = 4;
-
-	int xlen2_cpu = cpuDomain[0] + 2;
-	int xylen2_cpu = xlen2_cpu  * (cpuDomain[1] + 2);
-
-	int *flagField = calloc((xlength[0]) * (xlength[1]) * (xlength[2]), sizeof(int));
-	int *flagField_cpu = calloc((cpuDomain[0]+2) * (cpuDomain[1]+2) * (cpuDomain[2]+2), sizeof(int));
-	//int *flagField = malloc((xlength[0]+2)*(xlength[1]+2)*(xlength[2]+2) * sizeof(int));
-	int z = 0;
-	for (int y=0; y < 2; y++){
-		for(int x=9; x < 16; x++){
-			flagField[x + y * xlen2 + z * xylen2] = 9;
-		}
-	}
-	int rank = 0;
-	int scale[] = {0, rank, 0};
-	readPGM_cpu(flagField, cpuDomain, flagField_cpu, xlength, scale);
-	cpuBoundary(flagField_cpu, 1, "xz", cpuDomain);
-	cpuBoundary_connect(flagField_cpu, 4, cpuDomain, 3, xlength, "lower");
-
-	FILE *file = fopen("bla.txt", "w");
-
-
-	z = 1;
-		for (int y=0; y < cpuDomain[1]+2; y++){
-			for(int x=0; x < cpuDomain[0]+2; x++){
-				fprintf(file, "%d", flagField_cpu[x + y * xlen2_cpu + z * xylen2_cpu]);
-			}
-			fprintf(file, "%c", '\n');
-		}
-
-	fprintf(file, "%c", '\n');
-	fprintf(file, "%c", '\n');
-		z = 0;
-		for (int y=0; y < xlength[1]; y++){
-			for(int x=0; x < xlength[0]; x++){
-				fprintf(file, "%d", flagField[x + y * xlen2 + z * xylen2]);
-			}
-			fprintf(file, "%c", '\n');
-		}
-
-	free(flagField);
-	free(flagField_cpu);
-	free(xlength);
-	free(cpuDomain);
-	fclose(file);
-	return 0;
-}
-
 void readPGM_cpu(int *flagField, int *cpuDomain, int *flagField_cpu, int *xlength, int *scale){
 
 	// INPUT: flagField ... The Big flagField
+	// OUTPUT: flagField_cpu ... flagField belonging to current cpu.
 	// cpuDomain .. the domain size of each CPU, without boundaries
 	// flagField_cpu ... The Small flagField of each CPU, size with boundaries included, so cpuDomain+2!
 	// rank ... rank of CPU
 	// xlength ... dimensions of flagField (like mentioned, the flagField doesn't contain any boundaries
-	// scale ... vector [a, b, c]. rank should be put to a component that we take an interval from. We only do [rank, 0, 0], so that should be a usual approach!!
+	// scale ... vector [a, b, c]. rank should be put to a component that we take an interval from.
 
 	// Factors for looping through 1D array
-	int xlen2_cpu = cpuDomain[0] + 2;
-	int xylen2_cpu = xlen2_cpu  * (cpuDomain[1] + 2);
+	int xlen2_cpu = cpuDomain[0];
+	int xylen2_cpu = xlen2_cpu  * (cpuDomain[1]);
 
 	// Again factors.
 	int xlen2 = xlength[0];
 	int xylen2 = (xlength[0]) * (xlength[1]);
 
 	int x, y, z; // iterators for flagField
-	int x_cpu = 1, y_cpu = 1, z_cpu = 1; // iterators for flagField_cpu. We start from 1 because flagField_cpu contains boundary and flagField doesn't. We copy from whole flagField to inner part of flagField_cpu.
+	int x_cpu = 0, y_cpu = 0, z_cpu = 0; // iterators for flagField_cpu. We start from 1 because flagField_cpu contains boundary and flagField doesn't. We copy from whole flagField to inner part of flagField_cpu.
 
 	// We do a mapping from global coordinate system (flagField) to local coordinate system (flagField_cpu)
 	for (z = scale[2]*cpuDomain[2]; z < (scale[2] + 1) * (cpuDomain[2]); z++){
@@ -101,14 +30,14 @@ void readPGM_cpu(int *flagField, int *cpuDomain, int *flagField_cpu, int *xlengt
 				flagField_cpu[x_cpu + xlen2_cpu * y_cpu + xylen2_cpu * z_cpu] = flagField[x + xlen2 * y + xylen2 * z];
 				x_cpu++;
 			}
-			x_cpu = 1;
+			x_cpu = 0;
 			y_cpu++;
 		}
 		z_cpu++;
-		y_cpu = 1;
+		y_cpu = 0;
 	}
 }
-
+/* USELESS FOR NOW.
 void cpuBoundary_connect(int *flagField_cpu, int cpu_connection, int *cpuDomain, int spaceFinger, int *xlength, char *buildingSide){
 	// Input:
 	// cpuDomain .. the domain size of each CPU, without boundaries
@@ -189,3 +118,4 @@ void cpuBoundary(int *flagField_cpu, int typeofBoundary, char *plane, int *cpuDo
 		}
 	}
 }
+*/

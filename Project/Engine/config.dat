@@ -1,31 +1,94 @@
-#--------------------------------------------
-#            size of the domain             
-#--------------------------------------------
+#---------------------------------------------------
+#  Configuration file for the problem:
+#  MI Building
+#---------------------------------------------------
+#---------------------------------------------------
+#  "problem" argument
+#---------------------------------------------------
+problem			          lbm_mi_building
+
+#---------------------------------------------------
+#  size of the domain
+#---------------------------------------------------
 xlength                     20
 ylength                     20
 zlength                     20
 
-#--------------------------------------------
-#            relaxation time
-#--------------------------------------------
+#---------------------------------------------------
+#  relaxation time
+#---------------------------------------------------
 tau                         1.0
 
-#--------------------------------------------
-#               time steps
-#--------------------------------------------
+#---------------------------------------------------
+#  time steps
+#---------------------------------------------------
 timesteps                   300
 timestepsPerPlotting        2
 
-#--------------------------------------------
-#               boundaries
-#--------------------------------------------
-velocityWall1               0.1
-velocityWall2               0.0
-velocityWall3               0.0  
+#---------------------------------------------------
+#  boundary conditions
+#  (use 0 to ignore velocity boundary conditions)
+#  (use -1 to ignore density boundary conditions)
+#---------------------------------------------------
+
+# INFLOW
+inflow_v_x                  0.0
+inflow_v_y                  0.0
+inflow_v_z                  0.0
+
+# INFLOW_1
+inflow_1_v_x                0.0
+inflow_1_v_y                0.0
+inflow_1_v_z                0.0
+
+# INFLOW_2
+inflow_2_v_x                0.0
+inflow_2_v_y                0.0
+inflow_2_v_z                0.0
+
+# INFLOW_3
+inflow_3_v_x                0.0
+inflow_3_v_y                0.0
+inflow_3_v_z                0.0
+
+# INFLOW_4
+inflow_4_v_x                0.0
+inflow_4_v_y                0.0
+inflow_4_v_z                0.0
+
+# INFLOW_5
+inflow_5_v_x                0.0
+inflow_5_v_y                0.0
+inflow_5_v_z                0.0
+
+
+# PRESSURE_IN
+pressure_in_d               -1
+# PRESSURE_IN_1
+pressure_in_1_d             -1
+# PRESSURE_IN_1
+pressure_in_2_d             -1
+# PRESSURE_IN_1
+pressure_in_3_d             -1
+# PRESSURE_IN_1
+pressure_in_4_d             -1
+# PRESSURE_IN_1
+pressure_in_5_d             -1
+
+# Reference density
+densityRef                  1.0
 
 #--------------------------------------------
-#             MPI parameters
+#  Moving wall velocity|(if any)
+#--------------------------------------------
+velocityWall1		      0.0
+velocityWall2		      0.0
+velocityWall3		      0.0
+
+
+#--------------------------------------------
+#  MPI parameters
 #--------------------------------------------
 iProc                       2
 jProc                       1
-kProc                      1
+kProc                       1

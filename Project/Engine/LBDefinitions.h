@@ -3,9 +3,11 @@
 #include <math.h>
 
 #define Q_NUMBER 19
+
 #define FLUID 0
 #define NO_SLIP 1
 #define FREE_SLIP 2
+#define OUTFLOW 3
 
 #define PARALLEL_BOUNDARY 7
 

@@ -5,12 +5,25 @@
 #define Q_NUMBER 19
 #define FLUID 0
 #define NO_SLIP 1
-#define MOVING_WALL 2
-// #define FREE_SLIP 3
-// #define INFLOW 4
-// #define OUTFLOW 5
-// #define PRESSURE_IN 6
+#define FREE_SLIP 2
+
 #define PARALLEL_BOUNDARY 7
+
+#define MOVING_WALL 10
+
+#define INFLOW 30
+#define INFLOW_1 31
+#define INFLOW_2 32
+#define INFLOW_3 33
+#define INFLOW_4 34
+#define INFLOW_5 35
+
+#define PRESSURE_IN 50
+#define PRESSURE_IN_1 51
+#define PRESSURE_IN_2 52
+#define PRESSURE_IN_3 53
+#define PRESSURE_IN_4 54
+#define PRESSURE_IN_5 55
 
 #define DIR_R 0
 #define DIR_L 1

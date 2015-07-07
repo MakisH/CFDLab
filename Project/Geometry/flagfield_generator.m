@@ -53,34 +53,34 @@ Hall(2:hall_l-1, 2:hall_w-1, :) = FLUID;
 
 % Add the doors
 % North door (main entrance)
-x_pos = 1 + 2*x;
+x_pos = 1 + 2*x + 1; % East boundary + 2*x + start
 y_pos = 1;
 door_size = x;
-Hall(x_pos:x_pos+door_size, y_pos, :) = INFLOW_1;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = INFLOW_1;
 
 % East door (LRZ)
 x_pos = 1;
-y_pos = hall_w - 1 - 2*x;
+y_pos = hall_w - 2*x; % hall width - 2*x
 door_size = x;
-Hall(x_pos, y_pos:y_pos+door_size, :) = OUTFLOW;
+Hall(x_pos, y_pos:y_pos+door_size-1, :) = OUTFLOW;
 
 % Cantine door
 x_pos = 1 + wing_l + 2*(wing_l + wing_d) + wing_l + x;
 y_pos = hall_w;
 door_size = x;
-Hall(x_pos:x_pos+door_size, y_pos, :) = INFLOW_2;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = INFLOW_2;
 
 % South door (side door, library)
-x_pos = hall_l-3*x-1;
+x_pos = hall_l-3*x;
 y_pos = hall_w;
 door_size = x;
-Hall(x_pos:x_pos+door_size, y_pos, :) = OUTFLOW;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = OUTFLOW;
 
 % West door (back entrance)
 x_pos = hall_l;
 y_pos = 1 + x + 1;
 door_size = x;
-Hall(x_pos, y_pos:y_pos+door_size, :) = OUTFLOW;
+Hall(x_pos, y_pos:y_pos+door_size-1, :) = OUTFLOW;
 
 % Add the tables (at least x=4 is required)
 if (x>=4)
@@ -131,48 +131,34 @@ MI(: , wing_w:wing_w+hall_w-1, : ) = Hall;
 % Construct a north wing
 WingN = NO_SLIP * ones(wing_l, wing_w, wing_h);
 WingN(2:wing_l-1, 2:wing_w-1, :) = FLUID;
-WingN(2:wing_l-1, wing_w, :) = FLUID;
-% WingN(2:wing_l-1, wing_w, :) = PARALLEL_BOUNDARY;
+% WingN(2:wing_l-1, wing_w, :) = FLUID;
+WingN(1:wing_l, wing_w, :) = PARALLEL_BOUNDARY;
 
 % Put the north wings in place
 xpos = wing_l + wing_d + 1; % one wing + distance + east boundary
 ypos = 1;
 MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
 
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
+for i=2:5
+    xpos = xpos + wing_l + wing_d;
+    MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingN; 
+end
 
 % Construct a south wing
 WingS = NO_SLIP * ones(wing_l, wing_w, wing_h);
 WingS(2:wing_l-1, 2:wing_w-1, :) = FLUID;
-WingS(2:wing_l-1, 1, :) = FLUID; 
-% WingS(2:wing_l-1, 1, :) = PARALLEL_BOUNDARY; 
+% WingS(2:wing_l-1, 1, :) = FLUID; 
+WingS(1:wing_l, 1, :) = PARALLEL_BOUNDARY; 
 
 % Put the south wings in place
 xpos = wing_l + 1; % one wing + east boundary
 ypos = wing_w -1 + hall_w;
 MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
 
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
-
-xpos = xpos + wing_l + wing_d;
-MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
+for i=2:5
+    xpos = xpos + wing_l + wing_d;
+    MI(xpos:xpos+wing_l-1, ypos:ypos+wing_w-1, :) = WingS; 
+end
 
 % Visualize the domain
 image(10*MI(:,:,1));
@@ -182,7 +168,7 @@ ylim([0 Nx + 1]) % y for the graph only
 
 % Write pgm files
 % Main Hall
-n_cpus = 4;
+n_cpus = 4; % Number of partitions-cpus for the main hall
 hall_part_l = hall_l / n_cpus;
 if (mod(hall_l, n_cpus) ~= 0)
     printf('Careful! Hall not divisible by number of cpus!')
@@ -191,39 +177,51 @@ x_start = 1;
 x_end = hall_part_l;
 y_start = wing_w;
 y_end = y_start + hall_w -1;
-% ATTENTION: For this, first assign the boundary of each wing to be parallel boundary and take a copy of the wing files.
-% I will make it automatic later.
 part_0 = [MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
 dlmwrite('pgm/cpu_0.pgm', part_0, 'delimiter', ' ')
 
-x_start = x_start + hall_part_l;
-x_end = x_end + hall_part_l;
-part_1 = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
-dlmwrite('pgm/cpu_1.pgm', part_1, 'delimiter', ' ')
+file_id = 0;
 
-x_start = x_start + hall_part_l;
-x_end = x_end + hall_part_l;
-part_2 = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
-dlmwrite('pgm/cpu_2.pgm', part_2, 'delimiter', ' ')
+for i=1:n_cpus-2
+    file_id = file_id + 1;
+    x_start = x_start + hall_part_l;
+    x_end = x_end + hall_part_l;
+    clear part_i
+    part_i = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
+    dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_i, 'delimiter', ' ')
+end
 
+file_id = file_id + 1;
 x_start = x_start + hall_part_l;
 x_end = x_end + hall_part_l;
-part_3 = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)];
-dlmwrite('pgm/cpu_3.pgm', part_3, 'delimiter', ' ')
+part_n = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)];
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_n, 'delimiter', ' ')
 
 % North wings
+WingN(2:wing_l-1, wing_w, :) = FLUID;
 WingN_par = [WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)];
-dlmwrite('pgm/cpu_4.pgm', WingN_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_5.pgm', WingN_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_6.pgm', WingN_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_7.pgm', WingN_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_8.pgm', WingN_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
 
 % South wings
+WingS(2:wing_l-1, 1, :) = FLUID; 
 WingS_par = [PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS];
-dlmwrite('pgm/cpu_9.pgm',  WingS_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_10.pgm', WingS_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_11.pgm', WingS_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_12.pgm', WingS_par, 'delimiter', ' ')
-dlmwrite('pgm/cpu_13.pgm', WingS_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'],  WingS_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+file_id = file_id + 1;
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
 

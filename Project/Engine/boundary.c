@@ -3,153 +3,282 @@
 #include "computeCellValues.h"
 #include <stdio.h>
 
-void treatBoundary(double *collideField, int* flagField, const double * const wallVelocity, int *cpuDomain){
+void treatBoundary(double *collideField,
+									 int* flagField,
+									 const double * const wallVelocity,
+									 const double * const ref_density,
+                   int *cpuDomain,
+                   double_3d *velocityIn,
+                   double *density_in){
 
-  int i, inv_i, currentCell, neighborCell;
-  int neighborX, neighborY, neighborZ;
-  int x_start, x_end, y_start, y_end, z_start, z_end;
-  double f_inv_i, density, c_uwall;
-
-  // each is an array that stores each of the i-directions of the boundary walls that are going
-  // to be updated each time.
-  int each[5]; // trick to implement a "foreach" loop, for every i direction to be touched
+	int i, inv_i, currentCell, neighborCell;
+	int neighborX, neighborY, neighborZ;
+	double f_inv_i, density, c_uwall, velocity;
+	double feq[Q_NUMBER];
 
   int SizeX = cpuDomain[0] + 2; // Size of the extended domain in each direction
   int SizeY = cpuDomain[1] + 2;
   int SizeZ = cpuDomain[2] + 2;
-  int SizeXY = SizeX * SizeY; // Size of the XY plane of the extended domain
+	int SizeXY = SizeX * SizeY; // Size of the XY plane of the extended domain
 
-  for (int boundary = 1; boundary <= 6; boundary++) {
+	// Arrays to implement a "foreach" structure for the free-slip condition
+	int perpendicular[6] = {2, 6, 8, 10, 12, 16};
+	int affected[5], mirror[5];
 
-    // which boundary am I processing now?
-    // Start by traversing each whole 2D boundary plane.
-    // Select the indexes each time in a way that no edges/corners are touched two/three times.
-    switch (boundary) {
-    // z = 0 (no-slip by default)
-    case 1 :
-      x_start = 0;          x_end = SizeX - 1;
-      y_start = 0;          y_end = SizeY - 1;
-      z_start = 0;          z_end = 0;
-      each[0] = 19; //1
-      each[1] = 18; //2
-      each[2] = 17; //3
-      each[3] = 16; //4
-      each[4] = 15; //5
-      break;
+	// Traverse all the (extended) domain (we need this as we don't have information about the obstacles)
+	for (int z = 0; z < SizeZ; ++z) {
+		for (int y = 0; y < SizeY; ++y) {
+			for (int x = 0; x < SizeX; ++x) {
+				// Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
+				currentCell = x + y*SizeX + z*SizeXY; // current boundary cell
 
-    // z = SizeZ (moving wall by default)
-    case 2 :
-      x_start = 0;          x_end = SizeX - 1;
-      y_start = 0;          y_end = SizeY - 1;
-      z_start = SizeZ - 1;  z_end = SizeZ - 1;
-      each[0] = 5; //15
-      each[1] = 4; //16
-      each[2] = 3; //17
-      each[3] = 2; //18
-      each[4] = 1; //19
-      break;
+				// What kind of (boundary) cell do we process now?
+				switch (flagField[currentCell]) {
 
-    // y = 0 (no-slip by default)
-    case 3 :
-      x_start = 0;        x_end = SizeX - 1;
-      y_start = 0;        y_end = 0;
-      z_start = 1;        z_end = SizeZ - 2;
-      each[0] = 1; //19
-      each[1] = 6; //14
-      each[2] = 7; //13
-      each[3] = 8; //12
-      each[4] = 5; //15
-      break;
+					//----- FLUID -------------------------------------------------------------------------//
+					case FLUID :
+						break;
 
-    // y = SizeY (no-slip by default)
-    case 4 :
-      x_start = 0;          x_end = SizeX - 1;
-      y_start = SizeY - 1;  y_end = SizeY - 1;
-      z_start = 1;          z_end = SizeZ - 2;
-      each[0] = 15; //5
-      each[1] = 8; //12
-      each[2] = 7; //13
-      each[3] = 6; //14
-      each[4] = 1; //19
-      break;
+					//----- NO_SLIP -----------------------------------------------------------------------//
+					case NO_SLIP :
+						// For each direction in the current cell
+						for (int i = 0; i < Q_NUMBER; ++i) {
 
-    // x = 0 (no-slip by default)
-    case 5 :
-      x_start = 0;          x_end = 0;
-      y_start = 1;          y_end = SizeY - 2;
-      z_start = 1;          z_end = SizeZ - 2;
-      each[0] = 18; //2
-      each[1] = 14; //6
-      each[2] = 11; //9
-      each[3] = 8; //12
-      each[4] = 4; //16
-      break;
+							// Neighbor cell of current cell in i-direction
+							neighborX = x + LATTICEVELOCITIES[i][0];
+							neighborY = y + LATTICEVELOCITIES[i][1];
+							neighborZ = z + LATTICEVELOCITIES[i][2];
 
-    // x = SizeX (no-slip by default)
-    case 6 :
-      x_start = SizeX - 1;  x_end = SizeX - 1;
-      y_start = 1;          y_end = SizeY - 2;
-      z_start = 1;          z_end = SizeZ - 2;
-      each[0] = 16; //4
-      each[1] = 12; //8
-      each[2] = 9; //11
-      each[3] = 6; //14
-      each[4] = 2; //18
-      break;
-    }
+							// Check if the the coordinates of the neighbor cell are valid
+							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
 
-    for (int x = x_start; x <= x_end; ++x) {
-      for (int y = y_start; y <= y_end; ++y) {
-        for (int z = z_start; z <= z_end; ++z) {
+								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+								neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
 
-          // Index of the current cell on the 3D grid (e.g. of flagField). Q not counted.
-          currentCell = x + y*SizeX + z*SizeXY; // current boundary cell
+								// Check if the neighbor cell is fluid
+								if ( flagField[neighborCell] == FLUID ) {
 
-          for (int e = 0; e < 5; ++e) {
-            // "Foreach" i direction. We may kill prefetching but there is no foreach in C...
-            // The index of the array is in [0,18]
-            i = each[e] - 1;
+									// inv(i) - inverse direction of i
+									inv_i = Q_NUMBER - i - 1;
 
-            // inv(i) - inverse direction of i
-            inv_i = Q_NUMBER - i - 1;
+									// Index of the inverse direction of the neighbor cell.
+									f_inv_i = collideField[ Q_NUMBER * neighborCell + inv_i ];
 
-            // Neighbor cell of current cell in i-direction
-            neighborX = x + LATTICEVELOCITIES[i][0];
-            neighborY = y + LATTICEVELOCITIES[i][1];
-            neighborZ = z + LATTICEVELOCITIES[i][2];
+									// update the boundary
+									collideField[ Q_NUMBER * currentCell + i ] = f_inv_i;
 
-            // Check if the neighbor cell coordinates are valid (and not on or outside the limits, that is, boundaries)
-            if ( neighborX > 0 && neighborX < SizeX-1 && neighborY > 0 && neighborY < SizeY-1 && neighborZ > 0 && neighborZ < SizeZ-1 ) {
+								} // if neighbor is fluid
+							} // if neighbor coordinates
+						} // for each direction
+				//		printf("%d \n",currentCell);
+						break;
 
-              neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+					//----- MOVING_WALL -------------------------------------------------------------------//
+					case MOVING_WALL :
+						// For each direction in the current cell
+						for (int i = 0; i < Q_NUMBER; ++i) {
 
-              // We use f*_inv(i) in both cases (no-slip and moving wall)
-              f_inv_i = collideField[ Q_NUMBER * neighborCell + inv_i];
+							// Neighbor cell of current cell in i-direction
+							neighborX = x + LATTICEVELOCITIES[i][0];
+							neighborY = y + LATTICEVELOCITIES[i][1];
+							neighborZ = z + LATTICEVELOCITIES[i][2];
 
-              // What type of boundary condition do we have? We could avoid this if by hard-coding different loops for different
-              // kinds of boundary conditions, by we would decrease generality.
-              if ( flagField[currentCell] == NO_SLIP ) {
+							// Check if the the coordinates of the neighbor cell are valid
+							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
 
-                // update the boundary
-                collideField[ Q_NUMBER*currentCell + i] = f_inv_i;
-              } else if (flagField[currentCell] == MOVING_WALL) {
+								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
 
-                // density in the neighbor cell
-                computeDensity(collideField+Q_NUMBER*neighborCell, &density);
+								// Check if the neighbor cell is fluid
+								if ( flagField[neighborCell] == FLUID ) {
 
-                // vector product c_i * u_wall
-                c_uwall = LATTICEVELOCITIES[i][0] * wallVelocity[0] + LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2];
+									// inv(i) - inverse direction of i
+									inv_i = Q_NUMBER - i - 1;
 
-                // update the boundary
-                collideField[ Q_NUMBER * currentCell + i] = f_inv_i + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
-              } // if flag
-            } // if neighbor
-          } // for each
+									// Index of the inverse direction of the neighbor cell.
+									f_inv_i = collideField[ Q_NUMBER * neighborCell + inv_i ];
 
-        } // for z
-      } // for y
-    } // for x
+									// density in the neighbor cell
+									computeDensity(collideField + Q_NUMBER * neighborCell, &density);
 
-  } // for boundary
+									// vector product c_i * u_wall
+									c_uwall = LATTICEVELOCITIES[i][0] * wallVelocity[0] + LATTICEVELOCITIES[i][1] * wallVelocity[1] + LATTICEVELOCITIES[i][2] * wallVelocity[2];
+
+									// update the boundary
+									collideField[ Q_NUMBER * currentCell + i] = f_inv_i + 2 * LATTICEWEIGHTS[i] * density * c_uwall / C_S_sq;
+
+								} // if neighbor is fluid
+							} // if neighbor coordinates
+						} // for each direction
+						break;
+
+
+					//----- FREE_SLIP ---------------------------------------------------------------------//
+					case FREE_SLIP :
+						// For each direction in the current cell that is perpendicular to a face
+						for (int p = 0; p < 6; ++p) {
+
+							// We want i to take only the values-directions that are perpendicular to a face,
+							// as we assume that neighbors for the free-slip are only the cells that share an interface.
+							i = perpendicular[p];
+
+							// Neighbor cell of current cell in i-direction
+							neighborX = x + LATTICEVELOCITIES[i][0];
+							neighborY = y + LATTICEVELOCITIES[i][1];
+							neighborZ = z + LATTICEVELOCITIES[i][2];
+
+							// Check if the the coordinates of the neighbor cell are valid
+							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+
+								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
+
+								// Check if the neighbor cell is fluid
+								if ( flagField[neighborCell] == FLUID ) {
+									// affected: array of affected directions in the current cell
+									// mirror: array of mirrored directions of affected directions
+									// The mirroring depends on the mirroring plane, that is perpendicular to i
+									switch (i) {
+										case 2: // down face [ 0  1  2  3  4 ] --> [ 14 15 16 17 18 ]
+											affected[0] = 0;  mirror[0] = 14;
+											affected[1] = 1;  mirror[1] = 15;
+											affected[2] = 2;  mirror[2] = 16;
+											affected[3] = 3;  mirror[3] = 17;
+											affected[4] = 4;  mirror[4] = 18;
+											break;
+
+										case 6: // foreground face [ 0  5  6  7 14 ] --> [ 4 11 12 13 18 ]
+											affected[0] = 0;  mirror[0] = 4;
+											affected[1] = 5;  mirror[1] = 11;
+											affected[2] = 6;  mirror[2] = 12;
+											affected[3] = 7;  mirror[3] = 13;
+											affected[4] = 14; mirror[4] = 18;
+											break;
+
+										case 8: // left face [ 1 11  8  5 15 ] --> [ 3 13 10  7 17 ]
+											affected[0] = 1;  mirror[0] = 3;
+											affected[1] = 11; mirror[1] = 13;
+											affected[2] = 8;  mirror[2] = 10;
+											affected[3] = 5;  mirror[3] = 7;
+											affected[4] = 15; mirror[4] = 17;
+											break;
+
+										case 10: // right face [ 3 13 10  7 17 ] --> [ 1 11  8  5 15 ]
+											affected[0] = 3;  mirror[0] = 1;
+											affected[1] = 13; mirror[1] = 11;
+											affected[2] = 10; mirror[2] = 8;
+											affected[3] = 7;  mirror[3] = 5;
+											affected[4] = 17; mirror[4] = 15;
+											break;
+
+										case 12: // background face [ 4 11 12 13 18 ] --> [ 0  5  6  7 14 ]
+											affected[0] = 4;  mirror[0] = 0;
+											affected[1] = 11; mirror[1] = 5;
+											affected[2] = 12; mirror[2] = 6;
+											affected[3] = 13; mirror[3] = 7;
+											affected[4] = 18; mirror[4] = 14;
+											break;
+
+										case 16: // up face [ 14 15 16 17 18 ] --> [ 0  1  2  3  4 ]
+											affected[0] = 14; mirror[0] = 0;
+											affected[1] = 15; mirror[1] = 1;
+											affected[2] = 16; mirror[2] = 2;
+											affected[3] = 17; mirror[3] = 3;
+											affected[4] = 18; mirror[4] = 4;
+											break;
+
+                    default : printf("Error in free slip condition neighbor direction!\n"); break;
+									} // switch i
+
+									// foreach affected direction
+									for (int e = 0; e < 5; ++e) {
+
+										// update the boundary														// Index of the mirrored direction of the neighbor cell.
+										collideField[ Q_NUMBER * currentCell + affected[e] ] = collideField[ Q_NUMBER * neighborCell + mirror[e] ];
+									} // foreach affected
+
+								} // if neighbor is fluid
+							} // if neighbor coordinates
+						} // for each direction
+			//			printf("%d \n",currentCell);
+						break;
+
+					//----- INFLOW ------------------------------------------------------------------------//
+					case INFLOW: case INFLOW_1: case INFLOW_2: case INFLOW_3: case INFLOW_4: case INFLOW_5: {
+
+            // Pick the correct inflow velocity.
+            int currentCelll = flagField[currentCell] - INFLOW; // We pick the flag of the current cell and map it to correct array indices.
+
+            double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z};
+
+						// Compute the equilibrium distribution for the reference density and velocity
+						computeFeq(ref_density, &velocity_concrete[0], &collideField[Q_NUMBER * currentCell]);
+						break;
+          }
+					//----- OUTFLOW -----------------------------------------------------------------------//
+					case OUTFLOW :
+
+						// For each direction in the current cell
+						for (int i = 0; i < Q_NUMBER; ++i) {
+							// Neighbor cell of current cell in i-direction
+							neighborX = x + LATTICEVELOCITIES[i][0];
+							neighborY = y + LATTICEVELOCITIES[i][1];
+							neighborZ = z + LATTICEVELOCITIES[i][2];
+
+							// Check if the the coordinates of the neighbor cell are valid
+							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+
+                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+                neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
+
+                // Check if the neighbor cell is fluid
+								if ( flagField[neighborCell] == FLUID ) {
+                  computeDensity(collideField + neighborCell * Q_NUMBER, &density);
+                  computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
+                  computeFeq(ref_density, &velocity, feq);
+
+									inv_i = Q_NUMBER - i - 1;
+									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
+								} // if neighbor is fluid
+							} // if neighbor coordinates
+						} // for each direction
+						break;
+					//----- PRESSURE_IN -------------------------------------------------------------------//
+					case PRESSURE_IN: case PRESSURE_IN_1: case PRESSURE_IN_2: case PRESSURE_IN_3: case PRESSURE_IN_4: case PRESSURE_IN_5: {
+
+            // Pick the correct density among 6 of them.
+            int currentCelll = flagField[currentCell] - PRESSURE_IN; // We pick the flag of the current cell and map it to correct array indices.
+            double density_concrete = density_in[currentCelll];
+
+						// For each direction in the current cell
+						for (int i = 0; i < Q_NUMBER; ++i) {
+							// Neighbor cell of current cell in i-direction
+							neighborX = x + LATTICEVELOCITIES[i][0];
+							neighborY = y + LATTICEVELOCITIES[i][1];
+							neighborZ = z + LATTICEVELOCITIES[i][2];
+
+							// Check if the the coordinates of the neighbor cell are valid
+							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
+
+                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+                neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+
+                // Check if the neighbor cell is fluid
+								if ( flagField[neighborCell] == FLUID ) {
+									computeDensity(collideField + neighborCell * Q_NUMBER, &density);
+									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
+									computeFeq(&density_concrete, &velocity, feq);
+									inv_i = Q_NUMBER - i - 1;
+									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
+								} // if neighbor is fluid
+
+							} // if neighbor coordinates
+						} // for each direction
+						break;
+          }
+				} // switch flagField
+			} // for x
+		} // for y
+	} // for z
 
 } // function

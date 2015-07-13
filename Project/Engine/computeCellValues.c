@@ -22,7 +22,7 @@ void computeVelocity(const double * const currentCell, const double * const dens
 	//	velocity[0] = LATTICEVELOCITIES[0][0] * currentCell[0];
 	//	velocity[1] = LATTICEVELOCITIES[0][1] * currentCell[0];
 	//	velocity[2] = LATTICEVELOCITIES[0][2] * currentCell[0];
-	//for(unsigned int i = 1; i < Q_NUMBER; ++i){ 
+	//for(unsigned int i = 1; i < Q_NUMBER; ++i){
 	//	velocity[0] += LATTICEVELOCITIES[i][0] * currentCell[i];
 	//	velocity[1] += LATTICEVELOCITIES[i][1] * currentCell[i];
 	//	velocity[2] += LATTICEVELOCITIES[i][2] * currentCell[i];
@@ -97,4 +97,3 @@ void computeFeq(const double * const density, const double * const velocity, dou
 	//	feq[i] = LATTICEWEIGHTS[i] * *density * (  OneMinusu_u_2c2 + c_u_c2 + c_u_c2 * c_u_c2 * 0.5 );
 	//}
 }
-

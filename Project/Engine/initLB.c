@@ -3,16 +3,14 @@
 #include "helper.h"
 #include "LBDefinitions.h"
 
-int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
+int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, double_3d * const inflow, double * const pressure_in, double * const ref_density, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
 		return 1;
 	}
 	else {
 		const char *szFileName = NULL;
-		szFileName = argv[1];  
-
-		
+		szFileName = argv[1];
 
 		read_int( szFileName, "xlength", xlength );
 		read_int( szFileName, "ylength", xlength + 1 );
@@ -25,12 +23,50 @@ int readParameters(int * const xlength, double * const tau, double * const veloc
 		READ_DOUBLE( szFileName, *tau );
 		READ_INT( szFileName, *timesteps );
 		READ_INT( szFileName, *timestepsPerPlotting );
+
+		// who needs loops? :)
+		read_double( szFileName, "inflow_0_v_x", &inflow[0].x);
+		read_double( szFileName, "inflow_0_v_y", &inflow[0].y);
+		read_double( szFileName, "inflow_0_v_z", &inflow[0].z);
+
+		read_double( szFileName, "inflow_1_v_x", &inflow[1].x);
+		read_double( szFileName, "inflow_1_v_y", &inflow[1].y);
+		read_double( szFileName, "inflow_1_v_z", &inflow[1].z);
+
+		read_double( szFileName, "inflow_2_v_x", &inflow[2].x);
+		read_double( szFileName, "inflow_2_v_y", &inflow[2].y);
+		read_double( szFileName, "inflow_2_v_z", &inflow[2].z);
+
+		read_double( szFileName, "inflow_3_v_x", &inflow[3].x);
+		read_double( szFileName, "inflow_3_v_y", &inflow[3].y);
+		read_double( szFileName, "inflow_3_v_z", &inflow[3].z);
+
+		read_double( szFileName, "inflow_4_v_x", &inflow[4].x);
+		read_double( szFileName, "inflow_4_v_y", &inflow[4].y);
+		read_double( szFileName, "inflow_4_v_z", &inflow[4].z);
+
+		read_double( szFileName, "inflow_5_v_x", &inflow[5].x);
+		read_double( szFileName, "inflow_5_v_y", &inflow[5].y);
+		read_double( szFileName, "inflow_5_v_z", &inflow[5].z);
+
+		read_double( szFileName, "pressure_in_0_d", &pressure_in[0]);
+		read_double( szFileName, "pressure_in_1_d", &pressure_in[1]);
+		read_double( szFileName, "pressure_in_2_d", &pressure_in[2]);
+		read_double( szFileName, "pressure_in_3_d", &pressure_in[3]);
+		read_double( szFileName, "pressure_in_4_d", &pressure_in[4]);
+		read_double( szFileName, "pressure_in_5_d", &pressure_in[5]);
+
+		read_double( szFileName, "densityRef", ref_density);
+
 		read_double( szFileName, "velocityWall1", velocityWall );
 		read_double( szFileName, "velocityWall2", velocityWall + 1 );
 		read_double( szFileName, "velocityWall3", velocityWall + 2 );
 		READ_INT( szFileName, *iProc );
 		READ_INT( szFileName, *jProc );
 		READ_INT( szFileName, *kProc );
+		//for( int i = 0; i < INFLOW_COUNT; ++i){
+		//	printf("inflow[%d].x = %f\n", i, inflow[i].x);
+		//}
 	}
 	return 0;
 }
@@ -80,7 +116,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int zlen2 = cpuDomain[2] + 2;
 	//int xyzlen2 = xlen2 * ylen2 * zlen2;
 
-	
+
 
 	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 

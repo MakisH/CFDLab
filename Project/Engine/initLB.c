@@ -19,7 +19,6 @@ int read_assign_PGM (int *flagField, char *fileName, int *cpuDomain)
 
 	int xlen2 = cpuDomain[0];
 	int ylen2 = cpuDomain[1];
-	int zlen2 = cpuDomain[2];
 	int xylen2 = xlen2 * ylen2;
 
 	if ((file=fopen(fileName,"rb"))==0){
@@ -45,7 +44,7 @@ int read_assign_PGM (int *flagField, char *fileName, int *cpuDomain)
 	sscanf(line,"%d %d\n",&xsize,&ysize);
 
 	/* Rows are x dimension, columns are y dimension */
-	int z = 0, scale_y = 1, scale_x = 1;
+	int z = 0;
 	for (int y = 0; y < ysize; y++){
 		for (int x = 0; x < xsize; x++){
 			int byte;
@@ -183,10 +182,11 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int zlen2 = cpuDomain[2] + 2;
 	//int xyzlen2 = xlen2 * ylen2 * zlen2;
 
+	int xylen2 = xlen2 * ylen2;
 	// Now apply free slip to every x,y slice on z=1 to the end.
 	for (int z = 1; z < cpuDomain[2]; z++){
-		for (int y = 0; y < ysize; y++){
-			for (int x = 0; x < xsize; x++){
+		for (int y = 0; y < cpuDomain[1]; y++){
+			for (int x = 0; x < cpuDomain[0]; x++){
 				flagField[x + y * xlen2 + z * xylen2] = FREE_SLIP;
 			}
 		}

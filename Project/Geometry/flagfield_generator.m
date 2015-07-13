@@ -198,7 +198,9 @@ part_n = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y
 dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_n, 'delimiter', ' ')
 
 % North wings
+WingN(1, wing_w, :) = NO_SLIP;
 WingN(2:wing_l-1, wing_w, :) = FLUID;
+WingN(wing_l, wing_w, :) = NO_SLIP;
 WingN_par = [WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)];
 file_id = file_id + 1;
 dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
@@ -212,7 +214,9 @@ file_id = file_id + 1;
 dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
 
 % South wings
+WingS(1, 1, :) = NO_SLIP;
 WingS(2:wing_l-1, 1, :) = FLUID; 
+WingS(wing_l, 1, :) = NO_SLIP;
 WingS_par = [PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS];
 file_id = file_id + 1;
 dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'],  WingS_par, 'delimiter', ' ')

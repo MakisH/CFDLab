@@ -3,14 +3,14 @@
 #include "helper.h"
 #include "LBDefinitions.h"
 
-int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, double_3d * const inflow, double * const pressure_in, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
+int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, double_3d * const inflow, double * const pressure_in, double * const ref_density, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
 		return 1;
 	}
 	else {
 		const char *szFileName = NULL;
-		szFileName = argv[1];  
+		szFileName = argv[1];
 
 		read_int( szFileName, "xlength", xlength );
 		read_int( szFileName, "ylength", xlength + 1 );
@@ -55,6 +55,8 @@ int readParameters(int * const xlength, double * const tau, double * const veloc
 		read_double( szFileName, "pressure_in_3_d", &pressure_in[3]);
 		read_double( szFileName, "pressure_in_4_d", &pressure_in[4]);
 		read_double( szFileName, "pressure_in_5_d", &pressure_in[5]);
+
+		read_double( szFileName, "densityRef", ref_density);
 
 		read_double( szFileName, "velocityWall1", velocityWall );
 		read_double( szFileName, "velocityWall2", velocityWall + 1 );
@@ -114,7 +116,7 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	int zlen2 = cpuDomain[2] + 2;
 	//int xyzlen2 = xlen2 * ylen2 * zlen2;
 
-	
+
 
 	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
 

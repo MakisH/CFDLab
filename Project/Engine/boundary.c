@@ -7,8 +7,8 @@ void treatBoundary(double *collideField,
 									 int* flagField,
 									 const double * const wallVelocity,
 									 const double * const ref_density,
-                   int *cpuDomain
-                   double_3d *velocityIn
+                   int *cpuDomain,
+                   double_3d *velocityIn,
                    double *density_in){
 
 	int i, inv_i, currentCell, neighborCell;
@@ -204,15 +204,17 @@ void treatBoundary(double *collideField,
 						break;
 
 					//----- INFLOW ------------------------------------------------------------------------//
-					case INFLOW: INFLOW_1: INFLOW_2: INFLOW_3: INFLOW_4: INFLOW_5:
+					case INFLOW: case INFLOW_1: case INFLOW_2: case INFLOW_3: case INFLOW_4: case INFLOW_5: {
 
             // Pick the correct inflow velocity.
-            currentCelll = flagField[currentCell] - INFLOW; // We pick the flag of the current cell and map it to correct array indices.
-            double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z);
+            int currentCelll = flagField[currentCell] - INFLOW; // We pick the flag of the current cell and map it to correct array indices.
+
+            double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z};
 
 						// Compute the equilibrium distribution for the reference density and velocity
 						computeFeq(ref_density, &velocity_concrete[0], &collideField[Q_NUMBER * currentCell]);
 						break;
+          }
 					//----- OUTFLOW -----------------------------------------------------------------------//
 					case OUTFLOW :
 
@@ -242,11 +244,11 @@ void treatBoundary(double *collideField,
 						} // for each direction
 						break;
 					//----- PRESSURE_IN -------------------------------------------------------------------//
-					case PRESSURE_IN: PRESSURE_IN_1: PRESSURE_IN_2: PRESSURE_IN_3: PRESSURE_IN_4: PRESSURE_IN_5:
+					case PRESSURE_IN: case PRESSURE_IN_1: case PRESSURE_IN_2: case PRESSURE_IN_3: case PRESSURE_IN_4: case PRESSURE_IN_5: {
 
             // Pick the correct density among 6 of them.
-            currentCelll = flagField[currentCell] - PRESSURE_IN; // We pick the flag of the current cell and map it to correct array indices.
-            double density_concrete = density_in[curentCelll]
+            int currentCelll = flagField[currentCell] - PRESSURE_IN; // We pick the flag of the current cell and map it to correct array indices.
+            double density_concrete = density_in[currentCelll];
 
 						// For each direction in the current cell
 						for (int i = 0; i < Q_NUMBER; ++i) {
@@ -273,7 +275,7 @@ void treatBoundary(double *collideField,
 							} // if neighbor coordinates
 						} // for each direction
 						break;
-
+          }
 				} // switch flagField
 			} // for x
 		} // for y

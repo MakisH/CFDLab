@@ -16,6 +16,7 @@ int readParameters(
 		int * const timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
 		double_3d * const inflow,											/* array of structures (AoS) holding inflow values for x, y and z directions */
 		double * const pressure_in,								/* AoS holding pressure_in values for x, y and z directions */
+		double * const ref_density,
 		int * const iProc,                         /* Number of processes-subdomains per x-direction */
 		int * const jProc,                         /* Number of processes-subdomains per y-direction */
 		int * const kProc,                         /* Number of processes-subdomains per z-direction */
@@ -44,4 +45,3 @@ void initialiseBuffers(
 	const int * const neighbor
 );
 #endif
-

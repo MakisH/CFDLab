@@ -7,9 +7,9 @@ void treatBoundary(double *collideField,
 									 int* flagField,
 									 const double * const wallVelocity,
 									 const double * const ref_density,
-									 const double * const velocityIn,
-									 const double * const density_in
-                   int *cpuDomain){
+                   int *cpuDomain
+                   double_3d *velocityIn
+                   double *density_in){
 
 	int i, inv_i, currentCell, neighborCell;
 	int neighborX, neighborY, neighborZ;
@@ -205,8 +205,13 @@ void treatBoundary(double *collideField,
 
 					//----- INFLOW ------------------------------------------------------------------------//
 					case INFLOW: INFLOW_1: INFLOW_2: INFLOW_3: INFLOW_4: INFLOW_5:
+
+            // Pick the correct inflow velocity.
+            currentCelll = flagField[currentCell] - INFLOW; // We pick the flag of the current cell and map it to correct array indices.
+            double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z);
+
 						// Compute the equilibrium distribution for the reference density and velocity
-						computeFeq(ref_density, velocityIn, &collideField[Q_NUMBER * currentCell]);
+						computeFeq(ref_density, &velocity_concrete[0], &collideField[Q_NUMBER * currentCell]);
 						break;
 					//----- OUTFLOW -----------------------------------------------------------------------//
 					case OUTFLOW :
@@ -239,6 +244,10 @@ void treatBoundary(double *collideField,
 					//----- PRESSURE_IN -------------------------------------------------------------------//
 					case PRESSURE_IN: PRESSURE_IN_1: PRESSURE_IN_2: PRESSURE_IN_3: PRESSURE_IN_4: PRESSURE_IN_5:
 
+            // Pick the correct density among 6 of them.
+            currentCelll = flagField[currentCell] - PRESSURE_IN; // We pick the flag of the current cell and map it to correct array indices.
+            double density_concrete = density_in[curentCelll]
+
 						// For each direction in the current cell
 						for (int i = 0; i < Q_NUMBER; ++i) {
 							// Neighbor cell of current cell in i-direction
@@ -256,7 +265,7 @@ void treatBoundary(double *collideField,
 								if ( flagField[neighborCell] == FLUID ) {
 									computeDensity(collideField + neighborCell * Q_NUMBER, &density);
 									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
-									computeFeq(density_in, &velocity, feq);
+									computeFeq(&density_concrete, &velocity, feq);
 									inv_i = Q_NUMBER - i - 1;
 									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
 								} // if neighbor is fluid

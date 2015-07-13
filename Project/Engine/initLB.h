@@ -1,6 +1,12 @@
 #ifndef _INITLB_H_
 #define _INITLB_H_
 
+typedef struct {
+	double x;
+	double y;
+	double z;
+} double_3d;
+
 /* reads the parameters for the lid driven cavity scenario from a config file */
 int readParameters(
 		int * const xlength,                       /* reads domain size. Parameter name: "xlength" */
@@ -8,6 +14,8 @@ int readParameters(
 		double * const velocityWall,               /* velocity of the lid. Parameter name: "characteristicvelocity" */
 		int * const timesteps,                     /* number of timesteps. Parameter name: "timesteps" */
 		int * const timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
+		double_3d * const inflow,											/* array of structures (AoS) holding inflow values for x, y and z directions */
+		double * const pressure_in,								/* AoS holding pressure_in values for x, y and z directions */
 		int * const iProc,                         /* Number of processes-subdomains per x-direction */
 		int * const jProc,                         /* Number of processes-subdomains per y-direction */
 		int * const kProc,                         /* Number of processes-subdomains per z-direction */

@@ -13,6 +13,7 @@
 
 #define MOVING_WALL 10
 
+#define INFLOW_COUNT 6
 #define INFLOW 30
 #define INFLOW_1 31
 #define INFLOW_2 32
@@ -20,6 +21,7 @@
 #define INFLOW_4 34
 #define INFLOW_5 35
 
+#define PRESSURE_IN_COUNT 6
 #define PRESSURE_IN 50
 #define PRESSURE_IN_1 51
 #define PRESSURE_IN_2 52

@@ -26,14 +26,17 @@ int main(int argc, char *argv[]){
 	double velocityWall[3];
 	int timesteps;
 	int timestepsPerPlotting;
+	double_3d * inflow = (double_3d *) malloc(INFLOW_COUNT * sizeof(double_3d));
+	double * pressure_in = (double *) malloc(PRESSURE_IN_COUNT * sizeof(double));
 	int iProc, jProc, kProc;
 	int error_code;
-
+	
 	int cpuDomain[3];
 	// Read the config file using only one thread
 	if(0 == rank){
-		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, &iProc, &jProc, &kProc, argc, argv);
-// Error checking
+		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, 
+inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
+		// Error checking
 		if(error_code) return error_code;
 		else if(0 == iProc || 0 == jProc || 0 == kProc){
 			printf("Invalid number of processors in some dimension(cannot be 0)!\n");
@@ -60,7 +63,12 @@ int main(int argc, char *argv[]){
 	MPI_Bcast( &jProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( &kProc, 1, MPI_INT, 0, MPI_COMM_WORLD );
 	MPI_Bcast( cpuDomain, 3, MPI_INT, 0, MPI_COMM_WORLD );
+
+	MPI_Bcast( inflow, INFLOW_COUNT * 3 /* 3 because of 3d case */, MPI_DOUBLE, 0, MPI_COMM_WORLD );
+	MPI_Bcast( pressure_in, PRESSURE_IN_COUNT, MPI_DOUBLE, 0, MPI_COMM_WORLD );
+
 	/*
+
 //// test for correct data reading
 //	printf("\
 //xlength x y z		= %d %d %d\n \

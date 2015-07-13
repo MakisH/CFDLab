@@ -5,7 +5,7 @@
 #---------------------------------------------------
 #  "problem" argument
 #---------------------------------------------------
-problem			          lbm_mi_building
+#problem			          lbm_mi_building
 
 #---------------------------------------------------
 #  size of the domain
@@ -32,9 +32,9 @@ timestepsPerPlotting        2
 #---------------------------------------------------
 
 # INFLOW
-inflow_v_x                  0.0
-inflow_v_y                  0.0
-inflow_v_z                  0.0
+inflow_0_v_x                0.0
+inflow_0_v_y                0.0
+inflow_0_v_z                0.0
 
 # INFLOW_1
 inflow_1_v_x                0.0
@@ -63,7 +63,7 @@ inflow_5_v_z                0.0
 
 
 # PRESSURE_IN
-pressure_in_d               -1
+pressure_in_0_d               -1
 # PRESSURE_IN_1
 pressure_in_1_d             -1
 # PRESSURE_IN_1
@@ -76,7 +76,7 @@ pressure_in_4_d             -1
 pressure_in_5_d             -1
 
 # Reference density
-densityRef                  1.0
+#densityRef                  1.0
 
 #--------------------------------------------
 #  Moving wall velocity|(if any)
@@ -90,5 +90,5 @@ velocityWall3		      0.0
 #  MPI parameters
 #--------------------------------------------
 iProc                       2
-jProc                       1
-kProc                       1
+jProc                       2
+kProc                       2

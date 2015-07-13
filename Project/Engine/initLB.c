@@ -3,6 +3,71 @@
 #include "helper.h"
 #include "LBDefinitions.h"
 
+int read_assign_PGM (int *flagField, char *fileName, int *cpuDomain)
+{
+	/*
+		One CPU, one flagField, streamField, collideField. Martin gives pointers to proper sections of this arrays
+		We initilize flagField with values of PGM file.
+		We (just in case, if we'll need that somewhere) also copy the dimensions of PGM from PGM file.
+	*/
+
+	/* READ THE PGM FILE, STORE IN FLAGFIELD */
+
+	FILE *file = NULL;
+	char line[1024];
+	int xsize, ysize;
+
+	int xlen2 = cpuDomain[0];
+	int ylen2 = cpuDomain[1];
+	int zlen2 = cpuDomain[2];
+	int xylen2 = xlen2 * ylen2;
+
+	if ((file=fopen(fileName,"rb"))==0){
+		char szBuff[80];
+				sprintf( szBuff, "Can not read file %s !!!", fileName );
+				//ERROR( szBuff );
+				return 1;
+	}
+
+	/* check for the right "magic number" */
+	if ( fread(line,1,3,file)!=3 )
+	{
+					fclose(file);
+					//ERROR("Error Wrong Magic field!");
+					return 1;
+	}
+
+	do
+	if(fgets(line,sizeof line,file));
+	while(*line=='#');
+
+	/* read the width and height */
+	sscanf(line,"%d %d\n",&xsize,&ysize);
+
+	/* Rows are x dimension, columns are y dimension */
+	int z = 0, scale_y = 1, scale_x = 1;
+	for (int y = 0; y < ysize; y++){
+		for (int x = 0; x < xsize; x++){
+			int byte;
+			if(fscanf(file, "%d", &byte));
+			printf("%d ", byte);
+
+			flagField[x + y * xlen2 + z * xylen2] = byte;
+
+			if (byte==EOF){
+				fclose(file);
+				//ERROR("read failed");
+				return 1;
+			}
+		}
+	printf("\n");
+	}
+	fclose(file);
+
+	return 1;
+}
+
+
 int readParameters(int * const xlength, double * const tau, double * const velocityWall, int * const timesteps, int * const timestepsPerPlotting, double_3d * const inflow, double * const pressure_in, double * const ref_density, int * const iProc, int * const jProc, int * const kProc,  int argc,  char *  *  argv){
 	if ( argc != 2 ) {
 		printf("Usage: ./lbsim input_file");
@@ -110,133 +175,22 @@ void initialiseBuffers(double **sendBuffer, double **readBuffer, const int * con
 void initialiseFields(double *collideField, double *streamField, int *flagField, const int * const cpuDomain, const int iProc, const int jProc, const int kProc, const int rank, int * const neighbor){
 	// local domain is altogether Dlength + 2, where the first and last cells are either buffer(parallel boundary) or global domain(no slip)
 
+
+	// ALERT!! -> How is cpuDomain defined?? cpuDomain+2 might be too much!
 	int x, y, z, i;
 	int xlen2 = cpuDomain[0] + 2;
 	int ylen2 = cpuDomain[1] + 2;
 	int zlen2 = cpuDomain[2] + 2;
 	//int xyzlen2 = xlen2 * ylen2 * zlen2;
 
-
-
-	// Global domain, CPU order: (iProc = x_axis, jProc = y_axis, kProc = z_axis)
-
-	// Example (CUBE iProc*jProc*kProc = 4 * 3 * 2: -> for columns, three rows, two slices
-	// first x,z plane
-	// 8 9 10 11
-	// 4 5 6 7
-	// 1 2 3 4
-
-	// second x,z plane
-	// 20 21 22 23
-	// 16 17 18 19
-	// 12 13 14 15
-
-	// Boundary init.
-	// Left boundary. If true, then we pick the left plane A=A(x=0, y, z) of this process and define it as no-slip.
-	if (rank % iProc == 0){
-		for (z = 0; z < zlen2; z++) {
-			for (y = 0; y < ylen2; y++) {
-				flagField[y * xlen2 + z * xlen2 * ylen2] = NO_SLIP;
+	// Now apply free slip to every x,y slice on z=1 to the end.
+	for (int z = 1; z < cpuDomain[2]; z++){
+		for (int y = 0; y < ysize; y++){
+			for (int x = 0; x < xsize; x++){
+				flagField[x + y * xlen2 + z * xylen2] = FREE_SLIP;
 			}
 		}
-		neighbor[DIR_L] = MPI_PROC_NULL;
-	} else {
-
-		for (z = 0; z < zlen2; z++) {
-			for (y = 0; y < ylen2; y++) {
-				flagField[y * xlen2 + z * xlen2 * ylen2] = PARALLEL_BOUNDARY;
-			}
-		}
-		neighbor[DIR_L] = rank - 1;
 	}
-
-	// Right boundary. If true, then we pick the right plane A=A(x=xlen, y, z) of this process and define it as no-slip.
-	if (rank % iProc == iProc - 1){
-		for (z = 0; z < zlen2; z++) {
-			for (y = 0; y < ylen2; y++) {
-				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = NO_SLIP;
-			}
-		}
-		neighbor[DIR_R] = MPI_PROC_NULL;
-	} else {
-			for (z = 0; z < zlen2; z++) {
-				for (y = 0; y < ylen2; y++) {
-				flagField[(xlen2 - 1) + y * xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
-			}
-		}
-		neighbor[DIR_R] = rank + 1;
-}
-
-	// Front boundary. If true, then we pick the front plane A=A(x,y=0,z) of this process and define it as no-slip.
-	if (rank / iProc %jProc == 0){
-		for (z = 0; z < zlen2; z++) {
-			for (x = 0; x < xlen2; x++) {
-				flagField[x + z * xlen2*ylen2] = NO_SLIP;
-			}
-		}
-		neighbor[DIR_F] = MPI_PROC_NULL;
-	} else {
-			for (z = 0; z < zlen2; z++) {
-				for (x = 0; x < xlen2; x++) {
-					flagField[x + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
-				}
-			}
-			neighbor[DIR_F] = rank - iProc;
-		}
-
-	// Back boundary. If true, then we pick the back plane A=A(x,y=ylen,z) of this process and define it as no-slip.
-	if (rank / iProc % jProc == jProc -1){
-		for (z = 0; z < zlen2; z++) {
-			for (x = 0; x < xlen2; x++) {
-				flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = NO_SLIP;
-			}
-		}
-		neighbor[DIR_B] = MPI_PROC_NULL;
-	} else {
-			for (z = 0; z < zlen2; z++) {
-				for (x = 0; x < xlen2; x++) {
-					flagField[x + (ylen2 - 1)*xlen2 + z * xlen2*ylen2] = PARALLEL_BOUNDARY;
-				}
-			}
-			neighbor[DIR_B] = rank + iProc;
-	}
-
-	// Top boundary. If true, then we pick the top plane A=A(x,y,z=zlen2) of this process and define it as moving-boundary(!).
-	if (rank / iProc / jProc == kProc - 1) {
-		for (y = 0; y < ylen2; y++) {
-			for (x = 0; x < xlen2; x++) {
-				flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = MOVING_WALL;
-			}
-		}
-		neighbor[DIR_T] = MPI_PROC_NULL;
-	} else {
-
-			for (y = 0; y < ylen2; y++) {
-				for (x = 0; x < xlen2; x++) {
-					flagField[x + y*xlen2 + (zlen2 - 1) * xlen2*ylen2] = PARALLEL_BOUNDARY;
-				}
-			}
-			neighbor[DIR_T] = rank + iProc * jProc;
-		}
-
-	// Bottom boundary. If true, then we pick the bottom plane A=A(x,y,z=0) of this process and define it as no-slip.
-	if (rank / iProc / jProc == 0) {
-		for (y = 0; y < ylen2; y++) {
-			for (x = 0; x < xlen2; x++) {
-				flagField[x + y*xlen2] = NO_SLIP;
-			}
-		}
-		neighbor[DIR_D] = MPI_PROC_NULL;
-	} else {
-
-		for (y = 0; y < ylen2; y++) {
-			for (x = 0; x < xlen2; x++) {
-				flagField[x + y*xlen2] = PARALLEL_BOUNDARY;
-			}
-		}
-		neighbor[DIR_D] = rank - iProc * jProc;
-	}
-
 
 	/* stream & collide Fields initialization. */
 	for (z = 0; z < zlen2; ++z){
@@ -246,15 +200,6 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 					streamField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
 					collideField[Q_NUMBER * (x + y * xlen2 + z * xlen2*ylen2) + i] = LATTICEWEIGHTS[i];
 				}
-			}
-		}
-	}
-
-	// Fluid init (inner part of flagField).
-	for (z = 1; z <= zlen2-2; ++z) {
-		for (y = 1; y <= ylen2-2; ++y) {
-			for (x= 1; x <= xlen2-2; ++x) {
-				flagField[x + y * xlen2 + z * xlen2 * ylen2] = FLUID;
 			}
 		}
 	}

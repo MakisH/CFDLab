@@ -110,7 +110,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 // send and read buffers for all possible directions :
 	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 	double *sendBuffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL}; // needed for free, otherwise gives a stupid error.
-	double *readBuffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL};;
+	double *readBuffer[6] = {NULL, NULL, NULL, NULL, NULL, NULL};
 	int sizeBuffer[6];
 	initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer, neighbor);
 	double *tmp = NULL;

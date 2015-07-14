@@ -161,10 +161,10 @@ for i=2:5
 end
 
 % Visualize the domain
-image(10*MI(:,:,1));
+image(rot90(10*MI(:,:,1)));
 axis equal
-xlim([0 Ny + 1]) % x for the graph only
-ylim([0 Nx + 1]) % y for the graph only
+xlim([0 Nx + 1]) % x for the graph only
+ylim([0 Ny + 1]) % y for the graph only
 
 % Write pgm files
 % Main Hall

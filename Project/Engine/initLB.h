@@ -7,6 +7,10 @@ typedef struct {
 	double z;
 } double_3d;
 
+/* Reads PGM file and assigns it to flagField. */
+int read_assign_PGM (int *flagField, char *fileName, int *cpuDomain);
+
+
 /* reads the parameters for the lid driven cavity scenario from a config file */
 int readParameters(
 		int * const xlength,                       /* reads domain size. Parameter name: "xlength" */

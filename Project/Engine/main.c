@@ -17,7 +17,7 @@ int main(int argc, char *argv[]){
 	int rank;
 	int np;
 
-	
+
 	// Start MPI
 	// slow for more processors ???
 	initializeMPI( &rank, &np, argc, argv);
@@ -30,12 +30,13 @@ int main(int argc, char *argv[]){
 	double * pressure_in = (double *) malloc(PRESSURE_IN_COUNT * sizeof(double));
 	int iProc, jProc, kProc;
 	int error_code;
-	
+	double ref_density;
+
 	int cpuDomain[3];
 	// Read the config file using only one thread
 	if(0 == rank){
-		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting, 
-inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
+		error_code = readParameters( xlength, &tau, velocityWall, &timesteps, &timestepsPerPlotting,
+inflow, pressure_in, &ref_density, &iProc, &jProc, &kProc, argc, argv);
 		// Error checking
 		if(error_code) return error_code;
 		else if(0 == iProc || 0 == jProc || 0 == kProc){
@@ -66,6 +67,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 
 	MPI_Bcast( inflow, INFLOW_COUNT * 3 /* 3 because of 3d case */, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 	MPI_Bcast( pressure_in, PRESSURE_IN_COUNT, MPI_DOUBLE, 0, MPI_COMM_WORLD );
+	MPI_Bcast( &ref_density, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 
 	/*
 
@@ -155,7 +157,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 		if (neighbor[DIR_B] != MPI_PROC_NULL)	injection( collideField, cpuDomain, readBuffer,DIR_F, Bsides_inj);
 
 		//printf("before boundary\n");
-		treatBoundary( collideField, flagField, velocityWall, cpuDomain);
+		treatBoundary( collideField, flagField, velocityWall, &ref_density, cpuDomain, inflow, pressure_in);
 		//printf("before streaming\n");
 		doStreaming( collideField, streamField, flagField, cpuDomain);
 
@@ -165,7 +167,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 		//printf("before collision\n");
 		doCollision( collideField, flagField, &tau, cpuDomain );
 		//printf("after collision\n");
-		
+
 		//printf("%d time\n",t);
 		if ( t % timestepsPerPlotting == 0 ) {
 				//printf("%d cpu x\n", cpuDomain[0]);
@@ -193,7 +195,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 	free((void *)readBuffer[3]);
 	free((void *)readBuffer[4]);
 	free((void *)readBuffer[5]);
-	
+
 	free((void *)sendBuffer[0]);
 	free((void *)sendBuffer[1]);
 	free((void *)sendBuffer[2]);
@@ -201,7 +203,7 @@ inflow, pressure_in, &iProc, &jProc, &kProc, argc, argv);
 	free((void *)sendBuffer[4]);
 	free((void *)sendBuffer[5]);
 	finalizeMPI();
-	
+
 	return 0;
 }
 #endif

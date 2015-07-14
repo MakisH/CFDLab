@@ -76,7 +76,7 @@ pressure_in_4_d             -1
 pressure_in_5_d             -1
 
 # Reference density
-#densityRef                  1.0
+densityRef                  1.0
 
 #--------------------------------------------
 #  Moving wall velocity|(if any)

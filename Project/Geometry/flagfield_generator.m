@@ -24,9 +24,9 @@ PRESSURE_IN_5   = 55;
 
 PARALLEL_BOUNDARY = 7;
 
-
-% Set this
+% Set these
 x = 8;
+max_flag = 55;
 
 % Dimensions for the hall and the wings
 % l=length (x), w=width (y), h=height (z), d=distance
@@ -161,10 +161,10 @@ for i=2:5
 end
 
 % Visualize the domain
-image(10*MI(:,:,1));
+image(rot90(10*MI(:,:,1)));
 axis equal
-xlim([0 Ny + 1]) % x for the graph only
-ylim([0 Nx + 1]) % y for the graph only
+xlim([0 Nx + 1]) % x for the graph only
+ylim([0 Ny + 1]) % y for the graph only
 
 % Write pgm files
 % Main Hall
@@ -177,8 +177,12 @@ x_start = 1;
 x_end = hall_part_l;
 y_start = wing_w;
 y_end = y_start + hall_w -1;
-part_0 = [MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
-dlmwrite('pgm/cpu_0.pgm', part_0, 'delimiter', ' ')
+part_0 = rot90([MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]);
+f_name = 'pgm/cpu_0.pgm';
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_0,2)), ' ', num2str(size(part_0,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite('pgm/cpu_0.pgm', part_0, '-append', 'delimiter', ' ')
 
 file_id = 0;
 
@@ -187,45 +191,101 @@ for i=1:n_cpus-2
     x_start = x_start + hall_part_l;
     x_end = x_end + hall_part_l;
     clear part_i
-    part_i = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)];
-    dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_i, 'delimiter', ' ')
+    part_i = rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]);
+    f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+    f_id = fopen(f_name,'w');
+    fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_i,2)), ' ', num2str(size(part_i,1)), ' ', num2str(max_flag)]);
+    fclose(f_id);
+    dlmwrite(f_name, part_i, '-append', 'delimiter', ' ')
 end
 
 file_id = file_id + 1;
 x_start = x_start + hall_part_l;
 x_end = x_end + hall_part_l;
-part_n = [PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)];
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_n, 'delimiter', ' ')
+part_n = rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)]);
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_n,2)), ' ', num2str(size(part_n,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_n, '-append', 'delimiter', ' ')
 
 % North wings
 WingN(1, wing_w, :) = NO_SLIP;
 WingN(2:wing_l-1, wing_w, :) = FLUID;
 WingN(wing_l, wing_w, :) = NO_SLIP;
-WingN_par = [WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)];
+WingN_par = rot90([WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)]);
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingN_par,2)), ' ', num2str(size(WingN_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingN_par,2)), ' ', num2str(size(WingN_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingN_par,2)), ' ', num2str(size(WingN_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingN_par,2)), ' ', num2str(size(WingN_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingN_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingN_par,2)), ' ', num2str(size(WingN_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
 
 % South wings
 WingS(1, 1, :) = NO_SLIP;
 WingS(2:wing_l-1, 1, :) = FLUID; 
 WingS(wing_l, 1, :) = NO_SLIP;
-WingS_par = [PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS];
+WingS_par = rot90([PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS]);
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'],  WingS_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingS_par,2)), ' ', num2str(size(WingS_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name,  WingS_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingS_par,2)), ' ', num2str(size(WingS_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingS_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingS_par,2)), ' ', num2str(size(WingS_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingS_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingS_par,2)), ' ', num2str(size(WingS_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingS_par, '-append', 'delimiter', ' ')
+
 file_id = file_id + 1;
-dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], WingS_par, 'delimiter', ' ')
+f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
+f_id = fopen(f_name,'w');
+fprintf(f_id, '%s\n', ['P3 ', num2str(size(WingS_par,2)), ' ', num2str(size(WingS_par,1)), ' ', num2str(max_flag)]);
+fclose(f_id);
+dlmwrite(f_name, WingS_par, '-append', 'delimiter', ' ')
 

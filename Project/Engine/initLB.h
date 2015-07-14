@@ -7,6 +7,10 @@ typedef struct {
 	double z;
 } double_3d;
 
+/* Reads PGM file and assigns it to flagField. */
+int read_assign_PGM (int *flagField, char *fileName, int *cpuDomain);
+
+
 /* reads the parameters for the lid driven cavity scenario from a config file */
 int readParameters(
 		int * const xlength,                       /* reads domain size. Parameter name: "xlength" */
@@ -16,6 +20,7 @@ int readParameters(
 		int * const timestepsPerPlotting,          /* timesteps between subsequent VTK plots. Parameter name: "vtkoutput" */
 		double_3d * const inflow,											/* array of structures (AoS) holding inflow values for x, y and z directions */
 		double * const pressure_in,								/* AoS holding pressure_in values for x, y and z directions */
+		double * const ref_density,
 		int * const iProc,                         /* Number of processes-subdomains per x-direction */
 		int * const jProc,                         /* Number of processes-subdomains per y-direction */
 		int * const kProc,                         /* Number of processes-subdomains per z-direction */
@@ -44,4 +49,3 @@ void initialiseBuffers(
 	const int * const neighbor
 );
 #endif
-

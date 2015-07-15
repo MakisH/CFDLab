@@ -22,7 +22,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 	write_vtkHeader(fp, xlength); // Write the header.
 
-	//write_vtkPointCoordinates(fp, xlength, xlength_global, rank);
+	write_vtkPointCoordinates(fp, xlength, xlength_global, rank);
 
 	// write the densities and velocities.
 	int x, y, z;
@@ -82,56 +82,61 @@ void write_vtkHeader( FILE *fp, const int * const xlength) {
 }
 
 void write_vtkPointCoordinates( FILE *fp, const int * const xlength, const int * const xlength_global, const int rank) {
-	//double x, y, z;
+	double x, y, z;
 
-	//// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1) // -1 because spaces between points are 1 less than the number of points
-	//double dx, dy, dz;
+	// We have unity cubes. So dx = dy = dz = 1 / (xlength - 1) // -1 because spaces between points are 1 less than the number of points
+	double dx, dy, dz;
 
-	//double vtk_distance[3] = {2,16,1};
-	//// start at 0 and finish at 1.0 => len-1
-	//// e.g. for 15 points there are 14 "cells"
-	//// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
-	//dx = vtk_distance[0] / (xlength_global[0]-1);
-	//dy = vtk_distance[1] / (xlength_global[1]-1);
-	//dz = vtk_distance[2] / (xlength_global[2]-1);
+	double vtk_distance[3] = {2,16,1};
+	// start at 0 and finish at 1.0 => len-1
+	// e.g. for 15 points there are 14 "cells"
+	// if (xlength == 1), => dx = 3 => only 1 iteration with (coord == 0)
+	dx = vtk_distance[0] / (xlength_global[0]-1);
+	dy = vtk_distance[1] / (xlength_global[1]-1);
+	dz = 1;//vtk_distance[2] / (xlength_global[2]-1);
 
-	//// A factor of mapping from local CPU cube to the global one.
+	// A factor of mapping from local CPU cube to the global one.
 	//int xFactor = rank % iProc;
 	//int yFactor = rank / iProc % jProc;
 	//int zFactor = rank / iProc / jProc;
 
-	//// The actual mapping.
-	//double xStart = xFactor * xlength[0] * dx;
-	//double yStart = yFactor * xlength[1] * dy;
-	//double zStart = zFactor * xlength[2] * dz;
+	// The actual mapping.
+	double xStart = 0;//xFactor * xlength[0] * dx;
+	double yStart = 0;//yFactor * xlength[1] * dy;
+	double zStart = 0;//zFactor * xlength[2] * dz;
 
-	//double xEnd = ((xFactor + 1) * xlength[0] - 1) * dx;
-	//double yEnd = ((yFactor + 1) * xlength[1] - 1) * dy;
-	//double zEnd = ((zFactor + 1) * xlength[2] - 1) * dz;
+	double xEnd = 2; //((xFactor + 1) * xlength[0] - 1) * dx;
+	double yEnd = 16; //((yFactor + 1) * xlength[1] - 1) * dy;
+	double zEnd = 0.25; //((zFactor + 1) * xlength[2] - 1) * dz;
 
-	////printf("rank %d\n",rank);
-	////printf("dx %f\n", dx);
-	////printf("dy %f\n", dy);
-	////printf("dz %f\n", dz);
+	printf("length gloabl for rank %d\n",rank);
+	printf("x %d\n", xlength_global[0]);
+	printf("y %d\n", xlength_global[1]);
+	printf("z %d\n", xlength_global[2]);
 
-	////printf("xFactor %d\n", xFactor);
-	////printf("yFactor %d\n", yFactor);
-	////printf("zFactor %d\n", zFactor);
+	printf("rank %d\n",rank);
+	printf("dx %f\n", dx);
+	printf("dy %f\n", dy);
+	printf("dz %f\n", dz);
+/*
+	printf("xFactor %d\n", xFactor);
+	printf("yFactor %d\n", yFactor);
+	printf("zFactor %d\n", zFactor);
+*/
+	printf("xStart %f\n", xStart);
+	printf("yStart %f\n", yStart);
+	printf("zStart %f\n", zStart);
 
-	////printf("xStart %f\n", xStart);
-	////printf("yStart %f\n", yStart);
-	////printf("zStart %f\n", zStart);
-
-	////printf("xEnd %f\n", xEnd);
-	////printf("yEnd %f\n", yEnd);
-	////printf("zEnd %f\n\n", zEnd);
-	//// discretization error appears if we don't include an additional "epsilon" factor.
-	//// We implemented eps in a way, that we are always on a safe side.
-	//for (z = zStart; z < zEnd + dz * 0.5; z += dz){
-	//	for (y = yStart; y < yEnd + dy * 0.5; y += dy){
-	//		for (x = xStart; x < xEnd + dx * 0.5; x += dx){
-	//			fprintf(fp, "%f %f %f\n", x, y, z);
-	//		}
-	//	}
-	//}
+	printf("xEnd %f\n", xEnd);
+	printf("yEnd %f\n", yEnd);
+	printf("zEnd %f\n\n", zEnd);
+	// discretization error appears if we don't include an additional "epsilon" factor.
+	// We implemented eps in a way, that we are always on a safe side.
+	for (z = zStart; z < zEnd + dz * 0.5; z += dz){
+		for (y = yStart; y < yEnd + dy * 0.5; y += dy){
+			for (x = xStart; x < xEnd + dx * 0.5; x += dx){
+				fprintf(fp, "%f %f %f\n", x, y, z);
+			}
+		}
+	}
 }

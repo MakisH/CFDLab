@@ -25,34 +25,34 @@ timestepsPerPlotting        2
 #---------------------------------------------------
 
 # INFLOW
-inflow_0_v_x                0.04
-inflow_0_v_y                0.04
-inflow_0_v_z                0.04
+inflow_0_v_x                0.00
+inflow_0_v_y                0.01
+inflow_0_v_z                0.00
 
 # INFLOW_1
-inflow_1_v_x                0.04
-inflow_1_v_y                -0.04
-inflow_1_v_z                0.04
+inflow_1_v_x                0.00
+inflow_1_v_y                0.00
+inflow_1_v_z                0.00
 
 # INFLOW_2
-inflow_2_v_x                0.04
-inflow_2_v_y                0.04
-inflow_2_v_z                0.04
+inflow_2_v_x                0.00
+inflow_2_v_y                0.00
+inflow_2_v_z                0.00
 
 # INFLOW_3
-inflow_3_v_x                0.04
-inflow_3_v_y                0.04
-inflow_3_v_z                0.04
+inflow_3_v_x                0.00
+inflow_3_v_y                0.00
+inflow_3_v_z                0.00
 
 # INFLOW_4
-inflow_4_v_x                0.04
-inflow_4_v_y                0.04
-inflow_4_v_z                0.04
+inflow_4_v_x                0.00
+inflow_4_v_y                0.00
+inflow_4_v_z                0.00
 
 # INFLOW_5
-inflow_5_v_x                0.04
-inflow_5_v_y                0.04
-inflow_5_v_z                0.04
+inflow_5_v_x                0.00
+inflow_5_v_y                0.00
+inflow_5_v_z                0.00
 
 
 # PRESSURE_IN

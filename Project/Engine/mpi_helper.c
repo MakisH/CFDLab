@@ -223,14 +223,14 @@ void extraction(double * const collideField, const int * const cpuDomain, double
 void injection(double * const collideField, const int * const cpuDomain, double * const readBuffer, const int direction,	const int x_start,	const int y_start,	const int z_start,	const int x_end, const int y_end,	const int z_end ) {
 	int currentCell;
 	int cell = -1;
-	//int inv_dir = direction + 1  - direction % 2 * 2;
+	int inv_dir = direction + 1  - direction % 2 * 2;
 	for (int z = z_start; z <= z_end; ++z) {
 		for (int y = y_start; y <= y_end; ++y) {
 			for (int x = x_start; x <= x_end; ++x) {
 				++cell;
 				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2);
 				for (int vel_dir = 0; vel_dir < 5; ++vel_dir) {
-					collideField[Q_NUMBER * currentCell + each[direction][vel_dir]] = readBuffer[5 * cell + vel_dir];
+					collideField[Q_NUMBER * currentCell + each[inv_dir][vel_dir]] = readBuffer[5 * cell + vel_dir];
 				}
 			}
 		}

@@ -156,20 +156,37 @@ void finalizeMPI() {
 //	
 //}
 /// old swap
-void swap(double * const * const sendBuffer, double * const * const readBuffer, const int * const sizeBuffer, const int direction, const int * const neighbor) {
+void swap(double * const sendBuffer, double * const readBuffer, const int rank) {
 	// MPI_Status status; // waiting for status makes it slower ?
-	MPI_Request send_request;
+	MPI_Request * send_request = (MPI_Request *) malloc(neighbours_count[rank] * sizeof(MPI_Request));
+
+	//version 5
+	// send asynchronously to everyone
+	for(int i = 0; i < neighbours_count[rank]; ++i){
+		MPI_Isend(&sendBuffer[neighbours_dir[rank][i]], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, &send_request[i]);
+	}
+	// receive from all neighbours asynchronously
+	for(int i = 0; i < neighbours_count[rank]; ++i){
+		//int inv_dir = neighbours_dir[rank][i]+ 1  - neighbours_dir[rank][i] % 2 * 2;
+		MPI_Recv(&readBuffer[i], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Wait(&send_request[i],MPI_STATUS_IGNORE);
+	}
+	free(send_request);
 	// // version 4
 	//MPI_Sendrecv(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[inv_dir], MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		/// old
 	//// version 3
-	if(neighbor[direction] != MPI_PROC_NULL)	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, MPI_COMM_WORLD, &send_request);
-		// opposite direction is : direction + 1  - direction % 2 * 2
-	int inv_dir = direction + 1  - direction % 2 * 2;
-	if(neighbor[inv_dir] != MPI_PROC_NULL){
-		MPI_Recv(readBuffer[inv_dir], sizeBuffer[inv_dir], MPI_DOUBLE, neighbor[inv_dir], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-	}
-	if(neighbor[direction] != MPI_PROC_NULL)	MPI_Wait(&send_request,MPI_STATUS_IGNORE);
+
+	//MPI_Request send_request ;
+	//if(neighbor[direction] != MPI_PROC_NULL)	MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, MPI_COMM_WORLD, &send_request);
+	//	// opposite direction is : direction + 1  - direction % 2 * 2
+	//int inv_dir = direction + 1  - direction % 2 * 2;
+	//if(neighbor[inv_dir] != MPI_PROC_NULL){
+	//	MPI_Recv(readBuffer[inv_dir], sizeBuffer[inv_dir], MPI_DOUBLE, neighbor[inv_dir], 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+	//}
+	//if(neighbor[direction] != MPI_PROC_NULL)	MPI_Wait(&send_request,MPI_STATUS_IGNORE);
+
+
 	// // version 2
 		//MPI_Isend(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &send_request);
 		//MPI_Recv(readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighborId, 0, MPI_COMM_WORLD, &status);
@@ -184,16 +201,16 @@ void swap(double * const * const sendBuffer, double * const * const readBuffer, 
 
 // before calling - check for NULL neighbor!
 // DIR_R means that Right side of domain is streamed to the Right(3,7,10,13,17)
-void extraction(double * const collideField, const int * const cpuDomain, double * const * const sendBuffer, const int direction, const side * const Bsides) {
+void extraction(double * const collideField, const int * const cpuDomain, double * const sendBuffer, 	const int direction,	const int x_start,	const int y_start,	const int z_start,	const int x_end, const int y_end,	const int z_end) {
 	int currentCell;
 	int cell = -1; // buffer cell
-	for (int z = Bsides[direction].z_start; z <= Bsides[direction].z_end; ++z) {
-		for (int y = Bsides[direction].y_start; y <= Bsides[direction].y_end; ++y) {
-			for (int x = Bsides[direction].x_start; x <= Bsides[direction].x_end; ++x) {
+	for (int z = z_start; z <= z_end; ++z) {
+		for (int y = y_start; y <= y_end; ++y) {
+			for (int x = x_start; x <= x_end; ++x) {
 				++cell; // buffer index - destination
 				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2); // cpuDomain cell index - source
 				for (int dir = 0; dir < 5; ++dir) { // loop over all velocities to be extracted
-					sendBuffer[direction][5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[direction][dir]];
+					sendBuffer[5 * cell + dir] = collideField[Q_NUMBER * currentCell + each[direction][dir]];
 				}
 			}
 		}
@@ -202,17 +219,17 @@ void extraction(double * const collideField, const int * const cpuDomain, double
 
 // before calling - check for NULL neighbor!
 // DIR_R means that we inject from Left to Right  on the Left side(x-)(3,7,10,13,17) 
-void injection(double * const collideField, const int * const cpuDomain, double * const * const readBuffer, const int direction, const side * const Bsides) {
+void injection(double * const collideField, const int * const cpuDomain, double * const readBuffer, const int direction,	const int x_start,	const int y_start,	const int z_start,	const int x_end, const int y_end,	const int z_end ) {
 	int currentCell;
 	int cell = -1;
-	int inv_dir = direction + 1  - direction % 2 * 2;
-	for (int z = Bsides[direction].z_start; z <= Bsides[direction].z_end; ++z) {
-		for (int y = Bsides[direction].y_start; y <= Bsides[direction].y_end; ++y) {
-			for (int x = Bsides[direction].x_start; x <= Bsides[direction].x_end; ++x) {
+	//int inv_dir = direction + 1  - direction % 2 * 2;
+	for (int z = z_start; z <= z_end; ++z) {
+		for (int y = y_start; y <= y_end; ++y) {
+			for (int x = x_start; x <= x_end; ++x) {
 				++cell;
 				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2);
 				for (int vel_dir = 0; vel_dir < 5; ++vel_dir) {
-					collideField[Q_NUMBER * currentCell + each[direction][vel_dir]] = readBuffer[inv_dir][5 * cell + vel_dir];
+					collideField[Q_NUMBER * currentCell + each[direction][vel_dir]] = readBuffer[5 * cell + vel_dir];
 				}
 			}
 		}

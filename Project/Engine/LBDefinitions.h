@@ -54,8 +54,27 @@ static const int * const neighbours_dir[8] = {(int[]){DIR_R,DIR_F,DIR_B},
 																							(int[]){DIR_F,DIR_F,DIR_F},
 																							(int[]){DIR_F,DIR_F}}; // in one direction there may be several transactions(as in cpu 5 and 7)
 
+static const int * const neighbours_procid[8] = {(int[]){1,4,6},
+																								 (int[]){0,2,4,6,6},
+																								 (int[]){1,3,4,7},
+																								 (int[]){2,5,5,7},
+																								 (int[]){0,1,2},
+																								 (int[]){3,3},
+																								 (int[]){0,1,1},
+																								 (int[]){2,3}};
+// this makes the proccess coupling in the communication step - labeling is done from 1 to 13, starting from process 0 and going in "send" direction up to process 3, labeling only new connections
+static const int * const neighbours_tag[8] =		{(int[]){1,4,9},
+																								 (int[]){1,2,5,10,11},
+																								 (int[]){2,3,6,12},
+																								 (int[]){3,7,8,13},
+																								 (int[]){4,5,6},
+																								 (int[]){7,8},
+																								 (int[]){9,10,11},
+																								 (int[]){12,13}};
+
+
 // this is where the sevens are ... meaning it works for injection(because we inject in 7)
-static const int * const neighbours_local_startx[8] = {	(int[]){64,48,16},
+static const int * const neighbours_local_start_x[8] = {	(int[]){64,48,16},
 																												(int[]){0,65,33,1,49},
 																												(int[]){0,65,17,33},
 																												(int[]){0,1,49,17},
@@ -64,7 +83,7 @@ static const int * const neighbours_local_startx[8] = {	(int[]){64,48,16},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_starty[8] = {	(int[]){0,0,31},
+static const int * const neighbours_local_start_y[8] = {	(int[]){0,0,31},
 																												(int[]){0,0,0,31,31},
 																												(int[]){0,0,0,31},
 																												(int[]){0,0,0,31},
@@ -73,7 +92,7 @@ static const int * const neighbours_local_starty[8] = {	(int[]){0,0,31},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_startz[8] = {	(int[]){1,1,1},
+static const int * const neighbours_local_start_z[8] = {	(int[]){1,1,1},
 																												(int[]){1,1,1,1,1},
 																												(int[]){1,1,1,1},
 																												(int[]){1,1,1,1},
@@ -82,7 +101,7 @@ static const int * const neighbours_local_startz[8] = {	(int[]){1,1,1},
 																												(int[]){1,1,1},
 																												(int[]){1,1}};
 
-static const int * const neighbours_local_endx[8] = {	(int[]){64,63,31},
+static const int * const neighbours_local_end_x[8] = {	(int[]){64,63,31},
 																											(int[]){0,65,48,16,64},
 																											(int[]){0,65,32,48},
 																											(int[]){0,16,64,32},
@@ -91,7 +110,7 @@ static const int * const neighbours_local_endx[8] = {	(int[]){64,63,31},
 																											(int[]){15,15,15},
 																											(int[]){15,15}};
 
-static const int * const neighbours_local_endy[8] = {	(int[]){31,0,31},
+static const int * const neighbours_local_end_y[8] = {	(int[]){31,0,31},
 																											(int[]){31,31,0,31,31},
 																											(int[]){31,31,0,31},
 																											(int[]){31,0,0,31},
@@ -100,7 +119,7 @@ static const int * const neighbours_local_endy[8] = {	(int[]){31,0,31},
 																											(int[]){0,0,0},
 																											(int[]){0,0}};
 
-static const int * const neighbours_local_endz[8] = {	(int[]){1,1,1},
+static const int * const neighbours_local_end_z[8] = {	(int[]){1,1,1},
 																											(int[]){1,1,1,1,1},
 																											(int[]){1,1,1,1},
 																											(int[]){1,1,1,1},
@@ -108,6 +127,52 @@ static const int * const neighbours_local_endz[8] = {	(int[]){1,1,1},
 																											(int[]){1,1},
 																											(int[]){1,1,1},
 																											(int[]){1,1}};
+static const int * const neighbours_local_buffer_size[8] = {(int[]){160,80,80},
+																														(int[]){160,160,80,80,80},
+																														(int[]){160,160,80,80},
+																														(int[]){160,80,80,80},
+																														(int[]){80,80,80},
+																														(int[]){80,80},
+																														(int[]){80,80,80},
+																														(int[]){80,80}};
+
+static const int chunk_count[8] = {1,1,1,1,3,2,3,2};
+
+static const int * const chunk_id[8] = {(int[]){0},
+																				(int[]){1},
+																				(int[]){2},
+																				(int[]){3},
+																				(int[]){4,5,6},
+																				(int[]){7,8},
+																				(int[]){9,10,11},
+																				(int[]){12,13}};
+
+static const int * const chunk_begin_offset[8] = {(int[]){0},
+																									(int[]){0},
+																									(int[]){0},
+																									(int[]){0},
+																									(int[]){0,1040,2080},
+																									(int[]){0,1040},
+																									(int[]){0,1040,2080},
+																									(int[]){0,1040}};
+
+static const int * const chunk_size[8] = {(int[]){2080},
+																					(int[]){2080},
+																					(int[]){2080},
+																					(int[]){2080},
+																					(int[]){1040,1040,1040},
+																					(int[]){1040,1040},
+																					(int[]){1040,1040,1040},
+																					(int[]){1040,1040}}; // actually this can be computed from cpuDomain values
+typedef int int3d[3];
+static const int3d * const cpuDomain[8] = {(const int3d[1]){{30,63,1}},
+																(const int3d[1]){{30,63,1}},
+																(const int3d[1]){{30,63,1}},
+																(const int3d[1]){{30,63,1}},
+																(const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
+																(const int3d[2]){{14,63,1},{14,63,1}},
+																(const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
+																(const int3d[2]){{14,63,1},{14,63,1}}};
 
 static const double C_S = 0.577350269189626;
 

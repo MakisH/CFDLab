@@ -7,7 +7,7 @@ void treatBoundary(double *collideField,
 									 int* flagField,
 									 const double * const wallVelocity,
 									 const double * const ref_density,
-                   int *cpuDomain,
+                   const int * const cpuDomain,
                    double_3d *velocityIn,
                    double *density_in);
 

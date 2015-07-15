@@ -17,38 +17,37 @@ void finalizeMPI();
 
 // Transfer the overlapping cells
 void swap(
-	double * const * const sendBuffer,
-	double * const * const readBuffer,
-	const int * const sizeBuffer,
-	const int direction,
-	const int * const neighbor
+	double * const sendBuffer,
+	double * const readBuffer,
+	const int rank
 );
-
-typedef struct  {
-	int x_start;
-	int x_end;
-	int y_start;
-	int y_end;
-	int z_start;
-	int z_end;
-}side ;
 
 // Do the extraction
 void extraction(
 	double * const collideField,
 	const int * const cpuDomain,
-	double * const * const sendBuffer,
+	double * const sendBuffer,
 	const int direction,
-	const side * const Bsides
+	const int x_start,
+	const int y_start,
+	const int z_start,
+	const int x_end,
+	const int y_end,
+	const int z_end
 );
 
 // Do the injection
 void injection(
 	double * const collideField,
 	const int * const cpuDomain,
-	double * const * const readBuffer,
+	double * const readBuffer,
 	const int direction,
-	const side * const Bsides
+	const int x_start,
+	const int y_start,
+	const int z_start,
+	const int x_end,
+	const int y_end,
+	const int z_end
 );
 
 #endif

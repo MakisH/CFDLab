@@ -125,87 +125,87 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 			origin[0] = 24*XSIZE+1;
 			origin[1] = 8*XSIZE;
 			origin[2] = 0;
-			end[0] = 32*XSIZE-2;
+			end[0] = 32*XSIZE;
 			end[1] = 12*XSIZE-3;
 			end[2] = 0;
 			break;
 		case 4:
-			origin[0] = 6*XSIZE+1;
+			origin[0] = 6*XSIZE+2;
 			origin[1] = 1;
 			origin[2] = 0;
-			end[0] = 8*XSIZE-2;
-			end[1] = 8*XSIZE-2;
+			end[0] = 8*XSIZE;
+			end[1] = 8*XSIZE-1;
 			end[2] = 0;
 			break;
 		case 5:
-			origin[0] = 12*XSIZE+1;
+			origin[0] = 12*XSIZE+2;
 			origin[1] = 1;
 			origin[2] = 0;
-			end[0] = 14*XSIZE-2;
-			end[1] = 8*XSIZE-2;
+			end[0] = 14*XSIZE;
+			end[1] = 8*XSIZE-1;
 			end[2] = 0;
 			break;
 		case 6:
-			origin[0] = 18*XSIZE+1;
+			origin[0] = 18*XSIZE+2;
 			origin[1] = 1;
 			origin[2] = 0;
-			end[0] = 20*XSIZE-2;
-			end[1] = 8*XSIZE-2;
+			end[0] = 20*XSIZE;
+			end[1] = 8*XSIZE-1;
 			end[2] = 0;
 			break;
 		case 7:
-			origin[0] = 24*XSIZE+1;
+			origin[0] = 24*XSIZE+2;
 			origin[1] = 1;
 			origin[2] = 0;
-			end[0] = 26*XSIZE-2;
-			end[1] = 8*XSIZE-2;
+			end[0] = 26*XSIZE;
+			end[1] = 8*XSIZE-1;
 			end[2] = 0;
 			break;
 		case 8:
-			origin[0] = 30*XSIZE+1;
+			origin[0] = 30*XSIZE+2;
 			origin[1] = 1;
 			origin[2] = 0;
-			end[0] = 32*XSIZE-2;
-			end[1] = 8*XSIZE-2;
+			end[0] = 32*XSIZE;
+			end[1] = 8*XSIZE-1;
 			end[2] = 0;
 			break;
 		case 9:
 			origin[0] = 2*XSIZE+1;
-			origin[1] = 12*XSIZE-1;
+			origin[1] = 12*XSIZE-2;
 			origin[2] = 0;
-			end[0] = 4*XSIZE-2;
+			end[0] = 4*XSIZE-1;
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;
 		case 10:
 			origin[0] = 8*XSIZE+1;
-			origin[1] = 12*XSIZE-1;
+			origin[1] = 12*XSIZE-2;
 			origin[2] = 0;
-			end[0] = 10*XSIZE-2;
+			end[0] = 10*XSIZE-1;
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;
 		case 11:
 			origin[0] = 14*XSIZE+1;
-			origin[1] = 12*XSIZE-1;
+			origin[1] = 12*XSIZE-2;
 			origin[2] = 0;
-			end[0] = 16*XSIZE-2;
+			end[0] = 16*XSIZE-1;
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;
 		case 12:
 			origin[0] = 20*XSIZE+1;
-			origin[1] = 12*XSIZE-1;
+			origin[1] = 12*XSIZE-2;
 			origin[2] = 0;
-			end[0] = 22*XSIZE-2;
+			end[0] = 22*XSIZE-1;
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;
 		case 13:
 			origin[0] = 26*XSIZE+1;
-			origin[1] = 12*XSIZE-1;
+			origin[1] = 12*XSIZE-2;
 			origin[2] = 0;
-			end[0] = 28*XSIZE-2;
+			end[0] = 28*XSIZE-1;
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;

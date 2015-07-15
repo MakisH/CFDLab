@@ -127,6 +127,7 @@ static const int * const neighbours_local_end_z[8] = {	(int[]){2,2,2},
 																											(int[]){2,2},
 																											(int[]){2,2,2},
 																											(int[]){2,2}};
+
 static const int * const neighbours_local_buffer_size[8] = {(int[]){480,240,240},
 																														(int[]){480,480,240,240,240},
 																														(int[]){480,480,240,240},
@@ -151,28 +152,28 @@ static const int * const chunk_begin_offset[8] = {(int[]){0},
 																									(int[]){0},
 																									(int[]){0},
 																									(int[]){0},
-																									(int[]){0,1040,2080},
-																									(int[]){0,1040},
-																									(int[]){0,1040,2080},
-																									(int[]){0,1040}};
+																									(int[]){0,3120,6240},
+																									(int[]){0,3120},
+																									(int[]){0,3120,6240},
+																									(int[]){0,3120}};
 
-static const int * const chunk_size[8] = {(int[]){2080},
-																					(int[]){2080},
-																					(int[]){2080},
-																					(int[]){2080},
-																					(int[]){1040,1040,1040},
-																					(int[]){1040,1040},
-																					(int[]){1040,1040,1040},
-																					(int[]){1040,1040}}; // actually this can be computed from cpuDomain values
+static const int * const chunk_size[8] = {(int[]){6240},
+																					(int[]){6240},
+																					(int[]){6240},
+																					(int[]){6240},
+																					(int[]){3120,3120,3120},
+																					(int[]){3120,3120},
+																					(int[]){3120,3120,3120},
+																					(int[]){3120,3120}}; // actually this can be computed from cpuDomain values
 typedef int int3d[3];
-static const int3d * const cpuDomain[8] = {(const int3d[1]){{30,63,1}},
-																					 (const int3d[1]){{30,63,1}},
-																					 (const int3d[1]){{30,63,1}},
-																					 (const int3d[1]){{30,63,1}},
-																					 (const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
-																					 (const int3d[2]){{14,63,1},{14,63,1}},
-																					 (const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
-																					 (const int3d[2]){{14,63,1},{14,63,1}}};
+static const int3d * const cpuDomain[8] = {(const int3d[1]){{63,30,1}},
+																					 (const int3d[1]){{63,30,1}},
+																					 (const int3d[1]){{63,30,1}},
+																					 (const int3d[1]){{63,30,1}},
+																					 (const int3d[3]){{63,14,1},{63,14,1},{63,14,1}},
+																					 (const int3d[2]){{63,14,1},{63,14,1}},
+																					 (const int3d[3]){{63,14,1},{63,14,1},{63,14,1}},
+																					 (const int3d[2]){{63,14,1},{63,14,1}}};
 
 static const double C_S = 0.577350269189626;
 

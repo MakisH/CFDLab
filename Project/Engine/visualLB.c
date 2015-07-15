@@ -4,7 +4,7 @@
 #include "helper.h"
 #include <stdio.h>
 
-void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, int *xlength, int part_id) {
+void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, const int * const xlength, const int part_id) {
 
 	// Opening the file.
 	FILE *fp = NULL;
@@ -88,7 +88,7 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 
 	double dx, dy, dz;
  	// 8 lattice points per xsize
-	double xsize_ratio = 9.5; // 1xsize corresponds to 9.5m
+	double xsize_ratio = 4.75; // 1xsize corresponds to 9.5m
 	dx = xsize_ratio / (XSIZE-1); // 9.5m per 8 points (7 intervals)
 	dy = dx;
 	dz = dx;

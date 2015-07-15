@@ -207,7 +207,7 @@ void treatBoundary(double *collideField,
 					case INFLOW: case INFLOW_1: case INFLOW_2: case INFLOW_3: case INFLOW_4: case INFLOW_5: {
 
             // Pick the correct inflow velocity.
-            int currentCelll = flagField[currentCell] - INFLOW; // We pick the flag of the current cell and map it to correct array indices.
+            int currentCelll = flagField[currentCell] - INFLOW - 1; // We pick the flag of the current cell and map it to correct array indices.
 
             double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z};
 
@@ -247,7 +247,7 @@ void treatBoundary(double *collideField,
 					case PRESSURE_IN: case PRESSURE_IN_1: case PRESSURE_IN_2: case PRESSURE_IN_3: case PRESSURE_IN_4: case PRESSURE_IN_5: {
 
             // Pick the correct density among 6 of them.
-            int currentCelll = flagField[currentCell] - PRESSURE_IN; // We pick the flag of the current cell and map it to correct array indices.
+            int currentCelll = flagField[currentCell] - PRESSURE_IN -1; // We pick the flag of the current cell and map it to correct array indices.
             double density_concrete = density_in[currentCelll];
 
 						// For each direction in the current cell

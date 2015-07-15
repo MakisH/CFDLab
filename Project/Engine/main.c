@@ -82,9 +82,28 @@ inflow, pressure_in, &ref_density, argc, argv);
 		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
 
 		sprintf( pgm_read_file, "cpu_%d.pgm",chunk_id[rank][i]);
+		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
+		
+		if(rank == 4){
+			int x, y, z;
+			int xlen2 = cpuDomain[rank][i][0]+2;
+			int ylen2 = cpuDomain[rank][i][1]+2;
+			int zlen2 = cpuDomain[rank][i][2]+2;
+					printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
+				for(z = zlen2 - 1; z >= 0; --z){
+					for(y = ylen2 - 1; y >= 0; --y){
+						for(x = 0; x < xlen2; ++x){
+							printf("%d ",flagField[chunk_begin_offset[rank][i] + x + y * xlen2 + z * xlen2 * ylen2]);
+						}
+					printf("plane %d rank _%d\n",z, rank);
+					}
+					printf("\n");
+				}
+				printf("exit initLB \n");
+		}
 	}
-	
+
 	//printf("neighbors:\n%d %d %d %d %d %d\n",neighbor[0], neighbor[1], neighbor[2], neighbor[3], neighbor[4], neighbor[5]);
 	
 	

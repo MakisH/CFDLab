@@ -151,8 +151,8 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 
 	// init free slip.
 	z = 0; // The 0-th plane.
-	for (y = 0; y<ylen2; y++){
-		for (x = 0; x<xlen2, x++){
+	for (y = 0; y < ylen2; y++){
+		for (x = 0; x < xlen2; x++){
 			flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
 		}
 	}
@@ -160,24 +160,23 @@ void initialiseFields(double *collideField, double *streamField, int *flagField,
 	// The 1-st plane has the PGM geometry inside.
 
 	z = 2; // The 2-nd plane.
-	for (y = 0; y<ylen2; y++){
-		for (x = 0; x<xlen2, x++){
+	for (y = 0; y < ylen2; y++){
+		for (x = 0; x < xlen2; x++){
 			flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
 		}
 	}
 
 
 	// print flagfield initialization for debug
-	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
-	//for(z = zlen2 - 1; z >= 0; --z){
-	//	for(y = ylen2 - 1; y >= 0; --y){
-	//		for(x = 0; x < xlen2; ++x){
-	//			printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
-	//		}
-	//	printf("plane %d rank _%d\n",z, rank);
-	//	}
-	//	printf("\n");
-	//}
-	//printf("exit initLB \n");
-
+		//printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
+		//for(z = zlen2 - 1; z >= 0; --z){
+		//	for(y = ylen2 - 1; y >= 0; --y){
+		//		for(x = 0; x < xlen2; ++x){
+		//			printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
+		//		}
+		//	printf("plane %d rank _%d\n",z, rank);
+		//	}
+		//	printf("\n");
+		//}
+		//printf("exit initLB \n");
 }

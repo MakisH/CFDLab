@@ -27,6 +27,11 @@ PARALLEL_BOUNDARY = 7;
 % Set these
 x = 8;
 max_flag = 55;
+tables = true;
+control_room = true;
+library = true;
+slides = true;
+HS1 = true;
 
 % Dimensions for the hall and the wings
 % l=length (x), w=width (y), h=height (z), d=distance
@@ -83,15 +88,17 @@ door_size = x;
 Hall(x_pos, y_pos:y_pos+door_size-1, :) = OUTFLOW;
 
 % Add the tables (at least x=4 is required)
-if (x>=4)
+if (tables)
     table_l = x/4;
     table_w = x/2;
     table_d = x;
     
     % North-east set (Rechnerhalle)
-    start_x = wing_l + wing_d + wing_l + x;
+    table_start_x = wing_l + wing_d + wing_l + x; 
+    table_start_y = 1 + x;
+    start_x = table_start_x;
     end_x = start_x + table_l;
-    start_y = 1 + x;
+    start_y = table_start_y;
     end_y = start_y + table_w;
     Hall(start_x:end_x, start_y:end_y, :) = NO_SLIP;
 
@@ -124,6 +131,51 @@ if (x>=4)
         Hall(start_x:end_x, start_y:end_y, :) = NO_SLIP;
     end
 end
+
+% Control room
+if (control_room)
+    control_room_size = x/2;
+    start_x = x;
+    end_x = start_x + control_room_size;
+    start_y = 3*x-2;
+    end_y = start_y + control_room_size;
+    Hall(start_x:end_x, start_y:end_y, :) = NO_SLIP;
+end
+
+% Library
+if (library)
+   library_l = 3*x/2;
+   library_w = x;
+   end_x = hall_l;
+   start_x = end_x-library_l;
+   end_y = hall_w;
+   start_y = end_y-library_w;
+   Hall(start_x:end_x, start_y:end_y, :) = NO_SLIP;   
+end
+
+% Slides
+if (slides)
+   slides_l = 6*x/6;
+   start_x = 2*x;
+   end_x = start_x + x/6;
+   for i=-1*start_x:end_x
+       j = floor(0.01*i^2);
+       pos_x = i+17*x+3;
+       pos_y = j+table_start_y-2;
+       Hall(pos_x:pos_x+1,pos_y:pos_y+2,:) = NO_SLIP;
+   end
+
+end
+
+% Horsaal 1
+if (HS1)
+   for i=1:x
+      for j=1:i
+          Hall(x-i+1,j,:) = NO_SLIP;
+      end
+   end
+end
+
 
 % Put the main hall in place
 MI(: , wing_w:wing_w+hall_w-1, : ) = Hall;

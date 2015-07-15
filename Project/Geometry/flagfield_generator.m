@@ -177,7 +177,7 @@ x_start = 1;
 x_end = hall_part_l;
 y_start = wing_w;
 y_end = y_start + hall_w -1;
-part_0 = rot90([MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]);
+part_0 = flipud(rot90([MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]));
 f_name = 'pgm/cpu_0.pgm';
 f_id = fopen(f_name,'w');
 fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_0,2)), ' ', num2str(size(part_0,1)), ' ', num2str(max_flag)]);
@@ -191,7 +191,7 @@ for i=1:n_cpus-2
     x_start = x_start + hall_part_l;
     x_end = x_end + hall_part_l;
     clear part_i
-    part_i = rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]);
+    part_i = flipud(rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :); PARALLEL_BOUNDARY*ones(1, hall_w, hall_h)]));
     f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
     f_id = fopen(f_name,'w');
     fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_i,2)), ' ', num2str(size(part_i,1)), ' ', num2str(max_flag)]);
@@ -202,7 +202,7 @@ end
 file_id = file_id + 1;
 x_start = x_start + hall_part_l;
 x_end = x_end + hall_part_l;
-part_n = rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)]);
+part_n = flipud(rot90([PARALLEL_BOUNDARY*ones(1, hall_w, hall_h); MI(x_start:x_end, y_start:y_end, :)]));
 f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
 f_id = fopen(f_name,'w');
 fprintf(f_id, '%s\n', ['P3 ', num2str(size(part_n,2)), ' ', num2str(size(part_n,1)), ' ', num2str(max_flag)]);
@@ -213,7 +213,7 @@ dlmwrite(['pgm/cpu_',num2str(file_id),'.pgm'], part_n, '-append', 'delimiter', '
 WingN(1, wing_w, :) = NO_SLIP;
 WingN(2:wing_l-1, wing_w, :) = FLUID;
 WingN(wing_l, wing_w, :) = NO_SLIP;
-WingN_par = rot90([WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)]);
+WingN_par = flipud(rot90([WingN PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h)]));
 file_id = file_id + 1;
 f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
 f_id = fopen(f_name,'w');
@@ -253,7 +253,7 @@ dlmwrite(f_name, WingN_par, '-append', 'delimiter', ' ')
 WingS(1, 1, :) = NO_SLIP;
 WingS(2:wing_l-1, 1, :) = FLUID; 
 WingS(wing_l, 1, :) = NO_SLIP;
-WingS_par = rot90([PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS]);
+WingS_par = flipud(rot90([PARALLEL_BOUNDARY * ones(wing_l, 1, wing_h) WingS]));
 file_id = file_id + 1;
 f_name = ['pgm/cpu_',num2str(file_id),'.pgm'];
 f_id = fopen(f_name,'w');

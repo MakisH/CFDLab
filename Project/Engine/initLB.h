@@ -28,6 +28,7 @@ int readParameters(
 void initialiseFields(
 	double *collideField,
 	double *streamField,
+	int * flagField,
 	const int * const cpuDomain
 );
 

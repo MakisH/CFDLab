@@ -79,7 +79,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 	char pgm_read_file[1024];
 
 	for(int i = 0; i < chunk_count[rank]; ++i){
-		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
+		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
 
 		sprintf( pgm_read_file, "cpu_%d.pgm",chunk_id[rank][i]);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);

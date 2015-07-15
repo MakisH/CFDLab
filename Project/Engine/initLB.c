@@ -125,7 +125,7 @@ int readParameters(double * const tau, double * const velocityWall, int * const 
 	return 0;
 }
 
-void initialiseFields(double *collideField, double *streamField, const int * const cpuDomain){
+void initialiseFields(double *collideField, double *streamField, int *flagField, const int * const cpuDomain){
 	// local domain is altogether Dlength + 2, where the first and last cells are either buffer(parallel boundary) or global domain(no slip)
 
 	// ALERT!! -> How is cpuDomain defined?? cpuDomain+2 might be too much!

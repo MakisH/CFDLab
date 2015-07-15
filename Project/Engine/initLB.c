@@ -44,7 +44,7 @@ int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain
 	sscanf(line,"%d %d\n",&xsize,&ysize);
 
 	/* Rows are x dimension, columns are y dimension */
-	int z = 0;
+	int z = 1; // The middle layer is PGM, the 0-th and 2-nd layer are free slip!
 	for (int y = 0; y < ysize; y++){
 		for (int x = 0; x < xsize; x++){
 			int byte;
@@ -148,6 +148,24 @@ void initialiseFields(double *collideField, double *streamField, const int * con
 			}
 		}
 	}
+
+	// init free slip.
+	z = 0; // The 0-th plane.
+	for (y = 0; y<ylen2; y++){
+		for (x = 0; x<xlen2, x++){
+			flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
+		}
+	}
+
+	// The 1-st plane has the PGM geometry inside.
+
+	z = 2; // The 2-nd plane.
+	for (y = 0; y<ylen2; y++){
+		for (x = 0; x<xlen2, x++){
+			flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
+		}
+	}
+
 
 	// print flagfield initialization for debug
 	printf("domain %d %d %d\n",xlen2,ylen2,zlen2);

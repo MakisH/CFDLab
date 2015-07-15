@@ -130,9 +130,9 @@ void initialiseFields(double *collideField, double *streamField, const int * con
 
 	// ALERT!! -> How is cpuDomain defined?? cpuDomain+2 might be too much!
 	int x, y, z, i;
-	int xlen2 = cpuDomain[0] + 2;
-	int ylen2 = cpuDomain[1] + 2;
-	int zlen2 = cpuDomain[2] + 2;
+	int xlen2 = cpuDomain[0];
+	int ylen2 = cpuDomain[1];
+	int zlen2 = cpuDomain[2];
 	//int xyzlen2 = xlen2 * ylen2 * zlen2;
 
 	int xylen2 = xlen2 * ylen2;

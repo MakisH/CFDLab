@@ -138,12 +138,11 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 				}
 				else
 				{
+					y = 1;
 					for (z = (j1 - 1) * scale_y + 1; z <= j1 * scale_y + scale_y; ++z) {
-						for (y = 1; y <= xlength[1]; ++y) { // height is always traversed fully
 							for (x = (i1 - 1) * scale_x + 1; x <= i1 * scale_x + scale_x; ++x) {
 								flagField[x + y * xlen2 + z * xylen2] = byte;
 							}
-						}
 					}
 				}
 			}
@@ -232,6 +231,25 @@ int initialiseFields(double *collideField, double *streamField, int *flagField, 
 		* 5 - OUTFLOW
 		* 6 - PRESSURE_IN
 	**/
+
+
+	y = 0;
+	for (int x = 0; x < xlen2; x++){
+		for (int z = 0; z < zlen2; z++){
+			flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
+		}
+	}
+
+  y = 2;
+  for (int x = 0; x < xlen2; x++){
+    for (int z = 0; z < zlen2; z++){
+      flagField[x + y*xlen2 + z*xylen2] = FREE_SLIP;
+    }
+  }
+
+
+
+
 	/* Boundary initialization: using input parameters */
 	for(int y = 0; y < ylen2; ++y){
 		for(x = 0; x < xlen2; ++x){

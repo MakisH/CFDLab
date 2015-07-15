@@ -8,7 +8,7 @@
 problem			          lbm_tilted_plate
 
 #---------------------------------------------------
-#  size of the domain             
+#  size of the domain
 #---------------------------------------------------
 xlength			          210
 ylength			          1
@@ -32,7 +32,7 @@ timestepsPerPlotting	100
 #---------------------------------------------------
 velocityInX		        0
 velocityInY		        0
-velocityInZ		        0.035  
+velocityInZ		        0.035
 
 densityIn			        -1
 densityRef		        1
@@ -54,11 +54,9 @@ velocityWall3		      0.0
 #   5   : OUTFLOW
 #   6   : PRESSURE_IN
 #---------------------------------------------------
-wallLeft			        4             
+wallLeft			        4
 wallRight			        5
 wallTop			          1
 wallBottom		        1
 wallBackground		    3
 wallForeground		    3
-
-

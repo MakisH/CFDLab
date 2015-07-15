@@ -148,12 +148,12 @@ inflow, pressure_in, &ref_density, argc, argv);
 									cpuDomain[rank][i],
 									sendBuffer[i],
 									neighbours_dir[rank][i],
-									neighbours_local_start_x[rank][i],
-									neighbours_local_start_y[rank][i],
-									neighbours_local_start_z[rank][i],
-									neighbours_local_end_x[rank][i],
-									neighbours_local_end_y[rank][i],
-									neighbours_local_end_z[rank][i]); // should we just pass rank and move all these inside the function call ? would be slightly faster + and will have cleaner main
+									neighbours_local_start_ext_x[rank][i],
+									neighbours_local_start_ext_y[rank][i],
+									neighbours_local_start_ext_z[rank][i],
+									neighbours_local_end_ext_x[rank][i],
+									neighbours_local_end_ext_y[rank][i],
+									neighbours_local_end_ext_z[rank][i]); // should we just pass rank and move all these inside the function call ? would be slightly faster + and will have cleaner main
 		}
 		printf("after extr\n");
 		//swap( sendBuffer, readBuffer, sizeBuffer, DIR_R, neighbor);
@@ -164,12 +164,12 @@ inflow, pressure_in, &ref_density, argc, argv);
 									cpuDomain[rank][i],
 									sendBuffer[i],
 									neighbours_dir[rank][i],
-									neighbours_local_start_x[rank][i],
-									neighbours_local_start_y[rank][i],
-									neighbours_local_start_z[rank][i],
-									neighbours_local_end_x[rank][i],
-									neighbours_local_end_y[rank][i],
-									neighbours_local_end_z[rank][i]);
+									neighbours_local_start_inj_x[rank][i],
+									neighbours_local_start_inj_y[rank][i],
+									neighbours_local_start_inj_z[rank][i],
+									neighbours_local_end_inj_x[rank][i],
+									neighbours_local_end_inj_y[rank][i],
+									neighbours_local_end_inj_z[rank][i]);
 		}
 		printf("after inj\n");
 

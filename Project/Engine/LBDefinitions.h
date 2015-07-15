@@ -74,7 +74,7 @@ static const int * const neighbours_tag[8] =		{(int[]){1,4,9},
 
 
 // this is where the sevens are ... meaning it works for injection(because we inject in 7)
-static const int * const neighbours_local_start_x[8] = {	(int[]){64,48,16},
+static const int * const neighbours_local_start_inj_x[8] = {	(int[]){64,48,16},
 																												(int[]){0,65,33,1,49},
 																												(int[]){0,65,17,33},
 																												(int[]){0,1,49,17},
@@ -83,7 +83,7 @@ static const int * const neighbours_local_start_x[8] = {	(int[]){64,48,16},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_start_y[8] = {	(int[]){0,0,31},
+static const int * const neighbours_local_start_inj_y[8] = {	(int[]){0,0,31},
 																												(int[]){0,0,0,31,31},
 																												(int[]){0,0,0,31},
 																												(int[]){0,0,0,31},
@@ -92,7 +92,7 @@ static const int * const neighbours_local_start_y[8] = {	(int[]){0,0,31},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_start_z[8] = {	(int[]){0,0,0},
+static const int * const neighbours_local_start_inj_z[8] = {(int[]){0,0,0},
 																												(int[]){0,0,0,0,0},
 																												(int[]){0,0,0,0},
 																												(int[]){0,0,0,0},
@@ -101,7 +101,7 @@ static const int * const neighbours_local_start_z[8] = {	(int[]){0,0,0},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_end_x[8] = {	(int[]){64,63,31},
+static const int * const neighbours_local_end_inj_x[8] = {	(int[]){64,63,31},
 																											(int[]){0,65,48,16,64},
 																											(int[]){0,65,32,48},
 																											(int[]){0,16,64,32},
@@ -110,7 +110,7 @@ static const int * const neighbours_local_end_x[8] = {	(int[]){64,63,31},
 																											(int[]){15,15,15},
 																											(int[]){15,15}};
 
-static const int * const neighbours_local_end_y[8] = {	(int[]){31,0,31},
+static const int * const neighbours_local_end_inj_y[8] = {	(int[]){31,0,31},
 																											(int[]){31,31,0,31,31},
 																											(int[]){31,31,0,31},
 																											(int[]){31,0,0,31},
@@ -119,7 +119,7 @@ static const int * const neighbours_local_end_y[8] = {	(int[]){31,0,31},
 																											(int[]){0,0,0},
 																											(int[]){0,0}};
 
-static const int * const neighbours_local_end_z[8] = {	(int[]){2,2,2},
+static const int * const neighbours_local_end_inj_z[8] = {	(int[]){2,2,2},
 																											(int[]){2,2,2,2,2},
 																											(int[]){2,2,2,2},
 																											(int[]){2,2,2,2},
@@ -127,6 +127,63 @@ static const int * const neighbours_local_end_z[8] = {	(int[]){2,2,2},
 																											(int[]){2,2},
 																											(int[]){2,2,2},
 																											(int[]){2,2}};
+
+
+
+static const int * const neighbours_local_start_ext_x[8] = {(int[]){63,48,16},
+																														(int[]){1,64,33,1,49},
+																														(int[]){1,64,17,33},
+																														(int[]){1,1,49,17},
+																														(int[]){0,0,0},
+																														(int[]){0,0},
+																														(int[]){0,0,0},
+																														(int[]){0,0}};
+
+static const int * const neighbours_local_start_ext_y[8] = {(int[]){0,1,30},
+																														(int[]){0,0,1,30,30},
+																														(int[]){0,0,1,30},
+																														(int[]){0,1,1,30},
+																														(int[]){63,63,63},
+																														(int[]){63,63},
+																														(int[]){1,1,1},
+																														(int[]){1,1}};
+
+static const int * const neighbours_local_start_ext_z[8] = {(int[]){0,0,0},
+																														(int[]){0,0,0,0,0},
+																														(int[]){0,0,0,0},
+																														(int[]){0,0,0,0},
+																														(int[]){0,0,0},
+																														(int[]){0,0},
+																														(int[]){0,0,0},
+																														(int[]){0,0}};
+
+static const int * const neighbours_local_end_ext_x[8] = {(int[]){63,63,31},
+																													(int[]){1,64,48,16,64},
+																													(int[]){1,64,32,48},
+																													(int[]){1,16,64,32},
+																													(int[]){15,15,15},
+																													(int[]){15,15},
+																													(int[]){15,15,15},
+																													(int[]){15,15}};
+
+static const int * const neighbours_local_end_ext_y[8] = {(int[]){31,1,30},
+																													(int[]){31,31,1,30,30},
+																													(int[]){31,31,1,30},
+																													(int[]){31,1,1,30},
+																													(int[]){63,63,63},
+																													(int[]){63,63},
+																													(int[]){1,1,1},
+																													(int[]){1,1}};
+
+static const int * const neighbours_local_end_ext_z[8] = {(int[]){2,2,2},
+																													(int[]){2,2,2,2,2},
+																													(int[]){2,2,2,2},
+																													(int[]){2,2,2,2},
+																													(int[]){2,2,2},
+																													(int[]){2,2},
+																													(int[]){2,2,2},
+																													(int[]){2,2}};
+
 
 static const int * const neighbours_local_buffer_size[8] = {(int[]){480,240,240},
 																														(int[]){480,480,240,240,240},

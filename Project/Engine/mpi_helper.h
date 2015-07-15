@@ -17,8 +17,8 @@ void finalizeMPI();
 
 // Transfer the overlapping cells
 void swap(
-	double * const sendBuffer,
-	double * const readBuffer,
+	double * const * const sendBuffer,
+	double * const * const readBuffer,
 	const int rank
 );
 

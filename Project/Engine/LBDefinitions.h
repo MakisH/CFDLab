@@ -92,14 +92,14 @@ static const int * const neighbours_local_start_y[8] = {	(int[]){0,0,31},
 																												(int[]){0,0,0},
 																												(int[]){0,0}};
 
-static const int * const neighbours_local_start_z[8] = {	(int[]){1,1,1},
-																												(int[]){1,1,1,1,1},
-																												(int[]){1,1,1,1},
-																												(int[]){1,1,1,1},
-																												(int[]){1,1,1},
-																												(int[]){1,1},
-																												(int[]){1,1,1},
-																												(int[]){1,1}};
+static const int * const neighbours_local_start_z[8] = {	(int[]){0,0,0},
+																												(int[]){0,0,0,0,0},
+																												(int[]){0,0,0,0},
+																												(int[]){0,0,0,0},
+																												(int[]){0,0,0},
+																												(int[]){0,0},
+																												(int[]){0,0,0},
+																												(int[]){0,0}};
 
 static const int * const neighbours_local_end_x[8] = {	(int[]){64,63,31},
 																											(int[]){0,65,48,16,64},
@@ -119,22 +119,22 @@ static const int * const neighbours_local_end_y[8] = {	(int[]){31,0,31},
 																											(int[]){0,0,0},
 																											(int[]){0,0}};
 
-static const int * const neighbours_local_end_z[8] = {	(int[]){1,1,1},
-																											(int[]){1,1,1,1,1},
-																											(int[]){1,1,1,1},
-																											(int[]){1,1,1,1},
-																											(int[]){1,1,1},
-																											(int[]){1,1},
-																											(int[]){1,1,1},
-																											(int[]){1,1}};
-static const int * const neighbours_local_buffer_size[8] = {(int[]){160,80,80},
-																														(int[]){160,160,80,80,80},
-																														(int[]){160,160,80,80},
-																														(int[]){160,80,80,80},
-																														(int[]){80,80,80},
-																														(int[]){80,80},
-																														(int[]){80,80,80},
-																														(int[]){80,80}};
+static const int * const neighbours_local_end_z[8] = {	(int[]){2,2,2},
+																											(int[]){2,2,2,2,2},
+																											(int[]){2,2,2,2},
+																											(int[]){2,2,2,2},
+																											(int[]){2,2,2},
+																											(int[]){2,2},
+																											(int[]){2,2,2},
+																											(int[]){2,2}};
+static const int * const neighbours_local_buffer_size[8] = {(int[]){480,240,240},
+																														(int[]){480,480,240,240,240},
+																														(int[]){480,480,240,240},
+																														(int[]){480,240,240,240},
+																														(int[]){240,240,240},
+																														(int[]){240,240},
+																														(int[]){240,240,240},
+																														(int[]){240,240}};
 
 static const int chunk_count[8] = {1,1,1,1,3,2,3,2};
 
@@ -166,13 +166,13 @@ static const int * const chunk_size[8] = {(int[]){2080},
 																					(int[]){1040,1040}}; // actually this can be computed from cpuDomain values
 typedef int int3d[3];
 static const int3d * const cpuDomain[8] = {(const int3d[1]){{30,63,1}},
-																(const int3d[1]){{30,63,1}},
-																(const int3d[1]){{30,63,1}},
-																(const int3d[1]){{30,63,1}},
-																(const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
-																(const int3d[2]){{14,63,1},{14,63,1}},
-																(const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
-																(const int3d[2]){{14,63,1},{14,63,1}}};
+																					 (const int3d[1]){{30,63,1}},
+																					 (const int3d[1]){{30,63,1}},
+																					 (const int3d[1]){{30,63,1}},
+																					 (const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
+																					 (const int3d[2]){{14,63,1},{14,63,1}},
+																					 (const int3d[3]){{14,63,1},{14,63,1},{14,63,1}},
+																					 (const int3d[2]){{14,63,1},{14,63,1}}};
 
 static const double C_S = 0.577350269189626;
 

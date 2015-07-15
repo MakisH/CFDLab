@@ -2,6 +2,7 @@
 //#include "stdlib.h" // not needed?
 
 #include "mpi_helper.h"
+#include <unistd.h>
 
 // stdout
 // stderr
@@ -156,19 +157,19 @@ void finalizeMPI() {
 //	
 //}
 /// old swap
-void swap(double * const sendBuffer, double * const readBuffer, const int rank) {
+void swap(double * const * const sendBuffer, double * const *const readBuffer, const int rank) {
 	// MPI_Status status; // waiting for status makes it slower ?
 	MPI_Request * send_request = (MPI_Request *) malloc(neighbours_count[rank] * sizeof(MPI_Request));
 
 	//version 5
 	// send asynchronously to everyone
 	for(int i = 0; i < neighbours_count[rank]; ++i){
-		MPI_Isend(&sendBuffer[neighbours_dir[rank][i]], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, &send_request[i]);
+		MPI_Isend(sendBuffer[i], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, &send_request[i]);
 	}
 	// receive from all neighbours asynchronously
 	for(int i = 0; i < neighbours_count[rank]; ++i){
 		//int inv_dir = neighbours_dir[rank][i]+ 1  - neighbours_dir[rank][i] % 2 * 2;
-		MPI_Recv(&readBuffer[i], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+		MPI_Recv(readBuffer[i], neighbours_local_buffer_size[rank][i], MPI_DOUBLE, neighbours_procid[rank][i], neighbours_tag[rank][i], MPI_COMM_WORLD, MPI_STATUS_IGNORE);
 		MPI_Wait(&send_request[i],MPI_STATUS_IGNORE);
 	}
 	free(send_request);

@@ -16,7 +16,7 @@ int main(int argc, char *argv[]){
 	printf("hi!\n");
 	int rank;
 	int np;
-	
+
 	// Start MPI
 	// slow for more processors ???
 	initializeMPI( &rank, &np, argc, argv);
@@ -45,7 +45,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 		MPI_Bcast( &inflow[i].y, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 		MPI_Bcast( &inflow[i].z, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 	}
-	
+
 	MPI_Bcast( pressure_in, PRESSURE_IN_COUNT, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 	MPI_Bcast( &ref_density, 1, MPI_DOUBLE, 0, MPI_COMM_WORLD );
 
@@ -81,7 +81,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 	for(int i = 0; i < chunk_count[rank]; ++i){
 		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
 
-		sprintf( pgm_read_file, "pgm\\cpu_%d.pgm",chunk_id[rank][i]);
+		sprintf( pgm_read_file, "./pgm/cpu_%d.pgm",chunk_id[rank][i]);
 		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
 		//
@@ -106,8 +106,8 @@ inflow, pressure_in, &ref_density, argc, argv);
 	}
 
 	//printf("neighbors:\n%d %d %d %d %d %d\n",neighbor[0], neighbor[1], neighbor[2], neighbor[3], neighbor[4], neighbor[5]);
-	
-	
+
+
 				// probably this is useless - will keep it for now just in case
 				// precomputed values for extraction and injection bounds depending on the direction
 				//const side Bsides_ext[6] = {{cpuDomain[0], cpuDomain[0], 0, cpuDomain[1] + 1, 0, cpuDomain[2] + 1},
@@ -143,9 +143,17 @@ inflow, pressure_in, &ref_density, argc, argv);
 
 		// swap needs two checks so they're in the function
 
+		/*int x, y;
+		int xlen2 = cpuDomain[0]+2;
+		int ylen2 = cpuDomain[1]+2;
+		int zlen2 = cpuDomain[2]+2;
+		int xylen2 = xlen2 * ylen2*;
+
+		int z = 1;*/
+
 		for(int i = 0; i < neighbours_count[rank]; ++i){
-			extraction( collideField + Q_NUMBER * chunk_begin_offset[rank][i],
-									cpuDomain[rank][i],
+			extraction( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
+									cpuDomain[rank][neighbours_chunk_id[rank][i]],
 									sendBuffer[i],
 									neighbours_dir[rank][i],
 									neighbours_local_start_ext_x[rank][i],
@@ -155,13 +163,13 @@ inflow, pressure_in, &ref_density, argc, argv);
 									neighbours_local_end_ext_y[rank][i],
 									neighbours_local_end_ext_z[rank][i]); // should we just pass rank and move all these inside the function call ? would be slightly faster + and will have cleaner main
 		}
-		printf("after extr\n");
+		//printf("after extr\n");
 		//swap( sendBuffer, readBuffer, sizeBuffer, DIR_R, neighbor);
 			swap( sendBuffer, readBuffer, rank);
-			printf("after swap\n");
+			//printf("after swap\n");
 		for(int i = 0; i < neighbours_count[rank]; ++i){
-			injection( collideField + Q_NUMBER * chunk_begin_offset[rank][i],
-									cpuDomain[rank][i],
+			injection( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
+									cpuDomain[rank][neighbours_chunk_id[rank][i]],
 									sendBuffer[i],
 									neighbours_dir[rank][i],
 									neighbours_local_start_inj_x[rank][i],
@@ -234,9 +242,9 @@ inflow, pressure_in, &ref_density, argc, argv);
 				//printf("%d jproc\n", jProc);
 				//printf("%d kproc\n\n", kProc);
 			if(!rank)
-				printf("Write vtk for time # %d \n", t);
+				//printf("Write vtk for time # %d \n", t);
 			for(int i = 0; i < chunk_count[rank]; ++i){
-				printf("rank %d i= %d, cpudDomain is %d %d %d \n\n",rank,i,cpuDomain[rank][i][0],cpuDomain[rank][i][1],cpuDomain[rank][i][2]);
+				//printf("rank %d i= %d, cpudDomain is %d %d %d \n\n",rank,i,cpuDomain[rank][i][0],cpuDomain[rank][i][1],cpuDomain[rank][i][2]);
 				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] ); // what are we doing with xlength and cpuDomain ???
 			}
 		}

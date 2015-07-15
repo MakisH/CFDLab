@@ -41,7 +41,7 @@
 static const int LATTICEVELOCITIES[Q_NUMBER][3] = {{0, -1, -1}, {-1, 0, -1}, {0, 0, -1}, {1, 0, -1}, {0, 1, -1}, {-1, -1, 0}, {0, -1, 0}, {1, -1, 0}, {-1, 0, 0}, {0, 0, 0}, {1, 0, 0}, {-1, 1, 0}, {0, 1, 0}, {1, 1, 0}, {0, -1, 1}, {-1, 0, 1}, {0, 0, 1}, {1, 0, 1}, {0, 1, 1}};
 static const double LATTICEWEIGHTS[Q_NUMBER] = {1.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36, 1.0/36, 2.0/36, 1.0/36, 2.0/36, 12.0/36, 2.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36, 1.0/36, 2.0/36, 1.0/36, 1.0/36};
 
-static const int * const neighbours[8] =  {(int[]){1,4,6},(int[]){0,2,4,6},(int[]){1,3,4,7},(int[]){2,5,7},(int[]){0,1,2},(int[]){3},(int[]){0,1},(int[]){2,3}}; 
+static const int * const neighbours[8] =  {(int[]){1,4,6},(int[]){0,2,4,6},(int[]){1,3,4,7},(int[]){2,5,7},(int[]){0,1,2},(int[]){3},(int[]){0,1},(int[]){2,3}};
 // those are the neighbouring processors for each processor, e.g. proc.0(first element of array) has neighbours processors 1,4 and 6
 // int[] is needed to make a pointer to the inside element array
 static const int neighbours_count[8] = {3,5,4,4,3,2,3,2};
@@ -53,6 +53,15 @@ static const int * const neighbours_dir[8] = {(int[]){DIR_R,DIR_F,DIR_B},
 																							(int[]){DIR_B,DIR_B},
 																							(int[]){DIR_F,DIR_F,DIR_F},
 																							(int[]){DIR_F,DIR_F}}; // in one direction there may be several transactions(as in cpu 5 and 7)
+
+static const int * const neighbours_chunk_id[8] = {	(int[]){0,0,0},
+																										(int[]){0,0,0,0,0},
+																										(int[]){0,0,0,0},
+																										(int[]){0,0,0,0},
+																										(int[]){0,1,2},
+																										(int[]){0,1},
+																										(int[]){0,1,2},
+																										(int[]){0,1}};
 
 static const int * const neighbours_procid[8] = {(int[]){1,4,6},
 																								 (int[]){0,2,4,6,6},

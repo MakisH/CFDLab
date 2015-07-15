@@ -8,13 +8,6 @@
 #problem			          lbm_mi_building
 
 #---------------------------------------------------
-#  size of the domain
-#---------------------------------------------------
-xlength                     20
-ylength                     20
-zlength                     20
-
-#---------------------------------------------------
 #  relaxation time
 #---------------------------------------------------
 tau                         1.0
@@ -32,34 +25,34 @@ timestepsPerPlotting        2
 #---------------------------------------------------
 
 # INFLOW
-inflow_0_v_x                0.0
-inflow_0_v_y                0.0
-inflow_0_v_z                0.0
+inflow_0_v_x                0.04
+inflow_0_v_y                0.04
+inflow_0_v_z                0.04
 
 # INFLOW_1
-inflow_1_v_x                0.0
-inflow_1_v_y                0.0
-inflow_1_v_z                0.0
+inflow_1_v_x                0.04
+inflow_1_v_y                -0.04
+inflow_1_v_z                0.04
 
 # INFLOW_2
-inflow_2_v_x                0.0
-inflow_2_v_y                0.0
-inflow_2_v_z                0.0
+inflow_2_v_x                0.04
+inflow_2_v_y                0.04
+inflow_2_v_z                0.04
 
 # INFLOW_3
-inflow_3_v_x                0.0
-inflow_3_v_y                0.0
-inflow_3_v_z                0.0
+inflow_3_v_x                0.04
+inflow_3_v_y                0.04
+inflow_3_v_z                0.04
 
 # INFLOW_4
-inflow_4_v_x                0.0
-inflow_4_v_y                0.0
-inflow_4_v_z                0.0
+inflow_4_v_x                0.04
+inflow_4_v_y                0.04
+inflow_4_v_z                0.04
 
 # INFLOW_5
-inflow_5_v_x                0.0
-inflow_5_v_y                0.0
-inflow_5_v_z                0.0
+inflow_5_v_x                0.04
+inflow_5_v_y                0.04
+inflow_5_v_z                0.04
 
 
 # PRESSURE_IN
@@ -84,11 +77,3 @@ densityRef                  1.0
 velocityWall1		      0.0
 velocityWall2		      0.0
 velocityWall3		      0.0
-
-
-#--------------------------------------------
-#  MPI parameters
-#--------------------------------------------
-iProc                       2
-jProc                       2
-kProc                       2

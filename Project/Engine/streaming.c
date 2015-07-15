@@ -1,7 +1,7 @@
 #include "streaming.h"
 #include "LBDefinitions.h"
 
-void doStreaming(double *collideField, double *streamField,int *flagField,int *xlength){
+void doStreaming(double *collideField, double *streamField,int *flagField,const int * const xlength){
 
 	unsigned int xylen2 = (xlength[0] + 2) * (xlength[1] + 2);
 

@@ -62,7 +62,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 	fclose(fp);
 }
 
-void write_vtkHeader( FILE *fp, int *xlength) {
+void write_vtkHeader( FILE *fp, const int * const xlength) {
 	if( fp == NULL )
 	{
 		char szBuff[80];

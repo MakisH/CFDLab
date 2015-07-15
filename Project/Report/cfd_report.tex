@@ -1,0 +1,68 @@
+\documentclass[a4paper,11pt]{article}
+\usepackage[utf8]{inputenc}
+
+%opening
+\title{CFD Lab Project: Simulation of the MI Building}
+\author{Group 2: M. Andreev, G. Chourdakis, I. Tominec \\ Advisor: Kaveh Rahnema}
+
+\begin{document}
+
+\maketitle
+
+\section{Problem definition}
+In this project, we are trying to mix arbirary geometries with parallel processing
+in our Lattice-Boltzmann Method implementation.
+As a study case, we choose a geometry that looks like a 2D representation (top view) of the
+TUM Mathematics-Informatics building. In order to be able to apply the Lattice-Boltzmann Method
+in this study case (and get usuable results), we need a very fine grid, so we need
+to have a parallel code.
+
+\section{Challenges}
+The main challenge of the project is to parallely process partitions of different
+sizes, that need to communicate only in specific points. We could just mix the
+already known approaches, i.e. a big rectangle including all the geometry, distributed
+evenly to all the processors. This way, we would spend a lot of computational effort
+in order to process big areas of ``inactive'' boundary cells (e.g. between the
+``wings'' of the MI building). Another challenge is to balance the work each processor
+has to do, i.e. each processor needs to be assigned multiple partitions, as the partitions
+may have different sizes.
+
+Other challenges, related to the study case, are to define the geometry,
+create geometry input files, define boundary conditions and flow parameters.
+
+\section{Approach}
+First of all, we define out study case, in order to choose a computational approach.
+The building is modelled as a 2D top-view cross-section, near the floor and it
+is represented as several rectangles. The rectangles are dimensionless and scalable
+according to a size parameter ``x''. The physical dimensions of the building were
+defined by combining in-place measurements and the sizes of a ``fire plan'' of
+the building. Average dimensions were chosen, e.g. for the main hall length=152m (or 32x)
+and width=19m (or 4x), keeping a constant ratio of 8:1. The coordinate system
+is chosen as x:long side of the main hall (length) and y:short side (width).
+The origin is defined near the main entrance, so that it belongs to a big rectangle
+that contains the whole building.
+
+Some rectangular areas in the interior are assigned a no-slip boundary condition,
+in order to represent tables in the main hall. Five doors of the main hall are
+simulated, all open, either as inflows (with constant velocity), or as outflows:
+northern (main entrance), eastern (to LRZ), next to cantine, southern and western (next to the library).
+
+The geometry is divided in 14 partitions, numbered $\{0\dots13\}$. The main hall is
+divided in 4 rectangular partitions, connected in the x-direction. Each of the 10
+``wings'' is a partition on itself. Each partition is defined by a different geometry (pgm)
+file. In order to produce the pgm files, a Matlab script was developped, that takes
+as main parameter the size parameter ``x'' (lattice cells per x unit). Each file (containing the flagfield
+for the 2D domain) is loaded by the corresponding process and a result vtk file for
+each partition is produced.
+
+Each partition uses a ``parallel boundary'' flag at the areas where it has to communicate.
+Every cpu know the its neighbors that it has to communicate with. Each partition
+is stored in a different array. Each processor also knows which parts of each partition
+it has to communicate with the connected partitions.
+
+It should be noted that, although the main developement is complete,
+some problems exist in the results. It is in debugging state, but we continue trying to
+fix the problems.
+
+
+\end{document}

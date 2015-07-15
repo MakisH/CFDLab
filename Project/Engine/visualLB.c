@@ -209,6 +209,15 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 			end[1] = 20*XSIZE-4;
 			end[2] = 0;
 			break;
+		default:
+			origin[0] = 0;
+			origin[1] = 0;
+			origin[2] = 0;
+			end[0] = 0;
+			end[1] = 0;
+			end[2] = 0;
+			printf("Default Switch - you should not be here!!!\n\n\n");
+		break;
 	}
 
 	// The actual mapping.
@@ -223,8 +232,8 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 	// discretization error appears if we don't include an additional "epsilon" factor.
 	// We implemented eps in a way, that we are always on a safe side.
 	for (z = zStart; z < zEnd + dz * 0.5; z += dz){
-		for (y = yStart; y < yEnd + 0.5 * dy; y += dy){
-			for (x = xStart; x < xEnd + dx * (-0.1); x += dx){
+		for (y = yStart; y < yEnd + dy * 0.5; y += dy){
+			for (x = xStart; x < xEnd - dx * 0.1; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}

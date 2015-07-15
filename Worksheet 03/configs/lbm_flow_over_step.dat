@@ -12,7 +12,7 @@ problem			          lbm_flow_over_step
 #  size of the domain             
 #---------------------------------------------------
 xlength			          30
-ylength			          30
+ylength			          3
 zlength			          50
 
 #---------------------------------------------------

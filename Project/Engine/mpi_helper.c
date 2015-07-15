@@ -241,7 +241,6 @@ void injection(double * const collideField, const int * const cpuDomain, double 
 				printf ("I write to cell # %d\n", currentCell);
 				for (int vel_dir = 0; vel_dir < 5; ++vel_dir) {
 					collideField[Q_NUMBER * currentCell + each[inv_dir][vel_dir]] = readBuffer[5 * cell + vel_dir];
-	//				printf("%f ", readBuffer[5 * cell + vel_dir]);
 				}
 			}
 		}

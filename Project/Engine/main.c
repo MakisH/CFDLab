@@ -81,27 +81,28 @@ inflow, pressure_in, &ref_density, argc, argv);
 	for(int i = 0; i < chunk_count[rank]; ++i){
 		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
 
-		sprintf( pgm_read_file, "cpu_%d.pgm",chunk_id[rank][i]);
+		sprintf( pgm_read_file, "pgm\\cpu_%d.pgm",chunk_id[rank][i]);
 		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
-		
-		if(rank == 4){
-			int x, y, z;
-			int xlen2 = cpuDomain[rank][i][0]+2;
-			int ylen2 = cpuDomain[rank][i][1]+2;
-			int zlen2 = cpuDomain[rank][i][2]+2;
-					printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
-				for(z = zlen2 - 1; z >= 0; --z){
-					for(y = ylen2 - 1; y >= 0; --y){
-						for(x = 0; x < xlen2; ++x){
-							printf("%d ",flagField[chunk_begin_offset[rank][i] + x + y * xlen2 + z * xlen2 * ylen2]);
-						}
-					printf("plane %d rank _%d\n",z, rank);
-					}
-					printf("\n");
-				}
-				printf("exit initLB \n");
-		}
+		//
+		//if(rank == 0){
+		//	int x, y, z;
+		//	int xlen2 = cpuDomain[rank][i][0]+2;
+		//	int ylen2 = cpuDomain[rank][i][1]+2;
+		//	int zlen2 = cpuDomain[rank][i][2]+2;
+		//			printf("domain %d %d %d\n",xlen2,ylen2,zlen2);
+		//		for(z = zlen2 - 1; z >= 0; --z){
+		//			for(y = ylen2 - 1; y >= 0; --y){
+		//				for(x = 0; x < xlen2; ++x){
+		//					printf("%d ",flagField[chunk_begin_offset[rank][i] + x + y * xlen2 + z * xlen2 * ylen2]);
+		//				}
+		//			printf("plane %d rank _%d\n",z, rank);
+		//			}
+		//			printf("\n");
+		//		}
+		//		printf("exit initLB \n");
+		//}
+		//		sleep(1000);
 	}
 
 	//printf("neighbors:\n%d %d %d %d %d %d\n",neighbor[0], neighbor[1], neighbor[2], neighbor[3], neighbor[4], neighbor[5]);
@@ -236,7 +237,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 				printf("Write vtk for time # %d \n", t);
 			for(int i = 0; i < chunk_count[rank]; ++i){
 				printf("rank %d i= %d, cpudDomain is %d %d %d \n\n",rank,i,cpuDomain[rank][i][0],cpuDomain[rank][i][1],cpuDomain[rank][i][2]);
-				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], rank, cpuDomain[rank][i] ); // what are we doing with xlength and cpuDomain ???
+				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] ); // what are we doing with xlength and cpuDomain ???
 			}
 		}
 	}

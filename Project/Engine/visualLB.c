@@ -233,7 +233,7 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 	// We implemented eps in a way, that we are always on a safe side.
 	for (z = zStart; z < zEnd + dz * 0.5; z += dz){
 		for (y = yStart; y < yEnd + dy * 0.5; y += dy){
-			for (x = xStart; x < xEnd - dx * 0.1; x += dx){
+			for (x = xStart; x < xEnd + dx * 0.5; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);
 			}
 		}

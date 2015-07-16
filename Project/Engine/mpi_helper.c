@@ -177,7 +177,6 @@ void swap(double * const * const sendBuffer, double * const *const readBuffer, c
 		//printf("rank %d, I send: %f, to: %d -> tag: %d\n\n", rank, *(sendBuffer[i] + 2 + neighbours_local_buffer_size[rank][i]/3), neighbours_procid[rank][i], neighbours_tag[rank][i]);
 		MPI_Wait(&send_request[i],MPI_STATUS_IGNORE);
 	}
-	printf("\n\n");
 	free(send_request);
 	// // version 4
 	//MPI_Sendrecv(sendBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[direction], 0, readBuffer[direction], sizeBuffer[direction], MPI_DOUBLE, neighbor[inv_dir], MPI_ANY_TAG, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
@@ -238,7 +237,7 @@ void injection(double * const collideField, const int * const cpuDomain, double 
 			for (int x = x_start; x <= x_end; ++x) {
 				++cell;
 				currentCell = x + y * (cpuDomain[0] + 2) + z * (cpuDomain[0] + 2) * (cpuDomain[1] + 2);
-				printf ("I write to cell # %d\n", currentCell);
+			//	printf ("I write to cell # %d\n", currentCell);
 				for (int vel_dir = 0; vel_dir < 5; ++vel_dir) {
 					collideField[Q_NUMBER * currentCell + each[inv_dir][vel_dir]] = readBuffer[5 * cell + vel_dir];
 				}

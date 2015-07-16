@@ -70,7 +70,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 
 	int domain_size = 0;
 	for(int i = 0; i < chunk_count[rank];++i){
-		domain_size += chunk_size[rank][i];
+		domain_size += chunk_whole_flag_size[rank][i];
 	}
 	domain_size *= 3; // because we're in 3D
 	double *collideField = (double *) malloc(Q_NUMBER * domain_size * sizeof(double));
@@ -84,8 +84,9 @@ inflow, pressure_in, &ref_density, argc, argv);
 		sprintf( pgm_read_file, "./pgm/cpu_%d.pgm",chunk_id[rank][i]);
 		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
-		//
-		//if(rank == 0){
+	
+	/// Output FlagField for CPU0
+		//if(rank == 5){
 		//	int x, y, z;
 		//	int xlen2 = cpuDomain[rank][i][0]+2;
 		//	int ylen2 = cpuDomain[rank][i][1]+2;
@@ -94,7 +95,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 		//		for(z = zlen2 - 1; z >= 0; --z){
 		//			for(y = ylen2 - 1; y >= 0; --y){
 		//				for(x = 0; x < xlen2; ++x){
-		//					printf("%d ",flagField[chunk_begin_offset[rank][i] + x + y * xlen2 + z * xlen2 * ylen2]);
+		//					printf("%d ",flagField[x + y * xlen2 + z * xlen2 * ylen2]);
 		//				}
 		//			printf("plane %d rank _%d\n",z, rank);
 		//			}
@@ -104,9 +105,6 @@ inflow, pressure_in, &ref_density, argc, argv);
 		//}
 		//		sleep(1000);
 	}
-
-	//printf("neighbors:\n%d %d %d %d %d %d\n",neighbor[0], neighbor[1], neighbor[2], neighbor[3], neighbor[4], neighbor[5]);
-
 
 				// probably this is useless - will keep it for now just in case
 				// precomputed values for extraction and injection bounds depending on the direction
@@ -150,7 +148,6 @@ inflow, pressure_in, &ref_density, argc, argv);
 		int xylen2 = xlen2 * ylen2*;
 
 		int z = 1;*/
-
 		for(int i = 0; i < neighbours_count[rank]; ++i){
 			extraction( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
 									cpuDomain[rank][neighbours_chunk_id[rank][i]],
@@ -162,7 +159,23 @@ inflow, pressure_in, &ref_density, argc, argv);
 									neighbours_local_end_ext_x[rank][i],
 									neighbours_local_end_ext_y[rank][i],
 									neighbours_local_end_ext_z[rank][i]); // should we just pass rank and move all these inside the function call ? would be slightly faster + and will have cleaner main
+		//			printf("i = %d, neighbours_count[%d] = %d\n\n offset is %d\nFluid domain is x y z = %d %d %d\ndir is %d\n x y z start = %d %d %d\n xyz end are %d %d %d\n\n",i,
+		//				rank,
+		//				neighbours_count[rank],
+		//				chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
+		//				cpuDomain[rank][neighbours_chunk_id[rank][i]][0],
+		//				cpuDomain[rank][neighbours_chunk_id[rank][i]][1],
+		//			  cpuDomain[rank][neighbours_chunk_id[rank][i]][2],
+		//				neighbours_dir[rank][i],
+		//				neighbours_local_start_ext_x[rank][i],
+		//				neighbours_local_start_ext_y[rank][i],
+		//				neighbours_local_start_ext_z[rank][i],
+		//				neighbours_local_end_ext_x[rank][i],
+		//				neighbours_local_end_ext_y[rank][i],
+		//				neighbours_local_end_ext_z[rank][i]
+		//			);
 		}
+		//sleep(1000);
 		//printf("after extr\n");
 		//swap( sendBuffer, readBuffer, sizeBuffer, DIR_R, neighbor);
 			swap( sendBuffer, readBuffer, rank);
@@ -170,7 +183,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 		for(int i = 0; i < neighbours_count[rank]; ++i){
 			injection( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
 									cpuDomain[rank][neighbours_chunk_id[rank][i]],
-									sendBuffer[i],
+									readBuffer[i],
 									neighbours_dir[rank][i],
 									neighbours_local_start_inj_x[rank][i],
 									neighbours_local_start_inj_y[rank][i],
@@ -179,7 +192,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 									neighbours_local_end_inj_y[rank][i],
 									neighbours_local_end_inj_z[rank][i]);
 		}
-		printf("after inj\n");
+		//printf("after inj\n");
 
 		/// old extr-swap-inj
 		//		// x+ (left to right)
@@ -241,8 +254,9 @@ inflow, pressure_in, &ref_density, argc, argv);
 				//printf("%d iproc\n", iProc);
 				//printf("%d jproc\n", jProc);
 				//printf("%d kproc\n\n", kProc);
-			if(!rank)
-				//printf("Write vtk for time # %d \n", t);
+			if(!rank){
+				printf("Write vtk for time # %d \n", t);
+			}
 			for(int i = 0; i < chunk_count[rank]; ++i){
 				//printf("rank %d i= %d, cpudDomain is %d %d %d \n\n",rank,i,cpuDomain[rank][i][0],cpuDomain[rank][i][1],cpuDomain[rank][i][2]);
 				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] ); // what are we doing with xlength and cpuDomain ???
@@ -257,7 +271,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 	free(inflow);
 	free(pressure_in);
 
-	for(int i = 0; i < chunk_count[rank]; ++i){
+	for(int i = 0; i < neighbours_count[rank]; ++i){
 		free(sendBuffer[i]);
 		free(readBuffer[i]);
 	}

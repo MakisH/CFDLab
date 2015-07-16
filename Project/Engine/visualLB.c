@@ -3,7 +3,7 @@
 #include "computeCellValues.h"
 #include "helper.h"
 #include <stdio.h>
-
+#include <unistd.h>
 void writeVtkOutput(const double * const collideField, const int * const flagField, char *filename, unsigned int t, const int * const xlength, const int part_id) {
 
 	// Opening the file.
@@ -22,7 +22,7 @@ void writeVtkOutput(const double * const collideField, const int * const flagFie
 
 	write_vtkHeader(fp, xlength); // Write the header.
 
-	write_vtkPointCoordinates(fp, part_id);
+	write_vtkPointCoordinates(fp, part_id, xlength);
 
 	// write the densities and velocities.
 	int x, y, z;
@@ -83,15 +83,15 @@ void write_vtkHeader( FILE *fp, const int * const xlength) {
 
 #define XSIZE 8.0
 
-void write_vtkPointCoordinates( FILE *fp, int part_id) {
+void write_vtkPointCoordinates( FILE *fp, int part_id, const int * const xlength) {
 	double x, y, z;
 
-	double dx, dy, dz;
+	double dx, dy;//, dz;
  	// 8 lattice points per xsize
 	double xsize_ratio = 4.75; // 1xsize corresponds to 9.5m
 	dx = xsize_ratio / (XSIZE-1); // 9.5m per 8 points (7 intervals)
 	dy = dx;
-	dz = dx;
+	//dz = dx;
 
 	double origin[3];
 	double end[3];
@@ -221,17 +221,21 @@ void write_vtkPointCoordinates( FILE *fp, int part_id) {
 	}
 
 	// The actual mapping.
-	double xStart = origin[0] * dx;
-	double yStart = origin[1] * dy;
-	double zStart = origin[2] * dz;
+	double xStart = origin[0];
+	double yStart = origin[1];
+//	double zStart = origin[2];
 
-	double xEnd = end[0] * dx;
-	double yEnd = end[1] * dy;
-	double zEnd = end[2] * dz;
+	double xEnd = end[0];
+	double yEnd = end[1];
+	//double zEnd = end[2];
 
-	// discretization error appears if we don't include an additional "epsilon" factor.
-	// We implemented eps in a way, that we are always on a safe side.
-	for (z = zStart; z < zEnd + dz * 0.5; z += dz){
+	dx = (xEnd - xStart) / (xlength[0] - 1);
+	dy = (yEnd - yStart) / (xlength[1] - 1);
+	/*printf("CPU# %d \ndxy = %f %f\n xyStart = %f %f\nxyEnd = %f %f\ncpuDom xy = %d %d\n",part_id, dx,dy,xStart,yStart,xEnd,yEnd,cpuDomain[0][part_id][0],cpuDomain[0][part_id][1]);
+	sleep(1000);*/
+	// disycretization error appears if we don't include an additional "epsilon" factor.
+	// We zimplemented eps in a way, that we are always on a safe side.
+	for (z = 0; z <= 0; z += 1){
 		for (y = yStart; y < yEnd + dy * 0.5; y += dy){
 			for (x = xStart; x < xEnd + dx * 0.5; x += dx){
 				fprintf(fp, "%f %f %f\n", x, y, z);

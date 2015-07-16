@@ -24,14 +24,22 @@ PRESSURE_IN_5   = 55;
 
 PARALLEL_BOUNDARY = 7;
 
-% Set these
-x = 8;
-max_flag = 55;
-tables = true;
-control_room = true;
-library = true;
-slides = true;
-HS1 = true;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Set these:
+x = 8;                          % size parameter
+max_flag = 55;                  % maximum number that appears in flags
+tables = true;                  % show tables
+control_room = true;            % show the control room
+library = true;                 % show the library
+slides = true;                  % show the slides
+HS1 = true;                     % show the Horsaal 1 cut
+
+NORTH_DOOR      = INFLOW_1;     % main entrance
+EAST_DOOR       = OUTFLOW;      % to LRZ
+CANTINE_DOOR    = INFLOW_2;     % next to the cantine
+SOUTH_DOOR      = OUTFLOW;      % next to the library, to LRZ
+WEST_DOOR       = INFLOW_3;     % back entrance
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Dimensions for the hall and the wings
 % l=length (x), w=width (y), h=height (z), d=distance
@@ -61,31 +69,31 @@ Hall(2:hall_l-1, 2:hall_w-1, :) = FLUID;
 x_pos = 1 + 2*x + 1; % East boundary + 2*x + start
 y_pos = 1;
 door_size = x;
-Hall(x_pos:x_pos+door_size-1, y_pos, :) = INFLOW_1;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = NORTH_DOOR;
 
 % East door (LRZ)
 x_pos = 1;
 y_pos = hall_w - 2*x; % hall width - 2*x
 door_size = x;
-Hall(x_pos, y_pos:y_pos+door_size-1, :) = OUTFLOW;
+Hall(x_pos, y_pos:y_pos+door_size-1, :) = EAST_DOOR;
 
 % Cantine door
 x_pos = 1 + wing_l + 2*(wing_l + wing_d) + wing_l + x;
 y_pos = hall_w;
 door_size = x;
-Hall(x_pos:x_pos+door_size-1, y_pos, :) = INFLOW_2;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = CANTINE_DOOR;
 
 % South door (side door, library)
 x_pos = hall_l-3*x;
 y_pos = hall_w;
 door_size = x;
-Hall(x_pos:x_pos+door_size-1, y_pos, :) = OUTFLOW;
+Hall(x_pos:x_pos+door_size-1, y_pos, :) = SOUTH_DOOR;
 
 % West door (back entrance)
 x_pos = hall_l;
 y_pos = 1 + x + 1;
 door_size = x;
-Hall(x_pos, y_pos:y_pos+door_size-1, :) = OUTFLOW;
+Hall(x_pos, y_pos:y_pos+door_size-1, :) = WEST_DOOR;
 
 % Add the tables (at least x=4 is required)
 if (tables)

@@ -7,18 +7,18 @@ void treatBoundary(double *collideField,
 									 int* flagField,
 									 const double * const wallVelocity,
 									 const double * const ref_density,
-                   const int * const cpuDomain,
-                   double_3d *velocityIn,
-                   double *density_in){
+									 const int * const cpuDomain,
+									 double_3d *velocityIn,
+									 double *density_in){
 
 	int i, inv_i, currentCell, neighborCell;
 	int neighborX, neighborY, neighborZ;
-	double f_inv_i, density, c_uwall, velocity;
+	double f_inv_i, density, c_uwall, velocity[3];
 	double feq[Q_NUMBER];
 
-  int SizeX = cpuDomain[0] + 2; // Size of the extended domain in each direction
-  int SizeY = cpuDomain[1] + 2;
-  int SizeZ = cpuDomain[2] + 2;
+	int SizeX = cpuDomain[0] + 2; // Size of the extended domain in each direction
+	int SizeY = cpuDomain[1] + 2;
+	int SizeZ = cpuDomain[2] + 2;
 	int SizeXY = SizeX * SizeY; // Size of the XY plane of the extended domain
 
 	// Arrays to implement a "foreach" structure for the free-slip condition
@@ -56,7 +56,7 @@ void treatBoundary(double *collideField,
 								neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
 
 								// Check if the neighbor cell is fluid
-								if ( flagField[neighborCell] == FLUID ) {
+								if ( FLUID == flagField[neighborCell] || PARALLEL_BOUNDARY == flagField[neighborCell]) {
 
 									// inv(i) - inverse direction of i
 									inv_i = Q_NUMBER - i - 1;
@@ -90,7 +90,7 @@ void treatBoundary(double *collideField,
 								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
 
 								// Check if the neighbor cell is fluid
-								if ( flagField[neighborCell] == FLUID ) {
+								if ( FLUID == flagField[neighborCell] || PARALLEL_BOUNDARY == flagField[neighborCell]) {
 
 									// inv(i) - inverse direction of i
 									inv_i = Q_NUMBER - i - 1;
@@ -134,7 +134,7 @@ void treatBoundary(double *collideField,
 								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
 
 								// Check if the neighbor cell is fluid
-								if ( flagField[neighborCell] == FLUID ) {
+								if ( FLUID == flagField[neighborCell] || PARALLEL_BOUNDARY == flagField[neighborCell]) {
 									// affected: array of affected directions in the current cell
 									// mirror: array of mirrored directions of affected directions
 									// The mirroring depends on the mirroring plane, that is perpendicular to i
@@ -187,7 +187,7 @@ void treatBoundary(double *collideField,
 											affected[4] = 18; mirror[4] = 4;
 											break;
 
-                    default : printf("Error in free slip condition neighbor direction!\n"); break;
+										default : printf("Error in free slip condition neighbor direction!\n"); break;
 									} // switch i
 
 									// foreach affected direction
@@ -204,17 +204,19 @@ void treatBoundary(double *collideField,
 						break;
 
 					//----- INFLOW ------------------------------------------------------------------------//
-					case INFLOW: case INFLOW_1: case INFLOW_2: case INFLOW_3: case INFLOW_4: case INFLOW_5: {
+					case INFLOW: case INFLOW_1: case INFLOW_2: case INFLOW_3: case INFLOW_4: case INFLOW_5:
+						{
+						// Pick the correct inflow velocity.
+						int currentCelll = flagField[currentCell] - INFLOW - 1; // We pick the flag of the current cell and map it to correct array indices.
 
-            // Pick the correct inflow velocity.
-            int currentCelll = flagField[currentCell] - INFLOW - 1; // We pick the flag of the current cell and map it to correct array indices.
-
-            double velocity_concrete[] = {velocityIn[currentCelll].x, velocityIn[currentCelll].y, velocityIn[currentCelll].z};
+						double velocity_concrete[] = {velocityIn[currentCelll].x,
+																					velocityIn[currentCelll].y,
+																					velocityIn[currentCelll].z};
 
 						// Compute the equilibrium distribution for the reference density and velocity
-						computeFeq(ref_density, &velocity_concrete[0], &collideField[Q_NUMBER * currentCell]);
+						computeFeq(ref_density, velocity_concrete, &collideField[Q_NUMBER * currentCell]);
+						}
 						break;
-          }
 					//----- OUTFLOW -----------------------------------------------------------------------//
 					case OUTFLOW :
 
@@ -228,14 +230,14 @@ void treatBoundary(double *collideField,
 							// Check if the the coordinates of the neighbor cell are valid
 							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
 
-                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
-                neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
+								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+								neighborCell = neighborX + neighborY * SizeX + neighborZ * SizeXY;
 
-                // Check if the neighbor cell is fluid
-								if ( flagField[neighborCell] == FLUID ) {
-                  computeDensity(collideField + neighborCell * Q_NUMBER, &density);
-                  computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
-                  computeFeq(ref_density, &velocity, feq);
+								// Check if the neighbor cell is fluid
+								if ( FLUID == flagField[neighborCell] || PARALLEL_BOUNDARY == flagField[neighborCell]) {
+									computeDensity(collideField + neighborCell * Q_NUMBER, &density);
+									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, velocity);
+									computeFeq(ref_density, velocity, feq);
 
 									inv_i = Q_NUMBER - i - 1;
 									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
@@ -246,9 +248,9 @@ void treatBoundary(double *collideField,
 					//----- PRESSURE_IN -------------------------------------------------------------------//
 					case PRESSURE_IN: case PRESSURE_IN_1: case PRESSURE_IN_2: case PRESSURE_IN_3: case PRESSURE_IN_4: case PRESSURE_IN_5: {
 
-            // Pick the correct density among 6 of them.
-            int currentCelll = flagField[currentCell] - PRESSURE_IN -1; // We pick the flag of the current cell and map it to correct array indices.
-            double density_concrete = density_in[currentCelll];
+						// Pick the correct density among 6 of them.
+						int currentCelll = flagField[currentCell] - PRESSURE_IN -1; // We pick the flag of the current cell and map it to correct array indices.
+						double density_concrete = density_in[currentCelll];
 
 						// For each direction in the current cell
 						for (int i = 0; i < Q_NUMBER; ++i) {
@@ -260,14 +262,14 @@ void treatBoundary(double *collideField,
 							// Check if the the coordinates of the neighbor cell are valid
 							if ( neighborX >= 0 && neighborX <= SizeX-1 && neighborY >= 0 && neighborY <= SizeY-1 && neighborZ >= 0 && neighborZ <= SizeZ-1 ) {
 
-                // Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
-                neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
+								// Index of the neighbor cell on the 3D grid (e.g. of flagField). Q not counted.
+								neighborCell = neighborX + neighborY*SizeX + neighborZ*SizeXY;
 
-                // Check if the neighbor cell is fluid
-								if ( flagField[neighborCell] == FLUID ) {
+								// Check if the neighbor cell is fluid
+								if ( FLUID == flagField[neighborCell] || PARALLEL_BOUNDARY == flagField[neighborCell]) {
 									computeDensity(collideField + neighborCell * Q_NUMBER, &density);
-									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, &velocity);
-									computeFeq(&density_concrete, &velocity, feq);
+									computeVelocity(collideField + neighborCell * Q_NUMBER, &density, velocity);
+									computeFeq(&density_concrete, velocity, feq);
 									inv_i = Q_NUMBER - i - 1;
 									collideField[Q_NUMBER * currentCell + i] = feq[inv_i] + feq[i] - collideField[Q_NUMBER * neighborCell + inv_i];
 								} // if neighbor is fluid
@@ -275,7 +277,7 @@ void treatBoundary(double *collideField,
 							} // if neighbor coordinates
 						} // for each direction
 						break;
-          }
+					}
 				} // switch flagField
 			} // for x
 		} // for y

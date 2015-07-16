@@ -49,7 +49,7 @@ int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain
 		for (int x = 0; x < xsize; x++){
 			int byte;
 			if(fscanf(file, "%d", &byte));
-			printf("%d ", byte);
+			//printf("%d ", byte);
 
 			flagField[x + y * xlen2 + z * xylen2] = byte;
 
@@ -59,7 +59,7 @@ int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain
 				return 1;
 			}
 		}
-	printf("\n");
+	//printf("\n");
 	}
 	fclose(file);
 

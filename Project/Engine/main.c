@@ -10,26 +10,6 @@
 //sleep()
 //#include <unistd.h>
 
-int test_collide(const double * const collideField, const int rank){
-
-		for(int i = 0; i < chunk_count[rank]; ++i){
-			for(int z = 0; z < cpuDomain[rank][i][2] + 2; ++z ){
-				for(int y = 0; y < cpuDomain[rank][i][1] + 2; ++y ){
-					for(int x = 0; x < cpuDomain[rank][i][0] + 2; ++x ){
-						for(int Q_num = 0; Q_num < Q_NUMBER; ++Q_num){
-							if(isnan( collideField[chunk_begin_offset[rank][i] + Q_NUMBER * (x + y * (cpuDomain[rank][i][0] + 2) + z * (cpuDomain[rank][i][0] + 2) * (cpuDomain[rank][i][1] + 2)) + Q_num] )){
-								for(int Q_num1 = 0; Q_num1 < Q_NUMBER; ++Q_num1){ printf("%d: %f, ",Q_num1,collideField[chunk_begin_offset[rank][i] + Q_NUMBER * (x + y * (cpuDomain[rank][i][0] + 2) + z * (cpuDomain[rank][i][0] + 2) * (cpuDomain[rank][i][1] + 2)) + Q_num]);} printf("\n");
-								printf("NAAAAN\n rank = %d, chunk = %d, xyz = %d %d %d, Q = %d, final offset = %d\n\n\n\n\n",rank, i, x, y, z, Q_num, chunk_begin_offset[rank][i] + Q_NUMBER * (x + y * (cpuDomain[rank][i][0] + 2) + z * (cpuDomain[rank][i][0] + 2) * (cpuDomain[rank][i][1] + 2)) + Q_num);
-								return 1;
-							}
-						}
-					}
-				}
-			}
-		}
-		return 0;
-}
-
 int main(int argc, char *argv[]){
 	printf("hi!\n");
 	int rank;
@@ -112,15 +92,8 @@ inflow, pressure_in, &ref_density, argc, argv);
 			sendBuffer[i] = (double *) malloc(neighbours_local_buffer_size[rank][i] * sizeof(double));
 			readBuffer[i] = (double *) malloc(neighbours_local_buffer_size[rank][i] * sizeof(double));
 		}
-	// int sizeBuffer[6]; // do we need this and how to initialize it
-	// initialiseBuffers(sendBuffer, readBuffer, cpuDomain, sizeBuffer);
-		//if(test_collide(collideField, rank) == 1){ printf("init problem\n");return 1;}
 	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
-		//if(test_collide(collideField, rank) == 1) {
-		//	printf("NAAAAN timestep %d begin \n\n\n\n ",t);
-		//	return 1;
-		//}
 
 		for(int i = 0; i < neighbours_count[rank]; ++i){
 			extraction( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
@@ -134,8 +107,6 @@ inflow, pressure_in, &ref_density, argc, argv);
 									neighbours_local_end_ext_y[rank][i],
 									neighbours_local_end_ext_z[rank][i]);
 		}
-				//if(test_collide(collideField, rank) == 1) {printf("NAAAAN timestep %d ext \n\n\n\n ",t);return 1;}
-
 			swap( sendBuffer, readBuffer, rank);
 		for(int i = 0; i < neighbours_count[rank]; ++i){
 			injection( collideField + Q_NUMBER * chunk_begin_offset[rank][neighbours_chunk_id[rank][i]],
@@ -149,33 +120,21 @@ inflow, pressure_in, &ref_density, argc, argv);
 									neighbours_local_end_inj_y[rank][i],
 									neighbours_local_end_inj_z[rank][i]);
 		}
-		//if(test_collide(collideField, rank) == 1) {printf("NAAAAN timestep %d after inj \n\n\n\n ",t);return 1;}
-
 		for(int i = 0; i < chunk_count[rank]; ++i){
 			treatBoundary( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], velocityWall, &ref_density, cpuDomain[rank][i], inflow, pressure_in);
 			doStreaming( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]);
 		}
-				//if(test_collide(streamField, rank) == 1) {printf("NAAAAN timestep %d after treat_boundary \n\n\n\n ",t);return 1;}
 		tmp = collideField;
 		collideField = streamField;
 		streamField = tmp;
 		for(int i = 0; i < chunk_count[rank]; ++i){
 			doCollision( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], &tau, cpuDomain[rank][i] );
 		}
-		//if(test_collide(collideField, rank) == 1) {
-		//	printf("NAAAAN timestep %d after collision \n\n\n\n ", t);
-		//	return 1;
-		//}
 		if ( t % timestepsPerPlotting == 0 ) {
-				//printf("%d cpu x\n", cpuDomain[0]);
-				//printf("%d cpu y\n", cpuDomain[1]);
-				//printf("%d cpu z\n", cpuDomain[2]);
-				//printf("%d rank\n", rank);
 			if(!rank){
 				printf("Write vtk for time # %d \n", t);
 			}
 			for(int i = 0; i < chunk_count[rank]; ++i){
-				//printf("rank %d i= %d, cpudDomain is %d %d %d \n\n",rank,i,cpuDomain[rank][i][0],cpuDomain[rank][i][1],cpuDomain[rank][i][2]);
 
 				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] );
 			}

@@ -7,6 +7,8 @@
 #include "initLB.h"
 #include "visualLB.h"
 #include "boundary.h"
+#include "random_wings.h"
+#include <time.h>
 //sleep()
 //#include <unistd.h>
 
@@ -58,11 +60,11 @@ inflow, pressure_in, &ref_density, argc, argv);
 
 	for(int i = 0; i < chunk_count[rank]; ++i){
 		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
-		
+
 		sprintf( pgm_read_file, "./pgm/cpu_%d.pgm",chunk_id[rank][i]);
 		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
-	
+
 	/// Output FlagField for CPU0
 		//if(rank == 5){
 		//	int x, y, z;
@@ -83,7 +85,7 @@ inflow, pressure_in, &ref_density, argc, argv);
 		//}
 		//		sleep(1000);
 	}
-	
+
 // send and read buffers for all possible directions :
 	// [0:left, 1:right, 2:top, 3:bottom, 4:front, 5:back]
 	double * *sendBuffer = (double * *) malloc(neighbours_count[rank] * sizeof(double *));
@@ -92,6 +94,40 @@ inflow, pressure_in, &ref_density, argc, argv);
 			sendBuffer[i] = (double *) malloc(neighbours_local_buffer_size[rank][i] * sizeof(double));
 			readBuffer[i] = (double *) malloc(neighbours_local_buffer_size[rank][i] * sizeof(double));
 		}
+
+		// INIT OF RANDOM DOOR CLOSENING / OPENING
+		srand(time(NULL)*rank); // Initialise the random seed for each cpu
+		int offset = 20; // For how long do we leave the doors closed?
+		//int frequency_factor = 10; // bigger the f, more frequent we open/close the door
+
+		int *random_timestep = NULL;
+		int *wall_trigger = NULL;
+
+
+		if (rank == 4 || rank == 6){
+			random_timestep = malloc(3 * sizeof(int));
+			wall_trigger = calloc(3, sizeof(int));
+
+			random_timestep[0] = abs(rand()) % (offset);
+			random_timestep[1] = abs(rand()) % (offset);
+			random_timestep[2] = abs(rand()) % (offset);
+
+			wall_trigger[0] = 1;
+			wall_trigger[1] = 1;
+			wall_trigger[2] = 1;
+
+		} else if (rank == 5 || rank == 7) {
+			wall_trigger = calloc(2, sizeof(int));
+			random_timestep = malloc(2 * sizeof(int));
+
+			random_timestep[0] = abs(rand()) % (offset);
+			random_timestep[1] = abs(rand()) % (offset);
+
+			wall_trigger[0] = 1;
+			wall_trigger[1] = 1;
+
+		}
+
 	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
 
@@ -139,6 +175,9 @@ inflow, pressure_in, &ref_density, argc, argv);
 				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] );
 			}
 		}
+		
+		// Open and close fingers randomly.
+		randomFingerOpenClose (t, rank, random_timestep, wall_trigger, flagField, offset);
 	}
 
 	free((void *)collideField);

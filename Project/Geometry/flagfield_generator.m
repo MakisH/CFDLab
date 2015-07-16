@@ -227,6 +227,15 @@ xlim([0 Nx + 1]) % x for the graph only
 ylim([0 Ny + 1]) % y for the graph only
 
 % Write pgm files
+
+% Write the visualized (disable the parallel boundaries first!)
+% full_domain = flipud(rot90(MI));
+% f_name = 'pgm/full_domain.pgm';
+% f_id = fopen(f_name, 'w');
+% fprintf(f_id, '%s\n', ['P3 ', num2str(size(full_domain,2)), ' ', num2str(size(full_domain,1)), ' ', num2str(max_flag)]);
+% fclose(f_id);
+% dlmwrite('pgm/full_domain.pgm', full_domain, '-append', 'delimiter', ' ')
+
 % Main Hall
 n_cpus = 4; % Number of partitions-cpus for the main hall
 hall_part_l = hall_l / n_cpus;

@@ -220,6 +220,132 @@ void write_vtkPointCoordinates( FILE *fp, int part_id, const int * const xlength
 		break;
 	}
 
+	/// glued geometry
+	//	switch (part_id) {
+	//	case 0:
+	//		origin[0] = 0;
+	//		origin[1] = 8*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 8*XSIZE;
+	//		end[1] = 12*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 1:
+	//		origin[0] = 8*XSIZE;
+	//		origin[1] = 8*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 16*XSIZE;
+	//		end[1] = 12*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 2:
+	//		origin[0] = 16*XSIZE;
+	//		origin[1] = 8*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 24*XSIZE;
+	//		end[1] = 12*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 3:
+	//		origin[0] = 24*XSIZE;
+	//		origin[1] = 8*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 32*XSIZE;
+	//		end[1] = 12*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 4:
+	//		origin[0] = 6*XSIZE;
+	//		origin[1] = 1;
+	//		origin[2] = 0;
+	//		end[0] = 8*XSIZE;
+	//		end[1] = 8*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 5:
+	//		origin[0] = 12*XSIZE;
+	//		origin[1] = 1;
+	//		origin[2] = 0;
+	//		end[0] = 14*XSIZE;
+	//		end[1] = 8*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 6:
+	//		origin[0] = 18*XSIZE;
+	//		origin[1] = 1;
+	//		origin[2] = 0;
+	//		end[0] = 20*XSIZE;
+	//		end[1] = 8*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 7:
+	//		origin[0] = 24*XSIZE;
+	//		origin[1] = 1;
+	//		origin[2] = 0;
+	//		end[0] = 26*XSIZE;
+	//		end[1] = 8*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 8:
+	//		origin[0] = 30*XSIZE;
+	//		origin[1] = 1;
+	//		origin[2] = 0;
+	//		end[0] = 32*XSIZE;
+	//		end[1] = 8*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 9:
+	//		origin[0] = 2*XSIZE;
+	//		origin[1] = 12*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 4*XSIZE;
+	//		end[1] = 20*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 10:
+	//		origin[0] = 8*XSIZE;
+	//		origin[1] = 12*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 10*XSIZE;
+	//		end[1] = 20*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 11:
+	//		origin[0] = 14*XSIZE;
+	//		origin[1] = 12*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 16*XSIZE;
+	//		end[1] = 20*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 12:
+	//		origin[0] = 20*XSIZE;
+	//		origin[1] = 12*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 22*XSIZE;
+	//		end[1] = 20*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	case 13:
+	//		origin[0] = 26*XSIZE;
+	//		origin[1] = 12*XSIZE;
+	//		origin[2] = 0;
+	//		end[0] = 28*XSIZE;
+	//		end[1] = 20*XSIZE;
+	//		end[2] = 0;
+	//		break;
+	//	default:
+	//		origin[0] = 0;
+	//		origin[1] = 0;
+	//		origin[2] = 0;
+	//		end[0] = 0;
+	//		end[1] = 0;
+	//		end[2] = 0;
+	//		printf("Default Switch - you should not be here!!!\n\n\n");
+	//	break;
+	//}
+
+
 	// The actual mapping.
 	double xStart = origin[0];
 	double yStart = origin[1];
@@ -231,10 +357,8 @@ void write_vtkPointCoordinates( FILE *fp, int part_id, const int * const xlength
 
 	dx = (xEnd - xStart) / (xlength[0] - 1);
 	dy = (yEnd - yStart) / (xlength[1] - 1);
-	/*printf("CPU# %d \ndxy = %f %f\n xyStart = %f %f\nxyEnd = %f %f\ncpuDom xy = %d %d\n",part_id, dx,dy,xStart,yStart,xEnd,yEnd,cpuDomain[0][part_id][0],cpuDomain[0][part_id][1]);
-	sleep(1000);*/
-	// disycretization error appears if we don't include an additional "epsilon" factor.
-	// We zimplemented eps in a way, that we are always on a safe side.
+
+	// discretization error appears if we don't include additional "epsilon" factor.
 	for (z = 0; z <= 0; z += 1){
 		for (y = yStart; y < yEnd + dy * 0.5; y += dy){
 			for (x = xStart; x < xEnd + dx * 0.5; x += dx){

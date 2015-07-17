@@ -93,6 +93,7 @@ int main(int argc, char *argv[]){
 		readBuffer[i] = (double *) malloc(neighbours_local_buffer_size[rank][i] * sizeof(double));
 	}
 
+	#if defined(INCLUDE_RANDOM_DOORS)
 	// INIT OF RANDOM DOOR CLOSENING / OPENING
 	srand(time(NULL)*rank); // Initialise the random seed for each cpu
 	int offset = 20; // For how long do we leave the doors closed?
@@ -125,6 +126,7 @@ int main(int argc, char *argv[]){
 		wall_trigger[1] = 1;
 
 	}
+	#endif
 
 	double *tmp = NULL;
 	for(int t = 0; t <= timesteps; t++){
@@ -174,8 +176,10 @@ int main(int argc, char *argv[]){
 			}
 		}
 
+		#if defined(INCLUDE_RANDOM_DOORS)
 		// Open and close fingers randomly.
 		randomFingerOpenClose (t, rank, random_timestep, wall_trigger, flagField, offset);
+		#endif
 	}
 
 	free((void *)collideField);

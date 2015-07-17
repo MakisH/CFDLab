@@ -3,6 +3,9 @@
 #include <math.h>
 #include "stdlib.h"
 
+// Uncomment to include randomly opening-closing doors in the wings
+// #define INCLUDE_RANDOM_DOORS
+
 #define Q_NUMBER 19
 
 #define FLUID 0

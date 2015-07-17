@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="1052.3622"
+   height="744.09448"
+   id="svg4061"
+   version="1.1"
+   inkscape:version="0.48.4 r9939"
+   inkscape:export-filename="/home/makish/Desktop/load_balance.png"
+   inkscape:export-xdpi="96.152672"
+   inkscape:export-ydpi="96.152672"
+   sodipodi:docname="New document 21">
+  <defs
+     id="defs4063" />
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="0.49497475"
+     inkscape:cx="561.2311"
+     inkscape:cy="432.18677"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="931"
+     inkscape:window-height="1028"
+     inkscape:window-x="988"
+     inkscape:window-y="24"
+     inkscape:window-maximized="0" />
+  <metadata
+     id="metadata4066">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-308.2677)">
+    <g
+       id="g4198">
+      <rect
+         y="340.93359"
+         x="8.5714293"
+         height="636.48798"
+         width="1028.677"
+         id="rect4196"
+         style="fill:#ffffff;fill-opacity:1;stroke:none" />
+      <g
+         transform="translate(-63.494626,-760.9455)"
+         id="g3928">
+        <g
+           transform="translate(820.92598,609.54116)"
+           id="g4233-7-9">
+          <g
+             id="g3852">
+            <g
+               id="g4233-7"
+               transform="translate(-779.29442,0)">
+              <rect
+                 y="597.40375"
+                 x="53.252136"
+                 height="64.82869"
+                 width="203.7473"
+                 id="rect3936-6-2"
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none" />
+              <flowRoot
+                 transform="translate(-133.95819,490.0746)"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 id="flowRoot4016-6-7"
+                 xml:space="preserve"><flowRegion
+                   id="flowRegion4018-1-8"><rect
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                     y="115.48775"
+                     x="213.00854"
+                     height="55.567448"
+                     width="187.54013"
+                     id="rect4020-1-8" /></flowRegion><flowPara
+                   id="flowPara4022-4-0">rank = 0</flowPara></flowRoot>            </g>
+            <g
+               id="g4233-7-2"
+               transform="translate(-519.52961,0)">
+              <rect
+                 y="597.40375"
+                 x="53.252136"
+                 height="64.82869"
+                 width="203.7473"
+                 id="rect3936-6-2-5"
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none" />
+              <flowRoot
+                 transform="translate(-133.95819,490.0746)"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 id="flowRoot4016-6-7-3"
+                 xml:space="preserve"><flowRegion
+                   id="flowRegion4018-1-8-9"><rect
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                     y="115.48775"
+                     x="213.00854"
+                     height="55.567448"
+                     width="187.54013"
+                     id="rect4020-1-8-9" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-9">rank = 1</flowPara></flowRoot>            </g>
+            <g
+               id="g4233-7-24"
+               transform="translate(-259.76485,0)">
+              <rect
+                 y="597.40375"
+                 x="53.252136"
+                 height="64.82869"
+                 width="203.7473"
+                 id="rect3936-6-2-0"
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none" />
+              <flowRoot
+                 transform="translate(-133.95819,490.0746)"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 id="flowRoot4016-6-7-37"
+                 xml:space="preserve"><flowRegion
+                   id="flowRegion4018-1-8-4"><rect
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                     y="115.48775"
+                     x="213.00854"
+                     height="55.567448"
+                     width="187.54013"
+                     id="rect4020-1-8-6" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-4">rank = 2</flowPara></flowRoot>            </g>
+            <rect
+               y="597.40375"
+               x="53.252136"
+               height="64.82869"
+               width="203.7473"
+               id="rect3936-6-2-9"
+               style="fill:#000000;fill-opacity:0.78082192;stroke:none" />
+            <flowRoot
+               transform="translate(-133.95819,490.0746)"
+               style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+               id="flowRoot4016-6-7-30"
+               xml:space="preserve"><flowRegion
+                 id="flowRegion4018-1-8-2"><rect
+                   style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                   y="115.48775"
+                   x="213.00854"
+                   height="55.567448"
+                   width="187.54013"
+                   id="rect4020-1-8-3" /></flowRegion><flowPara
+                 id="flowPara4022-4-0-0">rank = 3</flowPara></flowRoot>          </g>
+        </g>
+        <g
+           id="g3807">
+          <g
+             transform="translate(-3.6750797,0)"
+             id="g3735">
+            <g
+               transform="translate(45.306641,971.06882)"
+               id="g4233-7-3">
+              <rect
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none"
+                 id="rect3936-6-2-92"
+                 width="203.7473"
+                 height="64.82869"
+                 x="53.252136"
+                 y="597.40375" />
+              <flowRoot
+                 xml:space="preserve"
+                 id="flowRoot4016-6-7-5"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 transform="translate(-133.95819,490.0746)"><flowRegion
+                   id="flowRegion4018-1-8-8"><rect
+                     id="rect4020-1-8-65"
+                     width="187.54013"
+                     height="55.567448"
+                     x="213.00854"
+                     y="115.48775"
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-6">rank = 4</flowPara></flowRoot>            </g>
+            <g
+               transform="translate(305.07145,971.06882)"
+               id="g4233-7-2-4">
+              <rect
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none"
+                 id="rect3936-6-2-5-5"
+                 width="203.7473"
+                 height="64.82869"
+                 x="53.252136"
+                 y="597.40375" />
+              <flowRoot
+                 xml:space="preserve"
+                 id="flowRoot4016-6-7-3-1"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 transform="translate(-133.95819,490.0746)"><flowRegion
+                   id="flowRegion4018-1-8-9-0"><rect
+                     id="rect4020-1-8-9-8"
+                     width="187.54013"
+                     height="55.567448"
+                     x="213.00854"
+                     y="115.48775"
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-9-0">rank = 5</flowPara></flowRoot>            </g>
+            <g
+               transform="translate(564.83621,971.06882)"
+               id="g4233-7-24-9">
+              <rect
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none"
+                 id="rect3936-6-2-0-0"
+                 width="203.7473"
+                 height="64.82869"
+                 x="53.252136"
+                 y="597.40375" />
+              <flowRoot
+                 xml:space="preserve"
+                 id="flowRoot4016-6-7-37-4"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 transform="translate(-133.95819,490.0746)"><flowRegion
+                   id="flowRegion4018-1-8-4-5"><rect
+                     id="rect4020-1-8-6-0"
+                     width="187.54013"
+                     height="55.567448"
+                     x="213.00854"
+                     y="115.48775"
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-4-7">rank = 6</flowPara></flowRoot>            </g>
+            <g
+               transform="translate(824.60106,971.06882)"
+               id="g4233-7-9-3">
+              <rect
+                 style="fill:#000000;fill-opacity:0.78082192;stroke:none"
+                 id="rect3936-6-2-9-6"
+                 width="203.7473"
+                 height="64.82869"
+                 x="53.252136"
+                 y="597.40375" />
+              <flowRoot
+                 xml:space="preserve"
+                 id="flowRoot4016-6-7-30-3"
+                 style="font-size:40px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Open Sans;-inkscape-font-specification:Open Sans"
+                 transform="translate(-133.95819,490.0746)"><flowRegion
+                   id="flowRegion4018-1-8-2-9"><rect
+                     id="rect4020-1-8-3-5"
+                     width="187.54013"
+                     height="55.567448"
+                     x="213.00854"
+                     y="115.48775"
+                     style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;fill:#ffffff;font-family:Open Sans;-inkscape-font-specification:Open Sans" /></flowRegion><flowPara
+                   id="flowPara4022-4-0-0-2">rank = 7</flowPara></flowRoot>            </g>
+          </g>
+        </g>
+        <g
+           id="g3797"
+           transform="translate(0,3.2702942)">
+          <rect
+             y="1401.2893"
+             x="616.9115"
+             height="150"
+             width="200"
+             id="rect3439"
+             style="fill:#ffa800;fill-opacity:1;stroke:none" />
+          <rect
+             y="1401.2893"
+             x="94.883698"
+             height="150"
+             width="200"
+             id="rect3439-5"
+             style="fill:#00ff18;fill-opacity:1;stroke:none" />
+          <rect
+             y="1401.2893"
+             x="877.92542"
+             height="100"
+             width="200"
+             id="rect3461"
+             style="fill:#ff0000;fill-opacity:1;stroke:none" />
+          <rect
+             y="1401.2893"
+             x="355.89761"
+             height="100"
+             width="200"
+             id="rect3461-1"
+             style="fill:#007f00;fill-opacity:1;stroke:none" />
+          <rect
+             y="1282.4163"
+             x="94.883698"
+             height="100"
+             width="200"
+             id="rect3481"
+             style="fill:#8a00ff;fill-opacity:1;stroke:none" />
+          <rect
+             y="1282.4163"
+             x="355.89761"
+             height="100"
+             width="200"
+             id="rect3481-7"
+             style="fill:#3000ff;fill-opacity:1;stroke:none" />
+          <rect
+             y="1282.4163"
+             x="616.9115"
+             height="100"
+             width="200"
+             id="rect3481-9"
+             style="fill:#0096ff;fill-opacity:1;stroke:none" />
+          <rect
+             y="1282.4163"
+             x="877.92542"
+             height="100"
+             width="200"
+             id="rect3481-3"
+             style="fill:#00e4ff;fill-opacity:1;stroke:none" />
+        </g>
+      </g>
+    </g>
+  </g>
+</svg>

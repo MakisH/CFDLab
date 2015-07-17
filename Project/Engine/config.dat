@@ -2,41 +2,36 @@
 #  Configuration file for the problem:
 #  MI Building
 #---------------------------------------------------
-#---------------------------------------------------
-#  "problem" argument
-#---------------------------------------------------
-#problem			          lbm_mi_building
 
 #---------------------------------------------------
 #  relaxation time
 #---------------------------------------------------
-tau                         1.0
+tau                         0.6
 
 #---------------------------------------------------
 #  time steps
 #---------------------------------------------------
-timesteps                   1300
-timestepsPerPlotting        2
+timesteps                   1000
+timestepsPerPlotting        1
 
 #---------------------------------------------------
 #  boundary conditions
-#  (use 0 to ignore velocity boundary conditions)
-#  (use -1 to ignore density boundary conditions)
+#  (the respective flags must exist in the pgm files)
 #---------------------------------------------------
 
 # INFLOW
 inflow_0_v_x                0.00
-inflow_0_v_y                0.00
+inflow_0_v_y                0.1
 inflow_0_v_z                0.00
 
 # INFLOW_1
 inflow_1_v_x                0.00
-inflow_1_v_y                0.00
+inflow_1_v_y                -0.1
 inflow_1_v_z                0.00
 
 # INFLOW_2
-inflow_2_v_x                0.00
-inflow_2_v_y                0.01
+inflow_2_v_x                -0.1
+inflow_2_v_y                0.00
 inflow_2_v_z                0.00
 
 # INFLOW_3
@@ -56,7 +51,7 @@ inflow_5_v_z                0.00
 
 
 # PRESSURE_IN
-pressure_in_0_d               -1
+pressure_in_0_d             -1
 # PRESSURE_IN_1
 pressure_in_1_d             -1
 # PRESSURE_IN_1

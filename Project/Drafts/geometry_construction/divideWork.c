@@ -1,117 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "../helper.h"
-#include "../LBDefinitions.h"
 
-
-int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain);
-int main(void){
-
-	int cpuDomain[] = {63, 30, 1};
-	int *flagField = malloc(cpuDomain[0]+2 * cpuDomain[1]+2 * cpuDomain[2]+2 * sizeof(int));
-	double *streamField = malloc(cpuDomain[0]+2 * cpuDomain[1]+2 * cpuDomain[2]+2 * sizeof(int));
-	double *collideField = malloc(cpuDomain[0]+2 * cpuDomain[1]+2 * cpuDomain[2]+2 * sizeof(int));
-
-
-	read_assign_PGM(flagField, "../../Geometry/pgm/cpu_0.pgm", &cpuDomain[0]);
-	int xlen2 = cpuDomain[0]+2;
-	int ylen2 = cpuDomain[1]+2;
-	int zlen2 = cpuDomain[2]+2;
-	int xylen2 = xlen2 * ylen2;
-
-
-	int z = 1;
-
-	for (int y = 0; y < ylen2; y++){
-		for (int x = 0; x < xlen2; x++){
-			printf ("%d", flagField[x + xlen2 * y + xylen2 * z]);
-		}
-	printf("\n");
-	}
-
-
-	free(flagField);
-	free(streamField);
-	free(collideField);
-}
-
-
-int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain)
-{
-	/*
-		One CPU, one flagField, streamField, collideField. Martin gives pointers to proper sections of this arrays
-		We initilize flagField with values of PGM file.
-		We (just in case, if we'll need that somewhere) also copy the dimensions of PGM from PGM file.
-	*/
-
-	/* READ THE PGM FILE, STORE IN FLAGFIELD */
-
-	FILE *file = NULL;
-	char line[1024];
-	int xsize, ysize;
-
-	int xlen2 = cpuDomain[0]+2;
-	int ylen2 = cpuDomain[1]+2;
-	int xylen2 = xlen2 * ylen2;
-
-	if ((file=fopen(fileName,"rb"))==0){
-		char szBuff[80];
-				sprintf( szBuff, "Can not read file %s !!!", fileName );
-				//ERROR( szBuff );
-				return 1;
-	}
-
-	/* check for the right "magic number" */
-	if ( fread(line,1,3,file)!=3 )
-	{
-					fclose(file);
-					//ERROR("Error Wrong Magic field!");
-					return 1;
-	}
-
-	do
-	if(fgets(line,sizeof line,file));
-	while(*line=='#');
-
-	/* read the width and height */
-	sscanf(line,"%d %d\n",&xsize,&ysize);
-
-	/* Rows are x dimension, columns are y dimension */
-	int z = 1; // The middle layer is PGM, the 0-th and 2-nd layer are free slip!
-	for (int y = 0; y < ysize; y++){
-		for (int x = 0; x < xsize; x++){
-			int byte;
-			if(fscanf(file, "%d", &byte));
-			printf("%d ", byte);
-
-			flagField[x + y * xlen2 + z * xylen2] = byte;
-
-			if (byte==EOF){
-				fclose(file);
-				//ERROR("read failed");
-				return 1;
-			}
-		}
-	printf("\n");
-	}
-	fclose(file);
-
-	return 1;
-}
-
-
-
-
-
-
-
-
-
-
-
-
-/*void readPGM_cpu(int *flagField, int *cpuDomain, int *flagField_cpu, int *xlength, int *scale){
+void readPGM_cpu(int *flagField, int *cpuDomain, int *flagField_cpu, int *xlength, int *scale){
 
 	// INPUT: flagField ... The Big flagField
 	// OUTPUT: flagField_cpu ... flagField belonging to current cpu.
@@ -145,7 +36,7 @@ int read_assign_PGM (int *flagField, char *fileName, const int * const cpuDomain
 		z_cpu++;
 		y_cpu = 0;
 	}
-}*/
+}
 /* USELESS FOR NOW.
 void cpuBoundary_connect(int *flagField_cpu, int cpu_connection, int *cpuDomain, int spaceFinger, int *xlength, char *buildingSide){
 	// Input:

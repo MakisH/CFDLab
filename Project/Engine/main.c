@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
 	for(int i = 0; i < chunk_count[rank]; ++i){
 		initialiseFields( collideField + Q_NUMBER * chunk_begin_offset[rank][i], streamField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], cpuDomain[rank][i]); // collide and stream
 
-		sprintf( pgm_read_file, "./pgm/cpu_%d.pgm",chunk_id[rank][i]);
+		sprintf( pgm_read_file, "./input_pgm/cpu_%d.pgm",chunk_id[rank][i]);
 		printf("%s rank = %d \n\n\n\n",pgm_read_file, rank);
 		read_assign_PGM(flagField + chunk_begin_offset[rank][i],pgm_read_file,cpuDomain[rank][i]);
 
@@ -172,7 +172,7 @@ int main(int argc, char *argv[]){
 			}
 			for(int i = 0; i < chunk_count[rank]; ++i){
 
-				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "pics/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] );
+				writeVtkOutput( collideField + Q_NUMBER * chunk_begin_offset[rank][i], flagField + chunk_begin_offset[rank][i], "output_vtk/simLB", t, cpuDomain[rank][i], chunk_id[rank][i] );
 			}
 		}
 

@@ -17,6 +17,8 @@
 {\begin{figure}}
 {\end{figure}}
 
+\usepackage{hyperref}
+
 %\usepackage[style=mla,babel=hyphen,backend=biber]{biblatex}
 
 % CSE-Beamer-Styles:
@@ -32,7 +34,7 @@
 \title{Simulation of the air flow in the MI building with LBM}
 \subtitle{CFD Lab Project: midterm presentation}
 \author[Group 2]{Group 2: Martin Andreev, Gerasimos Chourdakis, Igor Tominec \\ Advisor: Kaveh Rahnema} %[displayed in footer]{displayed on title page}
-\date{\today}
+\date{July 17th, 2015}
 \institute{Technische Universität München}
 
 \begin{document}
@@ -52,7 +54,7 @@
   \item Parallel approach for arbitrary geometries.
   \item Do not waste effort for large ``inactive'' areas.
 %   \item Use the Lattice Boltzmann Method (BGK LBM).
-  \item Case study: Mathematics-Informatics bulding-like geometry. 
+  \item Case study: Mathematics-Informatics building-like geometry. 
  \end{itemize}
 \end{frame}
 
@@ -66,43 +68,12 @@
 \end{frame}
 
 \begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_verylow}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_mario_f1}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_mario_f2}
-\addtocounter{framenumber}{-1}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_mario_f3}
-\addtocounter{framenumber}{-1}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_mario_f4}
-\addtocounter{framenumber}{-1}
-\end{figure}
-\end{frame}
-
-\begin{frame}{Approximation}
-\begin{figure}
-\includegraphics[width=0.8\linewidth]{MI_slides_mario_f5}
-\addtocounter{framenumber}{-1}
-\end{figure}
+\only<1>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_verylow}\end{figure}}
+\only<2>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_mario_f1}\end{figure}}
+\only<3>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_mario_f2}\end{figure}}
+\only<4>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_mario_f3}\end{figure}}
+\only<5>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_mario_f4}\end{figure}}
+\only<6>{\begin{figure}\includegraphics[width=0.8\linewidth]{MI_slides_mario_f5}\end{figure}}
 \end{frame}
 
 \begin{frame}{The model}
@@ -228,7 +199,7 @@ Various boundary conditions and obstacles can be defined.
   It is hot today! We understand you and thanks for the attention!
   \vspace{1cm}
   
-  Find our work on GitHub: https://github.com/MakisH/CFDLab \\
+  Find our work on GitHub: \href{https://github.com/MakisH/CFDLab}{\url{github.com/MakisH/CFDLab}} \\
   (expect some rough edges)
   
  \end{frame}

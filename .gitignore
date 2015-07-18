@@ -42,7 +42,8 @@
 *.log
 *.toc
 *.nav
-*.synchtex.gz
+*.synctex.gz
+*.snm
 
 
 Worksheet\ 04/materials.zip

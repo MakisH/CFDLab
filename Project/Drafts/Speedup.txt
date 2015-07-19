@@ -1,0 +1,43 @@
+CPU :Intel(R) Core(TM) i3-4030U CPU @ 1.90GHz
+Writing VTK files to disk included in both cases.
+---------------------------------------------------
+
+-> WS 3, plane shear flow (SEQUENTIAL):
+
+domain : 180 * 100 * 3  = 54000 cells
+timesteps : 2000
+tau : 1.0
+plotPerTimesteps: 2
+
+RUNTIME:
+----------------
+real	6m8.332s
+user	5m58.773s
+sys	0m3.605s
+---
+
+-> Project (PARALLEL):
+
+domain : 4 * 32*64 + 10 * 60 * 16 = 53376 cells
+timesteps : 2000
+tau : 1.0
+plotPerTimesteps: 2
+
+RUNTIME:
+---------------
+real	1m8.492s
+user	3m4.336s
+sys	0m55.379s
+----------------------------
+Calculated lower bound of speedup:
+SPEED UP >= real(par) / real(seq) = 5.37
+----------------------------
+
+Why am I doing that?
+
+(1) Let's consider the WS3, plane shear flow scenario. The scenario has no obstacles, meaning, the CPU will have to do collision & streaming for each single cell in this domain.
+(2) Let's consider the Project. The scenario has quite some obstacles. CPUs will not do the collision & streaming for all cells in this domain.
+
+The number of all cells is the same in both cases. Although the scenarios are not the same, the Machine will have to traverse ->almost<- the same amount of cells within 
+the exactly same procedures (streaming & collision). In addition, according to (1), the sequential version will actually do more work. That yields that comparing both runtimes 
+is legit, but only if we want to observe a lower bound of speedup for the faster version.
